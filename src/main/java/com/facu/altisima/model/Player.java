@@ -2,6 +2,8 @@ package com.facu.altisima.model;
 
 import org.springframework.data.annotation.Id;
 
+import java.util.Objects;
+
 public class Player {
     @Id
     private String id;
@@ -12,6 +14,19 @@ public class Player {
 
     public Player() {
 
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Player player = (Player) o;
+        return Objects.equals(id, player.id) && Objects.equals(username, player.username) && Objects.equals(image, player.image) && Objects.equals(gamesWon, player.gamesWon) && Objects.equals(gamesPlayed, player.gamesPlayed) && Objects.equals(totalScore, player.totalScore);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, username, image, gamesWon, gamesPlayed, totalScore);
     }
 
     public Player(String id, String username, String image, Integer gamesWon, Integer gamesPlayed, Integer totalScore) {

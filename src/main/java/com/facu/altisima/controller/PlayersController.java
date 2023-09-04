@@ -19,23 +19,23 @@ public class PlayersController {
     @Autowired
     private PlayerServiceAPI playerServiceAPI;
 
-    @GetMapping(value = "/all")
+    @GetMapping(value = "/")
     public List<Player> getAll() {
         return playerServiceAPI.getAll();
     }
 
-    @GetMapping(value = "/find/{id}")
+    @GetMapping(value = "/{id}")
     public Player find(@PathVariable String id) {
         return playerServiceAPI.get(id);
     }
 
-    @PostMapping(value = "/save")
+    @PostMapping(value = "/")
     public ResponseEntity<Player> save(@RequestBody Player player) {
         Player obj = playerServiceAPI.save(player);
-        return new ResponseEntity<Player>(obj, HttpStatus.OK);
+        return new ResponseEntity<>(obj, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/delete/{id}")
+    @DeleteMapping(value = "/{id}")
     public ResponseEntity<Player> delete(@PathVariable String id) {
         Player player = playerServiceAPI.get(id);
         if (player != null) {
