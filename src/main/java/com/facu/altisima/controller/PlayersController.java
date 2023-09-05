@@ -7,9 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 
-import com.facu.altisima.model.Player;
-import com.facu.altisima.service.api.PlayerServiceAPI;
-
 import java.util.List;
 
 @RestController
@@ -20,7 +17,7 @@ public class PlayersController {
     private PlayerServiceAPI playerServiceAPI;
 
     @GetMapping(value = "/")
-    public List<Player> getAll() {
+    public List<Player> getAllPlayers() {
         return playerServiceAPI.getAll();
     }
 
@@ -30,13 +27,13 @@ public class PlayersController {
     }
 
     @PostMapping(value = "/")
-    public ResponseEntity<Player> save(@RequestBody Player player) {
+    public ResponseEntity<Player> savePlayers(@RequestBody Player player) {
         Player obj = playerServiceAPI.save(player);
         return new ResponseEntity<>(obj, HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}")
-    public String delete(@PathVariable String id) {
+    public String deletePlayers(@PathVariable String id) {
         Player player = playerServiceAPI.get(id);
         if (player != null) {
             playerServiceAPI.delete(id);
@@ -48,7 +45,7 @@ public class PlayersController {
     }
 
     @PutMapping(value = "/{id}")
-    public ResponseEntity<Player> delete(@PathVariable String id, @RequestBody Player playerChanges) {
+    public ResponseEntity<Player> putPlayer(@PathVariable String id, @RequestBody Player playerChanges) {
         Player player = playerServiceAPI.put(id, playerChanges);
         return new ResponseEntity<Player>(player, HttpStatus.OK);
     }

@@ -1,4 +1,4 @@
-package com.facu.altisima;
+package com.facu.altisima.controller;
 
 import com.facu.altisima.model.Player;
 import com.facu.altisima.service.impl.PlayerServiceImpl;
@@ -46,7 +46,6 @@ public class PlayerControllerTest {
 
     @Test
     public void successfulSavePlayer() throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
 
         Player player = new Player("1", "Facu", "www.image.com/facu", 0, 0, 0);
 
@@ -77,7 +76,7 @@ public class PlayerControllerTest {
     }
 
     @Test
-    public void successfulDelete() throws Exception {
+    public void successfulPlayerDelete() throws Exception {
         doNothing().when(playerService).delete("1");
 
         mockMvc.perform(delete("/players/api/1")
@@ -87,9 +86,9 @@ public class PlayerControllerTest {
     }
 
     @Test
-    public void successfulEdit() throws Exception{
+    public void successfulPlayerEdit() throws Exception{
 
-        Player playerChanges = new Player("1", "Messi", "www.image.com/messi", 0, 0, 0);
+        Player playerChanges = new Player("1", "messi", "www.image.com/messi", 0, 0, 0);
 
         when(playerService.put("1", playerChanges)).thenReturn(playerChanges);
 

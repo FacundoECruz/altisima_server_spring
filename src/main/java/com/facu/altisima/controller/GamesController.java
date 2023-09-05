@@ -1,4 +1,4 @@
-package com.facu.altisima;
+package com.facu.altisima.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;

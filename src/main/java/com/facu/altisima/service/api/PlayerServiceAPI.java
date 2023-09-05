@@ -6,15 +6,15 @@ import org.springframework.data.repository.CrudRepository;
 import java.util.List;
 
 public interface PlayerServiceAPI {
-    CrudRepository<Player, String> getDao();
+        CrudRepository<Player, String> getDao();
 
-    Player save (Player entity);
+        Player save (Player entity);
 
-    void delete(String id);
+        void delete(String id);
 
-    Player get(String id);
+        Player get(String id);
 
-    List<Player> getAll();
+        List<Player> getAll();
 
-    Player put(String id, Player playerChanges);
+        Player put(String id, Player playerChanges);
 }
