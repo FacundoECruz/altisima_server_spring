@@ -15,4 +15,6 @@ public interface PlayerServiceAPI {
     Player get(String id);
 
     List<Player> getAll();
+
+    Player put(String id, Player playerChanges);
 }

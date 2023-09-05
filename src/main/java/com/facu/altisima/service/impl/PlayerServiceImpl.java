@@ -3,6 +3,7 @@ package com.facu.altisima.service.impl;
 import com.facu.altisima.dao.api.PlayerRepository;
 import com.facu.altisima.model.Player;
 import com.facu.altisima.service.api.PlayerServiceAPI;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
@@ -45,5 +46,14 @@ public class PlayerServiceImpl implements PlayerServiceAPI {
         List<Player> returnList = new ArrayList<>();
         getDao().findAll().forEach(obj -> returnList.add(obj));
         return returnList;
+    }
+
+    public Player put(String id, Player playerChanges) {
+       Optional <Player> object = getDao().findById(id);
+       Player obj = object.get();
+        obj.setUsername(playerChanges.getUsername());
+        obj.setImage(playerChanges.getImage());
+
+        return getDao().save(obj);
     }
 }

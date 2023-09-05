@@ -29,8 +29,10 @@ public class PlayerControllerTest {
     @MockBean
     PlayerServiceImpl playerService;
 
+    ObjectMapper objectMapper = new ObjectMapper();
+
     @Test
-    public void testPlayersEndpoint() throws Exception {
+    public void returnAllPlayers() throws Exception {
         List<Player> players = new ArrayList<>();
 
         when(playerService.getAll()).thenReturn(players);
@@ -43,40 +45,59 @@ public class PlayerControllerTest {
     }
 
     @Test
-    public void testSavePlayerEndpoint() throws Exception {
+    public void successfulSavePlayer() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
 
         Player player = new Player("1", "Facu", "www.image.com/facu", 0, 0, 0);
 
         when(playerService.save(player)).thenReturn(player);
 
+        String playerJson = objectMapper.writeValueAsString(player);
+
         mockMvc.perform(post("/players/api/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(player)))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
-
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().string(playerJson));
     }
 
     @Test
-    public void testFindByIdEndpoint() throws Exception {
+    public void findPlayerById() throws Exception {
 
         Player player = new Player("1", "Facu", "www.image.com/facu", 0, 0, 0);
         when(playerService.get("1")).thenReturn(player);
 
+        String playerJson = objectMapper.writeValueAsString(player);
         mockMvc.perform(get("/players/api/1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().string(playerJson));
     }
 
     @Test
-    public void testDeleteEndpoint() throws Exception {
+    public void successfulDelete() throws Exception {
         doNothing().when(playerService).delete("1");
 
         mockMvc.perform(delete("/players/api/1")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk());
 
+    }
+
+    @Test
+    public void successfulEdit() throws Exception{
+
+        Player playerChanges = new Player("1", "Messi", "www.image.com/messi", 0, 0, 0);
+
+        when(playerService.put("1", playerChanges)).thenReturn(playerChanges);
+
+        String playerJson = objectMapper.writeValueAsString(playerChanges);
+        mockMvc.perform(put("/players/api/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(playerJson))
+                .andExpect(status().isOk())
+                .andExpect(content().string(playerJson));
     }
 }

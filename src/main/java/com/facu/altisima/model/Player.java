@@ -11,6 +11,7 @@ public class Player {
     private String image;
     private Integer gamesWon;
     private Integer gamesPlayed;
+    private Integer totalScore;
 
     public Player() {
 
@@ -85,8 +86,6 @@ public class Player {
     public void setTotalScore(Integer totalScore) {
         this.totalScore = totalScore;
     }
-
-    private Integer totalScore;
 
 
 }

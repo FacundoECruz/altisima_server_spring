@@ -36,14 +36,20 @@ public class PlayersController {
     }
 
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<Player> delete(@PathVariable String id) {
+    public String delete(@PathVariable String id) {
         Player player = playerServiceAPI.get(id);
         if (player != null) {
             playerServiceAPI.delete(id);
         } else {
-            return new ResponseEntity<Player>(HttpStatus.NO_CONTENT);
+            return "Player does not exists";
         }
 
+        return "Successfully deleted";
+    }
+
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<Player> delete(@PathVariable String id, @RequestBody Player playerChanges) {
+        Player player = playerServiceAPI.put(id, playerChanges);
         return new ResponseEntity<Player>(player, HttpStatus.OK);
     }
 }
