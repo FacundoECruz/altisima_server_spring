@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/users/api")
@@ -50,9 +51,13 @@ public class UsersController {
     }
 
     @PostMapping(value = "/login")
-    public ResponseEntity<User> loginUser(@RequestBody LoginRequest loginRequest) {
-        User user = userServiceAPI.login(loginRequest);
-        return new ResponseEntity<User>(user, HttpStatus.OK);
+    public ResponseEntity loginUser(@RequestBody LoginRequest loginRequest) {
+        Optional<User> user = userServiceAPI.login(loginRequest);
+        if (user.isPresent()) {
+            return new ResponseEntity<>(user.get(), HttpStatus.OK);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario o contraseña invalidos");
+        }
     }
 }
 

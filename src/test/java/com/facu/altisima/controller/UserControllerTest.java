@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -101,10 +102,11 @@ public class UserControllerTest {
     @Test
     public void successfulLogin() throws Exception {
         LoginRequest loginRequest = new LoginRequest("facu", "facu");
-        User expectedUser = new User("3", "facu", "www.image.com/facu", "facu", 0);
+        User user = new User("3", "facu", "www.image.com/facu", "facu", 0);
+        Optional<User> expectedUser = Optional.of(user);
 
         String loginRequestJson = objectMapper.writeValueAsString(loginRequest);
-        String expectedUserJson = objectMapper.writeValueAsString(expectedUser);
+        String expectedUserJson = objectMapper.writeValueAsString(user);
 
         when(userService.login(loginRequest)).thenReturn(expectedUser);
 

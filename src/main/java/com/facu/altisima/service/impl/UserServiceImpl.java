@@ -54,8 +54,15 @@ public class UserServiceImpl implements UserServiceAPI {
         return userRepository.save(obj);
     }
 
-    public User login(LoginRequest loginRequest){
-        return null;
+    public Optional<User> login(LoginRequest loginRequest){
+        Optional<User> user = userRepository.findByUsername(loginRequest.getUsername());
+        if(user.isEmpty()){
+            return Optional.empty();
+        }
+        if(user.get().getPassword().equals(loginRequest.getPassword())){
+            return user;
+        }
+        return Optional.empty();
     }
 
 }

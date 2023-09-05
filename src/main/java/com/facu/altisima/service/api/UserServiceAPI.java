@@ -5,6 +5,7 @@ import com.facu.altisima.model.User;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserServiceAPI {
 
@@ -18,5 +19,5 @@ public interface UserServiceAPI {
 
     User put(String id, User userChanges);
 
-    User login(LoginRequest loginRequest);
+    Optional<User> login(LoginRequest loginRequest);
 }
