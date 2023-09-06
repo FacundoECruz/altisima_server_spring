@@ -1,5 +1,7 @@
 package com.facu.altisima.model;
 
+import com.facu.altisima.controller.dto.PlayerResult;
+import com.facu.altisima.controller.dto.PlayerRound;
 import org.springframework.data.annotation.Id;
 
 import java.util.List;
@@ -15,7 +17,8 @@ public class Game {
 
     private List<Player> players;
 
-    private List<Round> results;
+    private List<PlayerRound> roundResults;
+
 
     public Game() {
 
