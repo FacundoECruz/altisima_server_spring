@@ -37,7 +37,7 @@ public class UserControllerTest {
 
         when(userService.getAll()).thenReturn(users);
 
-        mockMvc.perform(get("/users/api/"))
+        mockMvc.perform(get("/users/api"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string("[]"));
@@ -51,7 +51,7 @@ public class UserControllerTest {
 
         String userJson = objectMapper.writeValueAsString(user);
 
-        mockMvc.perform(post("/users/api/")
+        mockMvc.perform(post("/users/api")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(userJson))
                 .andExpect(status().isOk())

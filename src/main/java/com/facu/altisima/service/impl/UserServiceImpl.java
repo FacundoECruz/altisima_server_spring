@@ -4,9 +4,9 @@ import com.facu.altisima.controller.dto.LoginRequest;
 import com.facu.altisima.dao.api.UserRepository;
 import com.facu.altisima.model.User;
 import com.facu.altisima.service.api.UserServiceAPI;
-import lombok.extern.java.Log;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.CrudRepository;
+
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -54,12 +54,12 @@ public class UserServiceImpl implements UserServiceAPI {
         return userRepository.save(obj);
     }
 
-    public Optional<User> login(LoginRequest loginRequest){
+    public Optional<User> login(LoginRequest loginRequest) {
         Optional<User> user = userRepository.findByUsername(loginRequest.getUsername());
-        if(user.isEmpty()){
+        if (user.isEmpty()) {
             return Optional.empty();
         }
-        if(user.get().getPassword().equals(loginRequest.getPassword())){
+        if (user.get().getPassword().equals(loginRequest.getPassword())) {
             return user;
         }
         return Optional.empty();
