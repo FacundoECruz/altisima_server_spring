@@ -11,12 +11,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/players/api")
-public class PlayersController {
+public class PlayerController {
 
     @Autowired
     private PlayerServiceAPI playerServiceAPI;
 
-    @GetMapping(value = "/")
+    @GetMapping
     public List<Player> getAllPlayers() {
         return playerServiceAPI.getAll();
     }
@@ -26,7 +26,7 @@ public class PlayersController {
         return playerServiceAPI.get(id);
     }
 
-    @PostMapping(value = "/")
+    @PostMapping
     public ResponseEntity<Player> savePlayers(@RequestBody Player player) {
         Player obj = playerServiceAPI.save(player);
         return new ResponseEntity<>(obj, HttpStatus.OK);

@@ -37,7 +37,7 @@ public class PlayerControllerTest {
 
         when(playerService.getAll()).thenReturn(players);
 
-        mockMvc.perform(get("/players/api/"))
+        mockMvc.perform(get("/players/api"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string("[]"));
@@ -53,7 +53,7 @@ public class PlayerControllerTest {
 
         String playerJson = objectMapper.writeValueAsString(player);
 
-        mockMvc.perform(post("/players/api/")
+        mockMvc.perform(post("/players/api")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(player)))
                 .andExpect(status().isOk())
