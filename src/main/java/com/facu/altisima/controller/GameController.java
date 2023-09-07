@@ -1,5 +1,7 @@
 package com.facu.altisima.controller;
 
+import com.facu.altisima.controller.dto.GameState;
+import com.facu.altisima.controller.dto.RoundStatus;
 import com.facu.altisima.model.Game;
 import com.facu.altisima.model.Player;
 import com.facu.altisima.model.User;
@@ -19,23 +21,23 @@ public class GameController {
 
     @GetMapping(value = "/{id}")
     public Game getGameById(@PathVariable String id) {
-        return gameServiceAPI.get(id);
+        return gameServiceAPI.getGame(id);
     }
 
     @PostMapping
     public ResponseEntity<Game> saveGame(@RequestBody Game game) {
-        Game obj = gameServiceAPI.save(game);
+        Game obj = gameServiceAPI.saveGame(game);
         return new ResponseEntity<>(obj, HttpStatus.OK);
     }
 
     @GetMapping
     public List<Game> getAllGames() {
-        return gameServiceAPI.getAll();
+        return gameServiceAPI.getAllGames();
     }
 
     @DeleteMapping(value="/{id}")
     public String deleteGame(@PathVariable String id) {
-        Game game = gameServiceAPI.get(id);
+        Game game = gameServiceAPI.getGame(id);
         if (game != null) {
             gameServiceAPI.delete(id);
         } else {
@@ -43,6 +45,13 @@ public class GameController {
         }
 
         return "Successfully deleted";
+    }
+
+    @PutMapping(value="/{id}")
+    public GameState nextRound(@PathVariable String id) {
+        Game game = gameServiceAPI.nextRound(id);
+        GameState gameState = game.toGameState();
+        return gameState;
     }
 }
 

@@ -1,16 +1,17 @@
 package com.facu.altisima.controller.dto;
 
+import com.facu.altisima.model.Player;
+
+import java.util.Map;
 import java.util.Objects;
 
 public class PlayerRound {
     private String username;
-    private Integer score;
     private Integer bid;
     private Integer bidsLost;
 
-    public PlayerRound(String username, Integer score, Integer bid, Integer bidsLost) {
+    public PlayerRound(String username, Integer bid, Integer bidsLost) {
         this.username = username;
-        this.score = score;
         this.bid = bid;
         this.bidsLost = bidsLost;
     }
@@ -24,12 +25,12 @@ public class PlayerRound {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PlayerRound that = (PlayerRound) o;
-        return Objects.equals(username, that.username) && Objects.equals(score, that.score) && Objects.equals(bid, that.bid) && Objects.equals(bidsLost, that.bidsLost);
+        return Objects.equals(username, that.username) && Objects.equals(bid, that.bid) && Objects.equals(bidsLost, that.bidsLost);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(username, score, bid, bidsLost);
+        return Objects.hash(username, bid, bidsLost);
     }
 
     public String getUsername() {
@@ -38,14 +39,6 @@ public class PlayerRound {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public Integer getScore() {
-        return score;
-    }
-
-    public void setScore(Integer score) {
-        this.score = score;
     }
 
     public Integer getBid() {
