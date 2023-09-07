@@ -57,5 +57,15 @@ public class GameController {
     public List<PlayerRound> prevRound(@PathVariable String id) {
         return gameServiceAPI.prevRound(id);
     }
+
+    @PutMapping(value="/{id}/finish")
+    public String finishGame(@PathVariable String id) {
+        Game game = gameServiceAPI.finishGame(id);
+        if(game != null) {
+            return "Game " + game.getId() + " saved in DB";
+        } else {
+            return "Game " + game.getId() + " is null";
+        }
+    }
 }
 

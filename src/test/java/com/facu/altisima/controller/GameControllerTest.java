@@ -158,4 +158,15 @@ public class GameControllerTest {
                 .andExpect(content().string(prevRoundJson));
     }
 
+    @Test
+    public void finishGame() throws Exception {
+        Game game = generateGame();
+        String expectedRes = "Game " + game.getId() + " saved in DB";
+
+        when(gameService.finishGame(game.getId())).thenReturn(game);
+
+        mockMvc.perform(put("/games/1/finish"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(expectedRes));
+    }
 }
