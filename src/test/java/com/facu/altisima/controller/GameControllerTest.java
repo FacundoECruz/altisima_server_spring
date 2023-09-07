@@ -47,7 +47,7 @@ public class GameControllerTest {
 
         String gameJson = objectMapper.writeValueAsString(game);
 
-        mockMvc.perform(post("/games/api")
+        mockMvc.perform(post("/games")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(gameJson))
                 .andExpect(status().isOk())
@@ -62,7 +62,7 @@ public class GameControllerTest {
         when(gameService.getAllGames()).thenReturn((games));
         String expectedRes = "[]";
 
-        mockMvc.perform(get("/games/api"))
+        mockMvc.perform(get("/games"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string(expectedRes));
@@ -81,7 +81,7 @@ public class GameControllerTest {
 
         String gameJson = objectMapper.writeValueAsString(game);
 
-        mockMvc.perform(get("/games/api/1"))
+        mockMvc.perform(get("/games/1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string(gameJson));
@@ -100,7 +100,7 @@ public class GameControllerTest {
         doNothing().when(gameService).delete("1");
         when(gameService.getGame("1")).thenReturn(game);
 
-        mockMvc.perform(delete("/games/api/1"))
+        mockMvc.perform(delete("/games/1"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(successfulMsg));
     }
@@ -133,7 +133,7 @@ public class GameControllerTest {
 
         when(gameService.nextRound(gameId)).thenReturn(game);
 
-        mockMvc.perform(put("/games/api/1")
+        mockMvc.perform(put("/games/1/next")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(roundJson))
                 .andExpect(status().isOk())

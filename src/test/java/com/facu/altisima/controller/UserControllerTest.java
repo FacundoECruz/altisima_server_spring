@@ -37,7 +37,7 @@ public class UserControllerTest {
 
         when(userService.getAll()).thenReturn(users);
 
-        mockMvc.perform(get("/users/api"))
+        mockMvc.perform(get("/users"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string("[]"));
@@ -51,7 +51,7 @@ public class UserControllerTest {
 
         String userJson = objectMapper.writeValueAsString(user);
 
-        mockMvc.perform(post("/users/api")
+        mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(userJson))
                 .andExpect(status().isOk())
@@ -66,7 +66,7 @@ public class UserControllerTest {
         when(userService.get("1")).thenReturn(user);
 
         String userJson = objectMapper.writeValueAsString(user);
-        mockMvc.perform(get("/users/api/1")
+        mockMvc.perform(get("/users/1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -77,7 +77,7 @@ public class UserControllerTest {
     public void successfulUserDelete() throws Exception {
         doNothing().when(userService).delete("messi");
 
-        mockMvc.perform(delete("/players/api/1")
+        mockMvc.perform(delete("/players/1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
@@ -91,7 +91,7 @@ public class UserControllerTest {
         when(userService.put("1", userChanges)).thenReturn(userChanges);
 
         String userJson = objectMapper.writeValueAsString(userChanges);
-        mockMvc.perform(put("/users/api/1")
+        mockMvc.perform(put("/users/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(userJson))
                 .andExpect(status().isOk())
@@ -110,7 +110,7 @@ public class UserControllerTest {
 
         when(userService.login(loginRequest)).thenReturn(expectedUser);
 
-        mockMvc.perform(post("/users/api/login")
+        mockMvc.perform(post("/users/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(loginRequestJson))
                 .andExpect(status().isOk())

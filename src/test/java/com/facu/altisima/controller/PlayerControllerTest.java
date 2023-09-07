@@ -37,7 +37,7 @@ public class PlayerControllerTest {
 
         when(playerService.getAll()).thenReturn(players);
 
-        mockMvc.perform(get("/players/api"))
+        mockMvc.perform(get("/players"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string("[]"));
@@ -53,7 +53,7 @@ public class PlayerControllerTest {
 
         String playerJson = objectMapper.writeValueAsString(player);
 
-        mockMvc.perform(post("/players/api")
+        mockMvc.perform(post("/players")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(player)))
                 .andExpect(status().isOk())
@@ -68,7 +68,7 @@ public class PlayerControllerTest {
         when(playerService.get("1")).thenReturn(player);
 
         String playerJson = objectMapper.writeValueAsString(player);
-        mockMvc.perform(get("/players/api/1")
+        mockMvc.perform(get("/players/1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -79,7 +79,7 @@ public class PlayerControllerTest {
     public void successfulPlayerDelete() throws Exception {
         doNothing().when(playerService).delete("1");
 
-        mockMvc.perform(delete("/players/api/1")
+        mockMvc.perform(delete("/players/1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
@@ -93,7 +93,7 @@ public class PlayerControllerTest {
         when(playerService.put("1", playerChanges)).thenReturn(playerChanges);
 
         String playerJson = objectMapper.writeValueAsString(playerChanges);
-        mockMvc.perform(put("/players/api/1")
+        mockMvc.perform(put("/players/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(playerJson))
                 .andExpect(status().isOk())

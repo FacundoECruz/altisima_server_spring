@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 import java.util.List;
 
 @RestController
-@RequestMapping("/players/api")
+@RequestMapping("/players")
 public class PlayerController {
 
     @Autowired
@@ -21,17 +21,21 @@ public class PlayerController {
         return playerServiceAPI.getAll();
     }
 
-    @GetMapping(value = "/{id}")
-    public Player find(@PathVariable String id) {
-        return playerServiceAPI.get(id);
-    }
-
     @PostMapping
     public ResponseEntity<Player> savePlayers(@RequestBody Player player) {
         Player obj = playerServiceAPI.save(player);
         return new ResponseEntity<>(obj, HttpStatus.OK);
     }
 
+    @GetMapping(value = "/{id}")
+    public Player find(@PathVariable String id) {
+        return playerServiceAPI.get(id);
+    }
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<Player> putPlayer(@PathVariable String id, @RequestBody Player playerChanges) {
+        Player player = playerServiceAPI.put(id, playerChanges);
+        return new ResponseEntity<Player>(player, HttpStatus.OK);
+    }
     @DeleteMapping(value = "/{id}")
     public String deletePlayers(@PathVariable String id) {
         Player player = playerServiceAPI.get(id);
@@ -42,11 +46,5 @@ public class PlayerController {
         }
 
         return "Successfully deleted";
-    }
-
-    @PutMapping(value = "/{id}")
-    public ResponseEntity<Player> putPlayer(@PathVariable String id, @RequestBody Player playerChanges) {
-        Player player = playerServiceAPI.put(id, playerChanges);
-        return new ResponseEntity<Player>(player, HttpStatus.OK);
     }
 }
