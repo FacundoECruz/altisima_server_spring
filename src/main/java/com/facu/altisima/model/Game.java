@@ -18,7 +18,7 @@ public class Game {
 
     private List<Integer> cardsPerRound;
 
-    private List<Player> players;
+    private List<String> players;
 
     private List<PlayerRound> roundResults;
 
@@ -62,11 +62,11 @@ public class Game {
         this.cardsPerRound = cardsPerRound;
     }
 
-    public List<Player> getPlayers() {
+    public List<String> getPlayers() {
         return players;
     }
 
-    public void setPlayers(List<Player> players) {
+    public void setPlayers(List<String> players) {
         this.players = players;
     }
 
@@ -99,7 +99,7 @@ public class Game {
         return Objects.hash(id, date, currentRound, cardsPerRound, players, roundResults, totalRounds);
     }
 
-    public Game(String id, String date, Integer currentRound, List<Integer> cardsPerRound, List<Player> players, List<PlayerRound> roundResults, Integer totalRounds) {
+    public Game(String id, String date, Integer currentRound, List<Integer> cardsPerRound, List<String> players, List<PlayerRound> roundResults, Integer totalRounds) {
         this.id = id;
         this.date = date;
         this.currentRound = currentRound;

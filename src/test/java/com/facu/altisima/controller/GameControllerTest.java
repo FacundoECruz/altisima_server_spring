@@ -34,14 +34,60 @@ public class GameControllerTest {
 
     ObjectMapper objectMapper = new ObjectMapper();
 
+
+    List<PlayerRound> generateRoundResults() {
+        List<PlayerRound> roundResults = new ArrayList<>();
+        for (int j = 0; j < 4; j++) {
+            PlayerRound playerRound = new PlayerRound("chueco " + j, 0, 0);
+            roundResults.add(playerRound);
+        }
+        return roundResults;
+    }
+
+    Game generateGame() {
+        //Generate cardsPerRound
+        List<Integer> cardsPerRound = new ArrayList<>();
+        for (int i = 0; i < 9; i++) {
+            cardsPerRound.add(i);
+        }
+
+        //Generate List of PlayerRound
+        List<PlayerRound> roundResults = generateRoundResults();
+
+        //Generate List of players
+        List<String> players = new ArrayList<>();
+        for (int k = 0; k < roundResults.size(); k++) {
+            PlayerRound player = roundResults.get(k);
+            String playerName = player.getUsername();
+        }
+
+        String gameId = "1";
+        String gameDate = "12/12/12";
+        Integer currentRound = 2;
+        Integer totalRounds = 9;
+
+        return new Game(gameId, gameDate, currentRound, cardsPerRound, players, roundResults, totalRounds);
+    }
+
+    GameState generateGameState() {
+        String status = "inProgress";
+        //Generate RoundStatus
+        Integer currentRound = 2;
+        Integer cardsToDeal = 2;
+        RoundStatus round = new RoundStatus(currentRound, cardsToDeal);
+
+        List<PlayerResult> results = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            PlayerResult playerResult = new PlayerResult("chueco " + i, 5);
+            results.add(playerResult);
+        }
+
+        return new GameState(round, status, results);
+    }
+
     @Test
     public void saveGame() throws Exception {
-        List<Integer> cardsPerRound = new ArrayList<>();
-        List<Player> players = new ArrayList<>();
-        PlayerRound chuecoRound = new PlayerRound("chueco", 0, 0);
-        List<PlayerRound> roundResults = new ArrayList<>();
-        roundResults.add(chuecoRound);
-        Game game = new Game("1", "12/2/23", 2, cardsPerRound, players, roundResults, 9);
+        Game game = generateGame();
 
         when(gameService.saveGame(game)).thenReturn(game);
 
@@ -70,12 +116,7 @@ public class GameControllerTest {
 
     @Test
     public void getGameById() throws Exception {
-        List<Integer> cardsPerRound = new ArrayList<>();
-        List<Player> players = new ArrayList<>();
-        PlayerRound chuecoRound = new PlayerRound("chueco", 0, 0);
-        List<PlayerRound> roundResults = new ArrayList<>();
-        roundResults.add(chuecoRound);
-        Game game = new Game("1", "12/2/23", 2, cardsPerRound, players, roundResults, 9);
+        Game game = generateGame();
 
         when(gameService.getGame("1")).thenReturn(game);
 
@@ -90,12 +131,7 @@ public class GameControllerTest {
     @Test
     public void deleteGame() throws Exception {
         String successfulMsg = "Successfully deleted";
-        List<Integer> cardsPerRound = new ArrayList<>();
-        List<Player> players = new ArrayList<>();
-        PlayerRound chuecoRound = new PlayerRound("chueco", 0, 0);
-        List<PlayerRound> roundResults = new ArrayList<>();
-        roundResults.add(chuecoRound);
-        Game game = new Game("1", "12/2/23", 2, cardsPerRound, players, roundResults, 9);
+        Game game = generateGame();
 
         doNothing().when(gameService).delete("1");
         when(gameService.getGame("1")).thenReturn(game);
@@ -107,31 +143,15 @@ public class GameControllerTest {
 
     @Test
     public void nextRound() throws Exception {
-        PlayerResult chuecoResults = new PlayerResult("chueco", 5);
-        List<PlayerResult> scores = new ArrayList<>();
-        scores.add(chuecoResults);
+        Game game = generateGame();
 
-        PlayerRound chuecoRound = new PlayerRound("chueco", 0, 0);
-        List<PlayerRound> roundResults = new ArrayList<>();
-        roundResults.add(chuecoRound);
+        when(gameService.nextRound(game.getId())).thenReturn(game);
+
+        List<PlayerRound> roundResults = generateRoundResults();
         String roundJson = objectMapper.writeValueAsString(roundResults);
 
-        String gameId = "1";
-        String status = "inProgress";
-        RoundStatus round = new RoundStatus(2, 2);
-
-        GameState gameState = new GameState(round, status, scores);
+        GameState gameState = generateGameState();
         String gameStateJson = objectMapper.writeValueAsString(gameState);
-
-        List<Integer> cardsPerRound = new ArrayList<>();
-        List<Player> players = new ArrayList<>();
-        for (int i = 0; i < 9; i++) {
-            cardsPerRound.add(i);
-        }
-
-        Game game = new Game("1", "12/2/23", 2, cardsPerRound, players, roundResults, 9);
-
-        when(gameService.nextRound(gameId)).thenReturn(game);
 
         mockMvc.perform(put("/games/1/next")
                         .contentType(MediaType.APPLICATION_JSON)
