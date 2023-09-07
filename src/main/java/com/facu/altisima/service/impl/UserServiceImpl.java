@@ -19,13 +19,14 @@ public class UserServiceImpl implements UserServiceAPI {
     private UserRepository userRepository;
 
     @Override
+    public List<User> getAll() {
+        List<User> returnList = new ArrayList<>();
+        userRepository.findAll().forEach(obj -> returnList.add(obj));
+        return returnList;
+    }
+    @Override
     public User save(User entity) {
         return userRepository.save(entity);
-    }
-
-    @Override
-    public void delete(String id) {
-        userRepository.deleteById(id);
     }
 
     @Override
@@ -36,13 +37,11 @@ public class UserServiceImpl implements UserServiceAPI {
         }
         return null;
     }
-
     @Override
-    public List<User> getAll() {
-        List<User> returnList = new ArrayList<>();
-        userRepository.findAll().forEach(obj -> returnList.add(obj));
-        return returnList;
+    public void delete(String id) {
+        userRepository.deleteById(id);
     }
+
 
     public User put(String id, User userChanges) {
         Optional<User> object = userRepository.findById(id);
