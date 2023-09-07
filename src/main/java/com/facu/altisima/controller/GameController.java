@@ -1,6 +1,8 @@
 package com.facu.altisima.controller;
 
 import com.facu.altisima.controller.dto.GameState;
+import com.facu.altisima.controller.dto.PlayerRound;
+import com.facu.altisima.controller.dto.Translate;
 import com.facu.altisima.model.Game;
 import com.facu.altisima.service.api.GameServiceAPI;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,12 +34,6 @@ public class GameController {
         return gameServiceAPI.getGame(id);
     }
 
-    @PutMapping(value="/{id}/next")
-    public GameState nextRound(@PathVariable String id) {
-        Game game = gameServiceAPI.nextRound(id);
-        GameState gameState = game.toGameState();
-        return gameState;
-    }
     @DeleteMapping(value="/{id}")
     public String deleteGame(@PathVariable String id) {
         Game game = gameServiceAPI.getGame(id);
@@ -48,6 +44,18 @@ public class GameController {
         }
 
         return "Successfully deleted";
+    }
+    @PutMapping(value="/{id}/next")
+    public GameState nextRound(@PathVariable String id, @RequestBody List<PlayerRound> roundResults) {
+        Game game = gameServiceAPI.nextRound(id, roundResults);
+        Translate translator = new Translate();
+
+        return translator.toGameState(game);
+    }
+
+    @PutMapping(value="/{id}/prev")
+    public List<PlayerRound> prevRound(@PathVariable String id) {
+        return gameServiceAPI.prevRound(id);
     }
 }
 

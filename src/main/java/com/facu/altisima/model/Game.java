@@ -14,17 +14,15 @@ public class Game {
     @Id
     private String id;
     private String date;
-    private Integer currentRound;
+    public Integer currentRound;
 
-    private List<Integer> cardsPerRound;
+    public List<Integer> cardsPerRound;
 
     private List<String> players;
 
     private List<PlayerRound> roundResults;
 
     private Integer totalRounds;
-
-    private static final Integer BASE_WIN_SCORE = 5;
 
     public Game() {
 
@@ -109,40 +107,6 @@ public class Game {
         this.totalRounds = totalRounds;
     }
 
-    public GameState toGameState() {
-        GameState gameState = new GameState();
 
-        gameState.setStatus("inProgress");
-        gameState.setRound(translateRoundStatus());
-        gameState.setResults(translatePlayerResults());
-
-        return gameState;
-    }
-    private RoundStatus translateRoundStatus() {
-        Integer current = currentRound;
-        Integer cardsToDeal = cardsPerRound.get(current);
-
-        return new RoundStatus(current, cardsToDeal);
-    }
-
-    private List<PlayerResult> translatePlayerResults() {
-        List<PlayerResult> playerResults = new ArrayList<>();
-
-        for (PlayerRound playerRound : roundResults) {
-            PlayerResult playerResult = new PlayerResult();
-            playerResult.setUsername(playerRound.getUsername());
-            Integer playerBid = playerRound.getBid();
-            Integer playerBidsLost = playerRound.getBidsLost();
-            if(playerBidsLost == 0) {
-                Integer newWinScore = playerBid + BASE_WIN_SCORE; //ACA FALTAN LOS PUNTOS QUE TENIA EN LA RONDA ANTERIOR
-                playerResult.setScore(newWinScore);
-            } else {
-                Integer newLostScore = playerBidsLost;
-                playerResult.setScore(newLostScore);
-            }
-            playerResults.add(playerResult);
-        }
-        return playerResults;
-    }
 
 }

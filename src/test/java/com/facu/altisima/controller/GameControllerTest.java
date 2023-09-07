@@ -1,11 +1,7 @@
 package com.facu.altisima.controller;
 
-import com.facu.altisima.controller.dto.GameState;
-import com.facu.altisima.controller.dto.RoundStatus;
+import com.facu.altisima.controller.dto.*;
 import com.facu.altisima.model.Game;
-import com.facu.altisima.controller.dto.PlayerResult;
-import com.facu.altisima.controller.dto.PlayerRound;
-import com.facu.altisima.model.Player;
 import com.facu.altisima.service.impl.GameServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -69,22 +65,6 @@ public class GameControllerTest {
         return new Game(gameId, gameDate, currentRound, cardsPerRound, players, roundResults, totalRounds);
     }
 
-    GameState generateGameState() {
-        String status = "inProgress";
-        //Generate RoundStatus
-        Integer currentRound = 2;
-        Integer cardsToDeal = 2;
-        RoundStatus round = new RoundStatus(currentRound, cardsToDeal);
-
-        List<PlayerResult> results = new ArrayList<>();
-        for (int i = 0; i < 4; i++) {
-            PlayerResult playerResult = new PlayerResult("chueco " + i, 5);
-            results.add(playerResult);
-        }
-
-        return new GameState(round, status, results);
-    }
-
     @Test
     public void saveGame() throws Exception {
         Game game = generateGame();
@@ -145,12 +125,13 @@ public class GameControllerTest {
     public void nextRound() throws Exception {
         Game game = generateGame();
 
-        when(gameService.nextRound(game.getId())).thenReturn(game);
-
         List<PlayerRound> roundResults = generateRoundResults();
         String roundJson = objectMapper.writeValueAsString(roundResults);
 
-        GameState gameState = generateGameState();
+        when(gameService.nextRound(game.getId(), roundResults)).thenReturn(game);
+
+        Translate translator = new Translate();
+        GameState gameState = translator.toGameState(game);
         String gameStateJson = objectMapper.writeValueAsString(gameState);
 
         mockMvc.perform(put("/games/1/next")
@@ -161,4 +142,20 @@ public class GameControllerTest {
                 .andExpect(content().string(gameStateJson));
 
     }
+
+    @Test
+    public void prevRound() throws Exception {
+        Game game = generateGame();
+
+        List<PlayerRound> prevRound = generateRoundResults();
+        String prevRoundJson = objectMapper.writeValueAsString(prevRound);
+
+        when(gameService.prevRound(game.getId())).thenReturn(prevRound);
+
+        mockMvc.perform(put("/games/1/prev"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().string(prevRoundJson));
+    }
+
 }
