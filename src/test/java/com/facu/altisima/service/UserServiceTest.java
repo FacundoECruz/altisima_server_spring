@@ -1,5 +1,6 @@
 package com.facu.altisima.service;
 
+import com.facu.altisima.controller.dto.LoginRequest;
 import com.facu.altisima.dao.api.UserRepository;
 import com.facu.altisima.model.User;
 import com.facu.altisima.service.api.UserServiceAPI;
@@ -52,13 +53,22 @@ public class UserServiceTest {
 
     @Test
     public void successfulUserCreate() {
-        //Testear si el usuario ya existe
         when(userRepository.save(user)).thenReturn(user);
-        User createdUser = userService.save(user);
+        ServiceResult<User> createdUser = userService.save(user);
 
-        assertEquals(createdUser, user);
+        assertEquals(createdUser.getData(), user);
     }
 
+    @Test
+    public void usernameAlreadyExists() {
+        when(userRepository.save(user)).thenReturn(null);
+        String expectedMsg = "El nombre de usuario ya existe";
+
+        ServiceResult<User> createdUser = userService.save(user);
+
+        assertEquals(expectedMsg, createdUser.getErrorMessage());
+
+    }
     @Test
     public void successfulGetUserById() {
         Optional<User> optionalUser = Optional.of(user);
@@ -67,6 +77,11 @@ public class UserServiceTest {
         User retrievedUser = userService.get(user.getId());
 
         assertEquals(retrievedUser, user);
+    }
+
+    @Test
+    public void userDoesNotExists() {
+
     }
 
     @Test
@@ -89,5 +104,27 @@ public class UserServiceTest {
 
         User retrievedUser = userService.put(user.getId(), userChanges);
         assertEquals(userChanges, retrievedUser);
+    }
+
+    @Test
+    public void successfulLogin() {
+        when(userRepository.findByUsername(user.getUsername())).thenReturn(user);
+
+        LoginRequest loginRequest = new LoginRequest("Facu", "facu");
+        ServiceResult<User> retrievedUser = userService.login(loginRequest);
+
+        assertEquals(retrievedUser.getData(), user);
+    }
+
+    @Test
+    public void unsuccessfulLogin() {
+        when(userRepository.findByUsername(user.getUsername())).thenReturn(null);
+        String expectedMsg = "No se encontraron usuarios.";
+        LoginRequest loginRequest = new LoginRequest("Facu", "facu");
+
+        ServiceResult<User> retrievedUser = userService.login(loginRequest);
+
+        assertEquals(retrievedUser.getErrorMessage(), expectedMsg);
+
     }
 }

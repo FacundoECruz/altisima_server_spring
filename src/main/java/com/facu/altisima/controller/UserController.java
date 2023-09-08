@@ -32,17 +32,25 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<User> saveUser(@RequestBody User user) {
-        User obj = userServiceAPI.save(user);
-        return new ResponseEntity<>(obj, HttpStatus.OK);
+    public ResponseEntity<?> saveUser(@RequestBody User user) {
+        ServiceResult<User> result = userServiceAPI.save(user);
+        if (result.isSuccess()) {
+            User retrievedUser = result.getData();
+            return ResponseEntity.ok(retrievedUser);
+        } else {
+            String errorMessage = result.getErrorMessage();
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(errorMessage);
+        }
     }
     @PostMapping(value = "/login")
-    public ResponseEntity loginUser(@RequestBody LoginRequest loginRequest) {
-        Optional<User> user = userServiceAPI.login(loginRequest);
-        if (user.isPresent()) {
-            return new ResponseEntity<>(user.get(), HttpStatus.OK);
+    public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
+        ServiceResult<User> user = userServiceAPI.login(loginRequest);
+        if (user.isSuccess()) {
+            User retrievedUser = user.getData();
+            return ResponseEntity.ok(retrievedUser);
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario o contraseña invalidos");
+            String errorMessage = user.getErrorMessage();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
         }
     }
     @GetMapping(value = "/{id}")

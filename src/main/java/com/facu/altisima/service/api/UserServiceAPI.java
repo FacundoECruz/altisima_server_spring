@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface UserServiceAPI {
 
-    User save (User entity);
+    ServiceResult<User> save (User entity);
 
     void delete(String id);
 
@@ -20,5 +20,5 @@ public interface UserServiceAPI {
 
     User put(String id, User userChanges);
 
-    Optional<User> login(LoginRequest loginRequest);
+    ServiceResult<User> login(LoginRequest loginRequest);
 }

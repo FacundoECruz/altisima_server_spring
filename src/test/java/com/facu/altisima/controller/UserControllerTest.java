@@ -47,8 +47,9 @@ public class UserControllerTest {
     @Test
     public void successfulCreateUser() throws Exception {
         User user = new User("1", "Facu", "www.image.com/facu", "lapass", 0);
+        ServiceResult<User> receivedUserFromService = ServiceResult.success(user);
 
-        when(userService.save(user)).thenReturn(user);
+        when(userService.save(user)).thenReturn(receivedUserFromService);
 
         String userJson = objectMapper.writeValueAsString(user);
 
@@ -104,12 +105,12 @@ public class UserControllerTest {
     public void successfulLogin() throws Exception {
         LoginRequest loginRequest = new LoginRequest("facu", "facu");
         User user = new User("3", "facu", "www.image.com/facu", "facu", 0);
-        Optional<User> expectedUser = Optional.of(user);
+        ServiceResult<User> receivedUserFromService = ServiceResult.success(user);
 
         String loginRequestJson = objectMapper.writeValueAsString(loginRequest);
         String expectedUserJson = objectMapper.writeValueAsString(user);
 
-        when(userService.login(loginRequest)).thenReturn(expectedUser);
+        when(userService.login(loginRequest)).thenReturn(receivedUserFromService);
 
         mockMvc.perform(post("/users/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -117,4 +118,5 @@ public class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string(expectedUserJson));
     }
+
 }

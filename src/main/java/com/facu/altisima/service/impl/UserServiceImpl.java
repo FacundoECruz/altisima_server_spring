@@ -30,15 +30,20 @@ public class UserServiceImpl implements UserServiceAPI {
     }
 
     @Override
-    public User save(User entity) {
-        return userRepository.save(entity);
+    public ServiceResult<User> save(User entity) {
+        User savedUser = userRepository.save(entity);
+        if(savedUser != null) {
+            return ServiceResult.success(savedUser);
+        } else {
+            return ServiceResult.error("El nombre de usuario ya existe");
+        }
     }
 
     @Override
     public User get(String id) {
-        Optional<User> obj = userRepository.findById(id);
-        if (obj.isPresent()) {
-            return obj.get();
+        Optional<User> retrievedUser = userRepository.findById(id);
+        if (retrievedUser.isPresent()) {
+            return retrievedUser.get();
         }
         return null;
     }
@@ -58,15 +63,13 @@ public class UserServiceImpl implements UserServiceAPI {
         return userRepository.save(obj);
     }
 
-    public Optional<User> login(LoginRequest loginRequest) {
-        Optional<User> user = userRepository.findByUsername(loginRequest.getUsername());
-        if (user.isEmpty()) {
-            return Optional.empty();
+    public ServiceResult<User> login(LoginRequest loginRequest) {
+        User user = userRepository.findByUsername(loginRequest.getUsername());
+        if (user != null) {
+            return ServiceResult.success(user);
+        } else {
+            return ServiceResult.error("No se encontraron usuarios.");
         }
-        if (user.get().getPassword().equals(loginRequest.getPassword())) {
-            return user;
-        }
-        return Optional.empty();
     }
 
 }
