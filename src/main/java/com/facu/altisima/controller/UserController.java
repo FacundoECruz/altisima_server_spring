@@ -3,6 +3,7 @@ package com.facu.altisima.controller;
 import com.facu.altisima.controller.dto.LoginRequest;
 import com.facu.altisima.model.User;
 import com.facu.altisima.service.api.UserServiceAPI;
+import com.facu.altisima.service.utils.ServiceResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +19,16 @@ public class UserController {
     private UserServiceAPI userServiceAPI;
 
     @GetMapping
-    public List<User> getAllUsers() {
-        return userServiceAPI.getAll();
+    public ResponseEntity<?> getUsers() {
+        ServiceResult<List<User>> result = userServiceAPI.getAll();
+
+        if (result.isSuccess()) {
+            List<User> users = result.getData();
+            return ResponseEntity.ok(users);
+        } else {
+            String errorMessage = result.getErrorMessage();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+        }
     }
 
     @PostMapping

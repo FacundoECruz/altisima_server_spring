@@ -3,6 +3,7 @@ package com.facu.altisima.controller;
 import com.facu.altisima.controller.dto.LoginRequest;
 import com.facu.altisima.model.User;
 import com.facu.altisima.service.impl.UserServiceImpl;
+import com.facu.altisima.service.utils.ServiceResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,7 +34,7 @@ public class UserControllerTest {
 
     @Test
     public void returnAllUsers() throws Exception {
-        List<User> users = new ArrayList<>();
+        ServiceResult<List<User>> users = ServiceResult.success(new ArrayList<>()) ;
 
         when(userService.getAll()).thenReturn(users);
 

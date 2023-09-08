@@ -3,6 +3,7 @@ package com.facu.altisima.service;
 import com.facu.altisima.dao.api.UserRepository;
 import com.facu.altisima.model.User;
 import com.facu.altisima.service.api.UserServiceAPI;
+import com.facu.altisima.service.utils.ServiceResult;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 public class UserServiceTest {
-    // Pensar como testear los casos negativos o que den error tambien.
     @Autowired
     private UserServiceAPI userService;
 
@@ -34,9 +34,20 @@ public class UserServiceTest {
         users.add(user);
         when(userRepository.findAll()).thenReturn(users);
 
-        List<User> returnedUsersList = userService.getAll();
+        ServiceResult<List<User>> returnedUsersList = userService.getAll();
+        List<User> receivedUsers = returnedUsersList.getData();
 
-        assertEquals(users, returnedUsersList);
+        assertEquals(users, receivedUsers);
+    }
+
+    @Test
+    public void testDatabaseConnectionUserListError() {
+        when(userRepository.findAll()).thenReturn(null);
+        String expectedMsg = "No se encontraron usuarios.";
+
+        ServiceResult<List<User>> result = userService.getAll();
+
+        assertEquals(expectedMsg, result.getErrorMessage());
     }
 
     @Test
@@ -71,15 +82,12 @@ public class UserServiceTest {
     @Test
     public void successfulEditUser() {
         Optional<User> optionalUser = Optional.of(user);
-
         when(userRepository.findById(user.getId())).thenReturn(optionalUser);
 
         User userChanges = new User("1", "Jorge", "www.image.com/jorge", "jorge", 0);
-
         when(userRepository.save(userChanges)).thenReturn(userChanges);
 
         User retrievedUser = userService.put(user.getId(), userChanges);
-
         assertEquals(userChanges, retrievedUser);
     }
 }

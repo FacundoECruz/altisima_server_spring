@@ -5,6 +5,7 @@ import com.facu.altisima.dao.api.UserRepository;
 import com.facu.altisima.model.User;
 import com.facu.altisima.service.api.UserServiceAPI;
 
+import com.facu.altisima.service.utils.ServiceResult;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.stereotype.Service;
@@ -19,11 +20,15 @@ public class UserServiceImpl implements UserServiceAPI {
     private UserRepository userRepository;
 
     @Override
-    public List<User> getAll() {
-        List<User> returnList = new ArrayList<>();
-        userRepository.findAll().forEach(obj -> returnList.add(obj));
-        return returnList;
+    public ServiceResult<List<User>> getAll() {
+        List<User> users = userRepository.findAll();
+        if (users != null) {
+            return ServiceResult.success(users);
+        } else {
+            return ServiceResult.error("No se encontraron usuarios.");
+        }
     }
+
     @Override
     public User save(User entity) {
         return userRepository.save(entity);
