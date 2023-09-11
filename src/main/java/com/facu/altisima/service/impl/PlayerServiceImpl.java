@@ -3,6 +3,7 @@ package com.facu.altisima.service.impl;
 import com.facu.altisima.dao.api.PlayerRepository;
 import com.facu.altisima.model.Player;
 import com.facu.altisima.service.api.PlayerServiceAPI;
+import com.facu.altisima.service.utils.ServiceResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
@@ -16,43 +17,41 @@ public class PlayerServiceImpl implements PlayerServiceAPI {
 
     @Autowired
     private PlayerRepository playerRepository;
-    @Override
-    public CrudRepository<Player, String> getDao() {
-        return playerRepository;
-    }
 
+    @Override
+    public ServiceResult<List<Player>> getAll() {
+        List<Player> allPlayers = playerRepository.findAll();
+
+        if (allPlayers != null) {
+            return ServiceResult.success(allPlayers);
+        } else {
+            return ServiceResult.error("No se pudieron recuperar los jugadores");
+        }
+    }
     @Override
     public Player save(Player entity) {
-        return getDao().save(entity);
-    }
-
-    @Override
-    public void delete(String id) {
-        getDao().deleteById(id);
+        return playerRepository.save(entity);
     }
 
     @Override
     public Player get(String id) {
-        Optional<Player> obj = getDao().findById(id);
+        Optional<Player> obj = playerRepository.findById(id);
         if (obj.isPresent()) {
             return obj.get();
         }
         return null;
     }
-
     @Override
-    public List<Player> getAll() {
-        List<Player> returnList = new ArrayList<>();
-        getDao().findAll().forEach(obj -> returnList.add(obj));
-        return returnList;
+    public void delete(String id) {
+        playerRepository.deleteById(id);
     }
 
     public Player put(String id, Player playerChanges) {
-       Optional <Player> object = getDao().findById(id);
+       Optional <Player> object = playerRepository.findById(id);
        Player obj = object.get();
         obj.setUsername(playerChanges.getUsername());
         obj.setImage(playerChanges.getImage());
 
-        return getDao().save(obj);
+        return playerRepository.save(obj);
     }
 }

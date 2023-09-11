@@ -1,12 +1,12 @@
 package com.facu.altisima.service.api;
 
 import com.facu.altisima.model.Player;
+import com.facu.altisima.service.utils.ServiceResult;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 
 public interface PlayerServiceAPI {
-        CrudRepository<Player, String> getDao();
 
         Player save (Player entity);
 
@@ -14,7 +14,7 @@ public interface PlayerServiceAPI {
 
         Player get(String id);
 
-        List<Player> getAll();
+        ServiceResult<List<Player>> getAll();
 
         Player put(String id, Player playerChanges);
 }

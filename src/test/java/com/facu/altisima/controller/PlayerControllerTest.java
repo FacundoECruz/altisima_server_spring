@@ -1,7 +1,9 @@
 package com.facu.altisima.controller;
 
 import com.facu.altisima.model.Player;
+import com.facu.altisima.model.User;
 import com.facu.altisima.service.impl.PlayerServiceImpl;
+import com.facu.altisima.service.utils.ServiceResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,7 +35,7 @@ public class PlayerControllerTest {
 
     @Test
     public void returnAllPlayers() throws Exception {
-        List<Player> players = new ArrayList<>();
+        ServiceResult<List<Player>> players = ServiceResult.success(new ArrayList<>()) ;
 
         when(playerService.getAll()).thenReturn(players);
 

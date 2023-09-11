@@ -2,6 +2,7 @@ package com.facu.altisima.controller;
 
 import com.facu.altisima.model.Player;
 import com.facu.altisima.service.api.PlayerServiceAPI;
+import com.facu.altisima.service.utils.ServiceResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +18,13 @@ public class PlayerController {
     private PlayerServiceAPI playerServiceAPI;
 
     @GetMapping
-    public List<Player> getAllPlayers() {
-        return playerServiceAPI.getAll();
+    public ResponseEntity<?> getAllPlayers() {
+        ServiceResult<List<Player>> allPlayers = playerServiceAPI.getAll();
+        if (allPlayers != null) {
+            return new ResponseEntity<>(allPlayers.getData(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(allPlayers.getErrorMessage(), HttpStatus.NOT_FOUND);
+        }
     }
 
     @PostMapping
@@ -31,11 +37,13 @@ public class PlayerController {
     public Player find(@PathVariable String id) {
         return playerServiceAPI.get(id);
     }
+
     @PutMapping(value = "/{id}")
     public ResponseEntity<Player> putPlayer(@PathVariable String id, @RequestBody Player playerChanges) {
         Player player = playerServiceAPI.put(id, playerChanges);
         return new ResponseEntity<Player>(player, HttpStatus.OK);
     }
+
     @DeleteMapping(value = "/{id}")
     public String deletePlayers(@PathVariable String id) {
         Player player = playerServiceAPI.get(id);
