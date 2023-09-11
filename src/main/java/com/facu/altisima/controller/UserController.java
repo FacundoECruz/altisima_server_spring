@@ -54,19 +54,26 @@ public class UserController {
         }
     }
     @GetMapping(value = "/{id}")
-    public User findUser(@PathVariable String id) {
-        return userServiceAPI.get(id);
+    public ResponseEntity<?> findUser(@PathVariable String id) {
+        ServiceResult<User> user = userServiceAPI.get(id);
+        if (user.isSuccess()) {
+            User retrievedUser = user.getData();
+            return ResponseEntity.ok(retrievedUser);
+        } else {
+            String errorMessage = user.getErrorMessage();
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(errorMessage);
+        }
     }
 
     @PutMapping(value = "/{id}")
     public ResponseEntity<User> putUser(@PathVariable String id, @RequestBody User userChanges) {
-        User user = userServiceAPI.put(id, userChanges);
-        return new ResponseEntity<User>(user, HttpStatus.OK);
+        ServiceResult<User> user = userServiceAPI.put(id, userChanges);
+        return new ResponseEntity<User>(user.getData(), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable String id) {
-        User user = userServiceAPI.get(id);
+        ServiceResult<User> user = userServiceAPI.get(id);
         if (user != null) {
             userServiceAPI.delete(id);
             return new ResponseEntity<>("Successfully deleted", HttpStatus.OK);

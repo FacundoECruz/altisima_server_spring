@@ -36,9 +36,8 @@ public class UserServiceTest {
         when(userRepository.findAll()).thenReturn(users);
 
         ServiceResult<List<User>> returnedUsersList = userService.getAll();
-        List<User> receivedUsers = returnedUsersList.getData();
 
-        assertEquals(users, receivedUsers);
+        assertEquals(users, returnedUsersList.getData());
     }
 
     @Test
@@ -69,19 +68,25 @@ public class UserServiceTest {
         assertEquals(expectedMsg, createdUser.getErrorMessage());
 
     }
+
     @Test
     public void successfulGetUserById() {
         Optional<User> optionalUser = Optional.of(user);
 
         when(userRepository.findById(user.getId())).thenReturn(optionalUser);
-        User retrievedUser = userService.get(user.getId());
+        ServiceResult<User> retrievedUser = userService.get(user.getId());
 
-        assertEquals(retrievedUser, user);
+        assertEquals(retrievedUser.getData(), user);
     }
 
     @Test
     public void userDoesNotExists() {
+        String expectedMsg = "El nombre de usuario no existe";
 
+        when(userRepository.findById(user.getId())).thenReturn((null));
+        ServiceResult<User> retrievedUser = userService.get(user.getId());
+
+        assertEquals(retrievedUser.getErrorMessage(), expectedMsg);
     }
 
     @Test
@@ -94,6 +99,10 @@ public class UserServiceTest {
         verify(userRepository, times(1)).deleteById(user.getId());
     }
 
+    public void unsuccessfulDeleteUser() {
+
+    }
+
     @Test
     public void successfulEditUser() {
         Optional<User> optionalUser = Optional.of(user);
@@ -102,8 +111,19 @@ public class UserServiceTest {
         User userChanges = new User("1", "Jorge", "www.image.com/jorge", "jorge", 0);
         when(userRepository.save(userChanges)).thenReturn(userChanges);
 
-        User retrievedUser = userService.put(user.getId(), userChanges);
-        assertEquals(userChanges, retrievedUser);
+        ServiceResult<User> retrievedUser = userService.put(user.getId(), userChanges);
+        assertEquals(userChanges, retrievedUser.getData());
+    }
+
+    @Test
+    public void unsuccessfulEditUser() {
+        String expectedMsg = "El nombre de usuario no existe";
+        when(userRepository.findById(user.getId())).thenReturn(null);
+
+        User userChanges = new User("1", "Jorge", "www.image.com/jorge", "jorge", 0);
+        ServiceResult<User> retrievedUser = userService.put(user.getId(), userChanges);
+
+        assertEquals(retrievedUser.getErrorMessage(), expectedMsg);
     }
 
     @Test
@@ -125,6 +145,5 @@ public class UserServiceTest {
         ServiceResult<User> retrievedUser = userService.login(loginRequest);
 
         assertEquals(retrievedUser.getErrorMessage(), expectedMsg);
-
     }
 }

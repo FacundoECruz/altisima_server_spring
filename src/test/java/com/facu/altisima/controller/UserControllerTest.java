@@ -13,6 +13,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.security.Provider;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -65,7 +66,8 @@ public class UserControllerTest {
     public void findUserByUsername() throws Exception {
 
         User user = new User("1", "Facu", "www.image.com/facu", "lapass", 0);
-        when(userService.get("1")).thenReturn(user);
+        ServiceResult<User> receivedUserFromService = ServiceResult.success(user);
+        when(userService.get("1")).thenReturn(receivedUserFromService);
 
         String userJson = objectMapper.writeValueAsString(user);
         mockMvc.perform(get("/users/1")
@@ -89,8 +91,9 @@ public class UserControllerTest {
     public void successfulUserEdit() throws Exception {
 
         User userChanges = new User("1", "messi", "www.image.com/messi", "lapass", 0);
+        ServiceResult<User> changedUser = ServiceResult.success(userChanges);
 
-        when(userService.put("1", userChanges)).thenReturn(userChanges);
+        when(userService.put("1", userChanges)).thenReturn(changedUser);
 
         String userJson = objectMapper.writeValueAsString(userChanges);
         mockMvc.perform(put("/users/1")

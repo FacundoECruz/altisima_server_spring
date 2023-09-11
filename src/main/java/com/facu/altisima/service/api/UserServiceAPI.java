@@ -14,11 +14,11 @@ public interface UserServiceAPI {
 
     void delete(String id);
 
-    User get(String id);
+    ServiceResult<User> get(String id);
 
     ServiceResult<List<User>> getAll();
 
-    User put(String id, User userChanges);
+    ServiceResult<User> put(String id, User userChanges);
 
     ServiceResult<User> login(LoginRequest loginRequest);
 }

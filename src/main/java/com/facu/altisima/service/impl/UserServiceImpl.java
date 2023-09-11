@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserServiceAPI {
     @Override
     public ServiceResult<User> save(User entity) {
         User savedUser = userRepository.save(entity);
-        if(savedUser != null) {
+        if (savedUser != null) {
             return ServiceResult.success(savedUser);
         } else {
             return ServiceResult.error("El nombre de usuario ya existe");
@@ -40,27 +40,34 @@ public class UserServiceImpl implements UserServiceAPI {
     }
 
     @Override
-    public User get(String id) {
+    public ServiceResult<User> get(String id) {
         Optional<User> retrievedUser = userRepository.findById(id);
-        if (retrievedUser.isPresent()) {
-            return retrievedUser.get();
+        if (retrievedUser != null && retrievedUser.isPresent()) {
+            return ServiceResult.success(retrievedUser.get());
+        } else {
+            return ServiceResult.error("El nombre de usuario no existe");
         }
-        return null;
+
     }
+
     @Override
     public void delete(String id) {
         userRepository.deleteById(id);
     }
 
 
-    public User put(String id, User userChanges) {
-        Optional<User> object = userRepository.findById(id);
-        User obj = object.get();
-        obj.setUsername(userChanges.getUsername());
-        obj.setImage(userChanges.getImage());
-        obj.setPassword(userChanges.getPassword());
-
-        return userRepository.save(obj);
+    public ServiceResult<User> put(String id, User userChanges) {
+        Optional<User> user = userRepository.findById(id);
+        if (user != null && user.isPresent()) {
+            User obj = user.get();
+            obj.setUsername(userChanges.getUsername());
+            obj.setImage(userChanges.getImage());
+            obj.setPassword(userChanges.getPassword());
+            User changedUser = userRepository.save(obj);
+            return ServiceResult.success(changedUser);
+        } else {
+            return ServiceResult.error("El nombre de usuario no existe");
+        }
     }
 
     public ServiceResult<User> login(LoginRequest loginRequest) {
