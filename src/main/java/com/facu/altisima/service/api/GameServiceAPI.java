@@ -19,8 +19,6 @@ public interface GameServiceAPI {
 
     Game getGame(String id);
 
-    Game saveGame(Game game);
-
     List<Game> getAllGames();
 
     void delete(String id);

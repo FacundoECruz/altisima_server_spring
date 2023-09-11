@@ -67,18 +67,23 @@ public class GameControllerTest {
 
     @Test
     public void saveGame() throws Exception {
+        // ESTE TEST HAY QUE ACOMODARLO.
         Game game = generateGame();
+        List<String> players = new ArrayList<>();
+        players.add("Migue");
+        players.add("Chaky");
+        players.add("kevin");
 
-        when(gameService.saveGame(game)).thenReturn(game);
+        when(gameService.createGame(players)).thenReturn(game);
 
-        String gameJson = objectMapper.writeValueAsString(game);
+        String playersJson = objectMapper.writeValueAsString(players);
 
         mockMvc.perform(post("/games")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(gameJson))
+                        .content(playersJson))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().string(gameJson));
+                .andExpect(content().string(playersJson));
     }
 
     @Test

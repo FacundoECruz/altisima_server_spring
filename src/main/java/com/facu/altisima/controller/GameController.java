@@ -24,9 +24,9 @@ public class GameController {
     }
 
     @PostMapping
-    public ResponseEntity<Game> saveGame(@RequestBody Game game) {
-        Game obj = gameServiceAPI.saveGame(game);
-        return new ResponseEntity<>(obj, HttpStatus.OK);
+    public ResponseEntity<Game> saveGame(@RequestBody List<String> players) {
+        Game game = gameServiceAPI.createGame(players);
+        return new ResponseEntity<>(game, HttpStatus.OK);
     }
 
     @GetMapping(value = "/{id}")

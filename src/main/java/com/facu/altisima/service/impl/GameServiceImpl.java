@@ -17,21 +17,16 @@ public class GameServiceImpl implements GameServiceAPI {
 
     @Autowired
     private GameRepository gameRepository;
-
-    public Game nextRound(String id, List<PlayerRound> roundResults) {
-        return null;
-    }
-
-    public List<PlayerRound> prevRound(String id) {
-        return null;
-    }
-
-    public Game finishGame(String id) {
-        return null;
-    }
-
     public Game createGame(List<String> players) {
+        //Aca va toda la logica de terminar creando
+        //el game con un POST.
         return null;
+    }
+
+    public List<Game> getAllGames() {
+        List<Game> returnList = new ArrayList<>();
+        gameRepository.findAll().forEach(obj -> returnList.add(obj));
+        return returnList;
     }
 
     @Override
@@ -44,19 +39,20 @@ public class GameServiceImpl implements GameServiceAPI {
     }
 
     @Override
-    public Game saveGame(Game game) {
-        return gameRepository.save(game);
-    }
-
-    public List<Game> getAllGames() {
-        List<Game> returnList = new ArrayList<>();
-        gameRepository.findAll().forEach(obj -> returnList.add(obj));
-        return returnList;
-    }
-
-    @Override
     public void delete(String id) {
         gameRepository.deleteById(id);
     }
 
+
+    public Game nextRound(String id, List<PlayerRound> roundResults) {
+        return null;
+    }
+
+    public List<PlayerRound> prevRound(String id) {
+        return null;
+    }
+
+    public Game finishGame(String id) {
+        return null;
+    }
 }
