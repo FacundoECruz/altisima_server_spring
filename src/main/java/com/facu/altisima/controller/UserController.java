@@ -50,7 +50,11 @@ public class UserController {
             return ResponseEntity.ok(retrievedUser);
         } else {
             String errorMessage = user.getErrorMessage();
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
+            if(errorMessage == "No se encontraron usuarios") {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
+            }
         }
     }
     @GetMapping(value = "/{id}")

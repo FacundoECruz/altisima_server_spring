@@ -20,5 +20,6 @@ public interface UserServiceAPI {
 
     ServiceResult<User> put(String id, User userChanges);
 
+
     ServiceResult<User> login(LoginRequest loginRequest);
 }

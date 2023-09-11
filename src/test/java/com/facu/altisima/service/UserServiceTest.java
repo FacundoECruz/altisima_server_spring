@@ -52,14 +52,14 @@ public class UserServiceTest {
 
     @Test
     public void successfulUserCreate() {
-        when(userRepository.save(user)).thenReturn(user);
+        when (userRepository.save(user)).thenReturn(user);
         ServiceResult<User> createdUser = userService.save(user);
 
         assertEquals(createdUser.getData(), user);
     }
 
     @Test
-    public void usernameAlreadyExists() {
+    public void usernameToCreateAlreadyExists() {
         when(userRepository.save(user)).thenReturn(null);
         String expectedMsg = "El nombre de usuario ya existe";
 
@@ -80,7 +80,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void userDoesNotExists() {
+    public void userToGetDoesNotExists() {
         String expectedMsg = "El nombre de usuario no existe";
 
         when(userRepository.findById(user.getId())).thenReturn((null));
@@ -104,7 +104,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void successfulEditUser() {
+    public void successfulEditedUser() {
         Optional<User> optionalUser = Optional.of(user);
         when(userRepository.findById(user.getId())).thenReturn(optionalUser);
 
@@ -116,7 +116,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void unsuccessfulEditUser() {
+    public void userToEditDoesNotExists() {
         String expectedMsg = "El nombre de usuario no existe";
         when(userRepository.findById(user.getId())).thenReturn(null);
 
@@ -128,22 +128,34 @@ public class UserServiceTest {
 
     @Test
     public void successfulLogin() {
-        when(userRepository.findByUsername(user.getUsername())).thenReturn(user);
+        LoginRequest loginRequest = new LoginRequest("Facu", "lapass");
+        when(userRepository.findByUsername(loginRequest.getUsername())).thenReturn(user);
 
-        LoginRequest loginRequest = new LoginRequest("Facu", "facu");
         ServiceResult<User> retrievedUser = userService.login(loginRequest);
 
         assertEquals(retrievedUser.getData(), user);
     }
 
     @Test
-    public void unsuccessfulLogin() {
+    public void userToLoginDoesNotExists() {
         when(userRepository.findByUsername(user.getUsername())).thenReturn(null);
-        String expectedMsg = "No se encontraron usuarios.";
+        String expectedMsg = "No se encontraron usuarios";
         LoginRequest loginRequest = new LoginRequest("Facu", "facu");
 
         ServiceResult<User> retrievedUser = userService.login(loginRequest);
 
         assertEquals(retrievedUser.getErrorMessage(), expectedMsg);
+    }
+
+    @Test
+    public void invalidPasswordInLogin() {
+        when(userRepository.findByUsername(user.getUsername())).thenReturn(user);
+        String expectedMsg = "Usuario o contraseña invalidos";
+        LoginRequest loginRequest = new LoginRequest("Facu", "asdf");
+
+        ServiceResult<User> retrievedUser = userService.login(loginRequest);
+
+        assertEquals(retrievedUser.getErrorMessage(), expectedMsg);
+
     }
 }

@@ -72,10 +72,15 @@ public class UserServiceImpl implements UserServiceAPI {
 
     public ServiceResult<User> login(LoginRequest loginRequest) {
         User user = userRepository.findByUsername(loginRequest.getUsername());
+
         if (user != null) {
-            return ServiceResult.success(user);
+            if (user.getPassword() == loginRequest.getPassword()) {
+                return ServiceResult.success(user);
+            } else {
+                return ServiceResult.error("Usuario o contraseña invalidos");
+            }
         } else {
-            return ServiceResult.error("No se encontraron usuarios.");
+            return ServiceResult.error("No se encontraron usuarios");
         }
     }
 
