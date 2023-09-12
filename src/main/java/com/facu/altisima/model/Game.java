@@ -6,14 +6,12 @@ import com.facu.altisima.controller.dto.PlayerRound;
 import com.facu.altisima.controller.dto.RoundStatus;
 import org.springframework.data.annotation.Id;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class Game {
     @Id
-    private String id;
-    private String date;
+    private UUID id;
+    private Date date;
     public Integer currentRound;
 
     public List<Integer> cardsPerRound;
@@ -28,19 +26,19 @@ public class Game {
 
     }
 
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 
@@ -97,7 +95,7 @@ public class Game {
         return Objects.hash(id, date, currentRound, cardsPerRound, players, roundResults, totalRounds);
     }
 
-    public Game(String id, String date, Integer currentRound, List<Integer> cardsPerRound, List<String> players, List<PlayerRound> roundResults, Integer totalRounds) {
+    public Game(UUID id, Date date, Integer currentRound, List<Integer> cardsPerRound, List<String> players, List<PlayerRound> roundResults, Integer totalRounds) {
         this.id = id;
         this.date = date;
         this.currentRound = currentRound;

@@ -5,37 +5,46 @@ import com.facu.altisima.controller.dto.PlayerRound;
 import com.facu.altisima.dao.api.GameRepository;
 import com.facu.altisima.model.Game;
 import com.facu.altisima.service.api.GameServiceAPI;
+import com.facu.altisima.service.utils.GameGenerator;
+import com.facu.altisima.service.utils.ServiceResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class GameServiceImpl implements GameServiceAPI {
 
     @Autowired
     private GameRepository gameRepository;
-    public Game createGame(List<String> players) {
-        //Aca va toda la logica de terminar creando
-        //el game con un POST.
-        return null;
+
+    public ServiceResult<Game> createGame(List<String> players, Integer totalRounds) {
+        GameGenerator gameGenerator = new GameGenerator();
+        Game game = new Game(UUID.randomUUID(), new Date(), 1, gameGenerator.generateCardsPerRound(players.size(), totalRounds), players, gameGenerator.generateRoundResults(players), totalRounds);
+
+        Game savedGame = gameRepository.save(game);
+
+        return ServiceResult.success(savedGame);
     }
 
-    public List<Game> getAllGames() {
-        List<Game> returnList = new ArrayList<>();
-        gameRepository.findAll().forEach(obj -> returnList.add(obj));
-        return returnList;
+    public ServiceResult<List<Game>> getAllGames() {
+        List<Game> allGames = gameRepository.findAll();
+        if (allGames.size() > 0) {
+            return ServiceResult.success(allGames);
+        } else {
+            return ServiceResult.error("No se encontraron partidas");
+        }
     }
 
     @Override
-    public Game getGame(String id) {
-        Optional<Game> obj = gameRepository.findById(id);
-        if (obj.isPresent()) {
-            return obj.get();
+    public ServiceResult<Game> getGame(String id) {
+        Optional<Game> game = gameRepository.findById(id);
+        if (game.isPresent()) {
+            return ServiceResult.success(game.get());
+        } else {
+            return ServiceResult.error("No se encontro partida con ese id");
         }
-        return null;
+
     }
 
     @Override
