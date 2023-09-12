@@ -22,7 +22,7 @@ public class UserServiceImpl implements UserServiceAPI {
     @Override
     public ServiceResult<List<User>> getAll() {
         List<User> users = userRepository.findAll();
-        if (users != null) {
+        if (users.size() > 0) {
             return ServiceResult.success(users);
         } else {
             return ServiceResult.error("No se encontraron usuarios.");
@@ -30,18 +30,21 @@ public class UserServiceImpl implements UserServiceAPI {
     }
 
     @Override
-    public ServiceResult<User> save(User entity) {
-        User savedUser = userRepository.save(entity);
-        if (savedUser != null) {
-            return ServiceResult.success(savedUser);
-        } else {
+    public ServiceResult<User> save(User user) {
+
+        Optional<User> dbUser = userRepository.findByUsername(user.getUsername());
+
+        if (dbUser.isPresent()) {
             return ServiceResult.error("El nombre de usuario ya existe");
+        } else {
+            User savedUser = userRepository.save(user);
+            return ServiceResult.success(savedUser);
         }
     }
 
     @Override
-    public ServiceResult<User> get(String id) {
-        Optional<User> retrievedUser = userRepository.findById(id);
+    public ServiceResult<User> get(String username) {
+        Optional<User> retrievedUser = userRepository.findByUsername(username);
         if (retrievedUser != null && retrievedUser.isPresent()) {
             return ServiceResult.success(retrievedUser.get());
         } else {
@@ -56,14 +59,14 @@ public class UserServiceImpl implements UserServiceAPI {
     }
 
 
-    public ServiceResult<User> put(String id, User userChanges) {
-        Optional<User> user = userRepository.findById(id);
-        if (user != null && user.isPresent()) {
-            User obj = user.get();
-            obj.setUsername(userChanges.getUsername());
-            obj.setImage(userChanges.getImage());
-            obj.setPassword(userChanges.getPassword());
-            User changedUser = userRepository.save(obj);
+    public ServiceResult<User> put(String username, User userChanges) {
+        Optional<User> user = userRepository.findByUsername(username);
+        if (user.isPresent()) {
+            User userToChange = user.get();
+            userToChange.setUsername(userChanges.getUsername());
+            userToChange.setImage(userChanges.getImage());
+            userToChange.setPassword(userChanges.getPassword());
+            User changedUser = userRepository.save(userToChange);
             return ServiceResult.success(changedUser);
         } else {
             return ServiceResult.error("El nombre de usuario no existe");
@@ -71,11 +74,12 @@ public class UserServiceImpl implements UserServiceAPI {
     }
 
     public ServiceResult<User> login(LoginRequest loginRequest) {
-        User user = userRepository.findByUsername(loginRequest.getUsername());
+        Optional<User> user = userRepository.findByUsername(loginRequest.getUsername());
 
-        if (user != null) {
-            if (user.getPassword() == loginRequest.getPassword()) {
-                return ServiceResult.success(user);
+        if (user.isPresent()) {
+            User userToLogin = user.get();
+            if (userToLogin.getPassword() == loginRequest.getPassword()) {
+                return ServiceResult.success(userToLogin);
             } else {
                 return ServiceResult.error("Usuario o contraseña invalidos");
             }

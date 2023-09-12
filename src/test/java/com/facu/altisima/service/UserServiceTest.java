@@ -42,7 +42,9 @@ public class UserServiceTest {
 
     @Test
     public void testDatabaseConnectionUserListError() {
-        when(userRepository.findAll()).thenReturn(null);
+        List<User> users = new ArrayList<>();
+
+        when(userRepository.findAll()).thenReturn(users);
         String expectedMsg = "No se encontraron usuarios.";
 
         ServiceResult<List<User>> result = userService.getAll();
@@ -60,7 +62,9 @@ public class UserServiceTest {
 
     @Test
     public void usernameToCreateAlreadyExists() {
-        when(userRepository.save(user)).thenReturn(null);
+        Optional<User> optionalUser = Optional.of(user);
+        when(userRepository.findByUsername(user.getUsername())).thenReturn(optionalUser);
+
         String expectedMsg = "El nombre de usuario ya existe";
 
         ServiceResult<User> createdUser = userService.save(user);
@@ -70,20 +74,21 @@ public class UserServiceTest {
     }
 
     @Test
-    public void successfulGetUserById() {
+    public void successfulGetUserByUsername() {
         Optional<User> optionalUser = Optional.of(user);
 
-        when(userRepository.findById(user.getId())).thenReturn(optionalUser);
-        ServiceResult<User> retrievedUser = userService.get(user.getId());
+        when(userRepository.findByUsername(user.getUsername())).thenReturn(optionalUser);
+        ServiceResult<User> retrievedUser = userService.get(user.getUsername());
 
         assertEquals(retrievedUser.getData(), user);
     }
 
     @Test
     public void userToGetDoesNotExists() {
+        Optional<User> optionalUser = Optional.empty();
         String expectedMsg = "El nombre de usuario no existe";
 
-        when(userRepository.findById(user.getId())).thenReturn((null));
+        when(userRepository.findById(user.getId())).thenReturn((optionalUser));
         ServiceResult<User> retrievedUser = userService.get(user.getId());
 
         assertEquals(retrievedUser.getErrorMessage(), expectedMsg);
@@ -106,19 +111,20 @@ public class UserServiceTest {
     @Test
     public void successfulEditedUser() {
         Optional<User> optionalUser = Optional.of(user);
-        when(userRepository.findById(user.getId())).thenReturn(optionalUser);
+        when(userRepository.findByUsername(user.getUsername())).thenReturn(optionalUser);
 
         User userChanges = new User("1", "Jorge", "www.image.com/jorge", "jorge", 0);
         when(userRepository.save(userChanges)).thenReturn(userChanges);
 
-        ServiceResult<User> retrievedUser = userService.put(user.getId(), userChanges);
+        ServiceResult<User> retrievedUser = userService.put(user.getUsername(), userChanges);
         assertEquals(userChanges, retrievedUser.getData());
     }
 
     @Test
     public void userToEditDoesNotExists() {
         String expectedMsg = "El nombre de usuario no existe";
-        when(userRepository.findById(user.getId())).thenReturn(null);
+        Optional<User> optionalUser = Optional.empty();
+        when(userRepository.findByUsername(user.getUsername())).thenReturn(optionalUser);
 
         User userChanges = new User("1", "Jorge", "www.image.com/jorge", "jorge", 0);
         ServiceResult<User> retrievedUser = userService.put(user.getId(), userChanges);
@@ -128,8 +134,9 @@ public class UserServiceTest {
 
     @Test
     public void successfulLogin() {
+        Optional<User> optionalUser = Optional.of(user);
         LoginRequest loginRequest = new LoginRequest("Facu", "lapass");
-        when(userRepository.findByUsername(loginRequest.getUsername())).thenReturn(user);
+        when(userRepository.findByUsername(loginRequest.getUsername())).thenReturn(optionalUser);
 
         ServiceResult<User> retrievedUser = userService.login(loginRequest);
 
@@ -138,7 +145,8 @@ public class UserServiceTest {
 
     @Test
     public void userToLoginDoesNotExists() {
-        when(userRepository.findByUsername(user.getUsername())).thenReturn(null);
+        Optional<User> optionalUser = Optional.empty();
+        when(userRepository.findByUsername(user.getUsername())).thenReturn(optionalUser);
         String expectedMsg = "No se encontraron usuarios";
         LoginRequest loginRequest = new LoginRequest("Facu", "facu");
 
@@ -149,7 +157,8 @@ public class UserServiceTest {
 
     @Test
     public void invalidPasswordInLogin() {
-        when(userRepository.findByUsername(user.getUsername())).thenReturn(user);
+        Optional<User> optionalUser = Optional.of(user);
+        when(userRepository.findByUsername(user.getUsername())).thenReturn(optionalUser);
         String expectedMsg = "Usuario o contraseña invalidos";
         LoginRequest loginRequest = new LoginRequest("Facu", "asdf");
 

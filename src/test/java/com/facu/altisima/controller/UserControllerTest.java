@@ -33,9 +33,11 @@ public class UserControllerTest {
 
     ObjectMapper objectMapper = new ObjectMapper();
 
+    User user = new User("1", "Facu", "www.image.com/facu", "lapass", 0);
+
     @Test
     public void returnAllUsers() throws Exception {
-        ServiceResult<List<User>> users = ServiceResult.success(new ArrayList<>()) ;
+        ServiceResult<List<User>> users = ServiceResult.success(new ArrayList<>());
 
         when(userService.getAll()).thenReturn(users);
 
@@ -47,7 +49,6 @@ public class UserControllerTest {
 
     @Test
     public void successfulCreateUser() throws Exception {
-        User user = new User("1", "Facu", "www.image.com/facu", "lapass", 0);
         ServiceResult<User> receivedUserFromService = ServiceResult.success(user);
 
         when(userService.save(user)).thenReturn(receivedUserFromService);
@@ -64,13 +65,14 @@ public class UserControllerTest {
 
     @Test
     public void findUserByUsername() throws Exception {
+        ServiceResult<User> serviceUser = ServiceResult.success(user);
+        when(userService.get(user.getUsername())).thenReturn(serviceUser);
 
-        User user = new User("1", "Facu", "www.image.com/facu", "lapass", 0);
-        ServiceResult<User> receivedUserFromService = ServiceResult.success(user);
-        when(userService.get("1")).thenReturn(receivedUserFromService);
+        String urlTemplate = "/users/" + user.getUsername();
 
         String userJson = objectMapper.writeValueAsString(user);
-        mockMvc.perform(get("/users/1")
+
+        mockMvc.perform(get(urlTemplate)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -79,12 +81,14 @@ public class UserControllerTest {
 
     @Test
     public void successfulUserDelete() throws Exception {
-        doNothing().when(userService).delete("messi");
+        doNothing().when(userService).delete(user.getId());
+        ServiceResult<User> serviceUser = ServiceResult.success(user);
+        when(userService.get(user.getUsername())).thenReturn(serviceUser);
 
-        mockMvc.perform(delete("/players/1")
+        String urlTemplate = "/users/" + user.getUsername();
+        mockMvc.perform(delete(urlTemplate)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
-
     }
 
     @Test
@@ -93,10 +97,12 @@ public class UserControllerTest {
         User userChanges = new User("1", "messi", "www.image.com/messi", "lapass", 0);
         ServiceResult<User> changedUser = ServiceResult.success(userChanges);
 
-        when(userService.put("1", userChanges)).thenReturn(changedUser);
+        when(userService.put(user.getUsername(), userChanges)).thenReturn(changedUser);
+
+        String urlTemplate = "/users/" + user.getUsername();
 
         String userJson = objectMapper.writeValueAsString(userChanges);
-        mockMvc.perform(put("/users/1")
+        mockMvc.perform(put(urlTemplate)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(userJson))
                 .andExpect(status().isOk())
