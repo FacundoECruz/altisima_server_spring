@@ -8,13 +8,10 @@ import java.util.List;
 
 public interface PlayerServiceAPI {
 
-        Player save (Player entity);
+        ServiceResult<Player> save (Player entity);
 
-        void delete(String id);
-
-        Player get(String id);
+        ServiceResult<Player> get(String username);
 
         ServiceResult<List<Player>> getAll();
 
-        Player put(String id, Player playerChanges);
 }

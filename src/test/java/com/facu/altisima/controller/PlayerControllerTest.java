@@ -16,7 +16,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -33,9 +32,11 @@ public class PlayerControllerTest {
 
     ObjectMapper objectMapper = new ObjectMapper();
 
+    Player player = new Player("1", "Facu", "www.image.com/facu", 0, 0, 0);
+
     @Test
     public void returnAllPlayers() throws Exception {
-        ServiceResult<List<Player>> players = ServiceResult.success(new ArrayList<>()) ;
+        ServiceResult<List<Player>> players = ServiceResult.success(new ArrayList<>());
 
         when(playerService.getAll()).thenReturn(players);
 
@@ -48,10 +49,9 @@ public class PlayerControllerTest {
 
     @Test
     public void successfulSavePlayer() throws Exception {
+        ServiceResult<Player> savedPlayer = ServiceResult.success(player);
 
-        Player player = new Player("1", "Facu", "www.image.com/facu", 0, 0, 0);
-
-        when(playerService.save(player)).thenReturn(player);
+        when(playerService.save(player)).thenReturn(savedPlayer);
 
         String playerJson = objectMapper.writeValueAsString(player);
 
@@ -64,41 +64,18 @@ public class PlayerControllerTest {
     }
 
     @Test
-    public void findPlayerById() throws Exception {
+    public void findPlayerByUsername() throws Exception {
+        ServiceResult<Player> returnedPlayer = ServiceResult.success(player);
+        when(playerService.get(player.getUsername())).thenReturn(returnedPlayer);
 
-        Player player = new Player("1", "Facu", "www.image.com/facu", 0, 0, 0);
-        when(playerService.get("1")).thenReturn(player);
+        String urlTemplate = "/players/" + player.getUsername();
 
         String playerJson = objectMapper.writeValueAsString(player);
-        mockMvc.perform(get("/players/1")
+        mockMvc.perform(get(urlTemplate)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string(playerJson));
     }
 
-    @Test
-    public void successfulPlayerDelete() throws Exception {
-        doNothing().when(playerService).delete("1");
-
-        mockMvc.perform(delete("/players/1")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-    }
-
-    @Test
-    public void successfulPlayerEdit() throws Exception{
-
-        Player playerChanges = new Player("1", "messi", "www.image.com/messi", 0, 0, 0);
-
-        when(playerService.put("1", playerChanges)).thenReturn(playerChanges);
-
-        String playerJson = objectMapper.writeValueAsString(playerChanges);
-        mockMvc.perform(put("/players/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(playerJson))
-                .andExpect(status().isOk())
-                .andExpect(content().string(playerJson));
-    }
 }

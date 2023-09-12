@@ -20,7 +20,7 @@ public class PlayerController {
     @GetMapping
     public ResponseEntity<?> getAllPlayers() {
         ServiceResult<List<Player>> allPlayers = playerServiceAPI.getAll();
-        if (allPlayers != null) {
+        if (allPlayers.getErrorMessage() == null) {
             return new ResponseEntity<>(allPlayers.getData(), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(allPlayers.getErrorMessage(), HttpStatus.NOT_FOUND);
@@ -28,31 +28,23 @@ public class PlayerController {
     }
 
     @PostMapping
-    public ResponseEntity<Player> savePlayers(@RequestBody Player player) {
-        Player obj = playerServiceAPI.save(player);
-        return new ResponseEntity<>(obj, HttpStatus.OK);
-    }
-
-    @GetMapping(value = "/{id}")
-    public Player find(@PathVariable String id) {
-        return playerServiceAPI.get(id);
-    }
-
-    @PutMapping(value = "/{id}")
-    public ResponseEntity<Player> putPlayer(@PathVariable String id, @RequestBody Player playerChanges) {
-        Player player = playerServiceAPI.put(id, playerChanges);
-        return new ResponseEntity<Player>(player, HttpStatus.OK);
-    }
-
-    @DeleteMapping(value = "/{id}")
-    public String deletePlayers(@PathVariable String id) {
-        Player player = playerServiceAPI.get(id);
-        if (player != null) {
-            playerServiceAPI.delete(id);
+    public ResponseEntity<?> savePlayers(@RequestBody Player player) {
+        ServiceResult<Player> savedPlayer = playerServiceAPI.save(player);
+        if(savedPlayer.getErrorMessage() == null) {
+            return new ResponseEntity<>(savedPlayer.getData(), HttpStatus.OK);
         } else {
-            return "Player does not exists";
+            return new ResponseEntity<>(savedPlayer.getErrorMessage(), HttpStatus.CONFLICT);
         }
-
-        return "Successfully deleted";
     }
+
+    @GetMapping(value = "/{username}")
+    public ResponseEntity<?> find(@PathVariable String username) {
+        ServiceResult<Player> player = playerServiceAPI.get(username);
+        if(player.getErrorMessage() == null) {
+            return new ResponseEntity<>(player.getData(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(player.getErrorMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
 }

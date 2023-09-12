@@ -1,8 +1,11 @@
 package com.facu.altisima.dao.api;
 
+import com.facu.altisima.model.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import com.facu.altisima.model.Player;
 
-public interface PlayerRepository extends MongoRepository<Player, String>{
+import java.util.Optional;
 
+public interface PlayerRepository extends MongoRepository<Player, String>{
+    Optional<Player> findByUsername(String username);
 }

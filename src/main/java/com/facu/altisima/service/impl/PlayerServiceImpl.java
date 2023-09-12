@@ -22,36 +22,32 @@ public class PlayerServiceImpl implements PlayerServiceAPI {
     public ServiceResult<List<Player>> getAll() {
         List<Player> allPlayers = playerRepository.findAll();
 
-        if (allPlayers != null) {
+        if (allPlayers.size() == 0) {
             return ServiceResult.success(allPlayers);
         } else {
             return ServiceResult.error("No se pudieron recuperar los jugadores");
         }
     }
-    @Override
-    public Player save(Player entity) {
-        return playerRepository.save(entity);
-    }
 
     @Override
-    public Player get(String id) {
-        Optional<Player> obj = playerRepository.findById(id);
-        if (obj.isPresent()) {
-            return obj.get();
+    public ServiceResult<Player> save(Player player) {
+        Optional<Player> playerInDb = playerRepository.findByUsername(player.getUsername());
+        if (playerInDb.isPresent()) {
+            return ServiceResult.error("El nombre de usuario ya existe");
+        } else {
+            Player savedPlayer = playerRepository.save(player);
+            return ServiceResult.success(savedPlayer);
         }
-        return null;
     }
+
     @Override
-    public void delete(String id) {
-        playerRepository.deleteById(id);
+    public ServiceResult<Player> get(String username) {
+        Optional<Player> player = playerRepository.findByUsername(username);
+        if(player.isPresent()) {
+            return ServiceResult.success(player.get());
+        } else {
+            return ServiceResult.error("El nombre de usuario no existe");
+        }
     }
 
-    public Player put(String id, Player playerChanges) {
-       Optional <Player> object = playerRepository.findById(id);
-       Player obj = object.get();
-        obj.setUsername(playerChanges.getUsername());
-        obj.setImage(playerChanges.getImage());
-
-        return playerRepository.save(obj);
-    }
 }

@@ -11,6 +11,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -46,5 +47,48 @@ public class PlayerServiceTest {
         ServiceResult<List<Player>> returnedAllPlayersList = playerService.getAll();
 
         assertEquals(returnedAllPlayersList.getErrorMessage(), expectedMsg);
+    }
+
+    @Test
+    public void successfulSavePlayer() {
+        when(playerRepository.save(player)).thenReturn(player);
+
+        ServiceResult<Player> savedPlayer = playerService.save(player);
+
+        assertEquals(savedPlayer.getData(), player);
+    }
+
+    @Test
+    public void usernameAlreadyExists() {
+        Optional<Player> optionalPlayer = Optional.of(player);
+        when(playerRepository.findByUsername(player.getUsername())).thenReturn(optionalPlayer);
+        String expectedMsg = "El nombre de usuario ya existe";
+
+        ServiceResult<Player> returnedPlayer = playerService.save(player);
+
+        assertEquals(expectedMsg, returnedPlayer.getErrorMessage());
+    }
+
+    @Test
+    public void successfulGetPlayerById() {
+        Optional<Player> optionalPlayer = Optional.of(player);
+
+        when(playerRepository.findByUsername(player.getUsername())).thenReturn(optionalPlayer);
+
+        ServiceResult<Player> returnedPlayer = playerService.get(player.getUsername());
+
+        assertEquals(returnedPlayer.getData(), player);
+    }
+
+    @Test
+    public void playerDoesNotExist() {
+        String expectedMsg = "El nombre de usuario no existe";
+        Optional<Player> optionalPlayer = Optional.empty();
+
+        when(playerRepository.findByUsername(player.getUsername())).thenReturn(optionalPlayer);
+
+        ServiceResult<Player> returnedPlayer = playerService.get(player.getUsername());
+
+        assertEquals(returnedPlayer.getErrorMessage(), expectedMsg);
     }
 }
