@@ -41,7 +41,8 @@ public class PlayerServiceTest {
 
     @Test
     public void unSuccessfulGetAllPlayers() {
-        when(playerRepository.findAll()).thenReturn(null);
+        List<Player> voidPlayersList = new ArrayList<>();
+        when(playerRepository.findAll()).thenReturn(voidPlayersList);
         String expectedMsg = "No se pudieron recuperar los jugadores";
 
         ServiceResult<List<Player>> returnedAllPlayersList = playerService.getAll();

@@ -22,7 +22,7 @@ public class PlayerServiceImpl implements PlayerServiceAPI {
     public ServiceResult<List<Player>> getAll() {
         List<Player> allPlayers = playerRepository.findAll();
 
-        if (allPlayers.size() == 0) {
+        if (allPlayers.size() != 0) {
             return ServiceResult.success(allPlayers);
         } else {
             return ServiceResult.error("No se pudieron recuperar los jugadores");
