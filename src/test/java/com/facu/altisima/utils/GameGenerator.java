@@ -38,7 +38,7 @@ public class GameGenerator {
 
     public Game generate(List<String> players, Integer totalRounds) {
         String id = idGenerator.generate();
-        Date date = new Date();
+        String date = "18/12/2022 14:55";
         Integer currentRound = 1;
         List<Integer> cardsPerRound = generateCardsPerRound(players.size(), totalRounds);
         List<PlayerRound> roundResults = generateRoundResults(players);

@@ -7,6 +7,7 @@ import com.facu.altisima.controller.dto.Translate;
 import com.facu.altisima.model.Game;
 import com.facu.altisima.service.api.GameServiceAPI;
 import com.facu.altisima.service.utils.ServiceResult;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,10 +26,15 @@ public class GameController {
 //        return gameServiceAPI.getGame(id);
 //    }
 
-//    @GetMapping
-//    public List<Game> getAllGames() {
-//        return gameServiceAPI.getAllGames();
-//    }
+    @GetMapping
+    public ResponseEntity<?> getAllGames() {
+        ServiceResult<List<Game>> allGames = gameServiceAPI.getAllGames();
+        if(allGames.getErrorMessage() == null) {
+            return new ResponseEntity<>(allGames.getData(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(allGames.getErrorMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
 
     @PostMapping
     public ResponseEntity<?> saveGame(@RequestBody GameRequestDto gameRequestDto) {

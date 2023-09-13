@@ -1,11 +1,12 @@
 package com.facu.altisima.service.impl;
 
-import com.facu.altisima.controller.dto.GameState;
 import com.facu.altisima.controller.dto.PlayerRound;
 import com.facu.altisima.dao.api.GameRepository;
 import com.facu.altisima.model.Game;
 import com.facu.altisima.service.api.GameServiceAPI;
-import com.facu.altisima.service.utils.GameGenerator;
+import com.facu.altisima.service.utils.DateFormatter;
+import com.facu.altisima.service.utils.Generate;
+import com.facu.altisima.service.utils.IdGenerator;
 import com.facu.altisima.service.utils.ServiceResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,17 +15,27 @@ import java.util.*;
 
 @Service
 public class GameServiceImpl implements GameServiceAPI {
+    private final GameRepository gameRepository;
+    private final IdGenerator idGenerator;
+    Generate generate = new Generate();
+    DateFormatter dateFormatter = new DateFormatter();
 
     @Autowired
-    private GameRepository gameRepository;
+    public GameServiceImpl(GameRepository gameRepository, IdGenerator idGenerator) {
+        this.gameRepository = gameRepository;
+        this.idGenerator = idGenerator;
+    }
 
     public ServiceResult<Game> createGame(List<String> players, Integer totalRounds) {
-        GameGenerator gameGenerator = new GameGenerator();
-        Game game = new Game(UUID.randomUUID(), new Date(), 1, gameGenerator.generateCardsPerRound(players.size(), totalRounds), players, gameGenerator.generateRoundResults(players), totalRounds);
+        if (players.size() > 8) {
+            return ServiceResult.error("Demasiados jugadores");
+        } else {
+            Game game = new Game(idGenerator.generate(), dateFormatter.formatDate(new Date()), 1, generate.cardsPerRound(players.size(), totalRounds), players, generate.roundResults(players), totalRounds);
 
-        Game savedGame = gameRepository.save(game);
+            Game savedGame = gameRepository.save(game);
 
-        return ServiceResult.success(savedGame);
+            return ServiceResult.success(savedGame);
+        }
     }
 
     public ServiceResult<List<Game>> getAllGames() {

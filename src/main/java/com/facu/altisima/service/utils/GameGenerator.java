@@ -13,7 +13,7 @@ public class GameGenerator {
 
     }
     UUIDGenerator uuidGenerator = new UUIDGenerator();
-
+    DateFormatter dateFormatter = new DateFormatter();
     public List<Integer> generateCardsPerRound(Integer playersQty, Integer totalRounds) {
         List<Integer> cardsPerRound = new ArrayList<>();
 
@@ -39,7 +39,7 @@ public class GameGenerator {
 
     public Game generateGame(List<String> players, Integer totalRounds) {
         String id = uuidGenerator.generate();
-        Date date = new Date();
+        String date = dateFormatter.formatDate(new Date());
         Integer currentRound = 1;
         List<Integer> cardsPerRound = generateCardsPerRound(players.size(), totalRounds);
         List<PlayerRound> roundResults = generateRoundResults(players);
