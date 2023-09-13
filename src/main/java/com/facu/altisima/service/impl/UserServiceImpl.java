@@ -25,7 +25,7 @@ public class UserServiceImpl implements UserServiceAPI {
         if (users.size() > 0) {
             return ServiceResult.success(users);
         } else {
-            return ServiceResult.error("No se encontraron usuarios.");
+            return ServiceResult.error("No se encontraron usuarios");
         }
     }
 

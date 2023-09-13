@@ -18,6 +18,17 @@ public class UserController {
     @Autowired
     private UserServiceAPI userServiceAPI;
 
+    @GetMapping(value = "/{username}")
+    public ResponseEntity<?> findUser(@PathVariable String username) {
+        ServiceResult<User> user = userServiceAPI.get(username);
+        if (user.isSuccess()) {
+            User retrievedUser = user.getData();
+            return ResponseEntity.ok(retrievedUser);
+        } else {
+            String errorMessage = user.getErrorMessage();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
+        }
+    }
     @GetMapping
     public ResponseEntity<?> getUsers() {
         ServiceResult<List<User>> result = userServiceAPI.getAll();
@@ -42,6 +53,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(errorMessage);
         }
     }
+
     @PostMapping(value = "/login")
     public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
         ServiceResult<User> user = userServiceAPI.login(loginRequest);
@@ -57,22 +69,15 @@ public class UserController {
             }
         }
     }
-    @GetMapping(value = "/{username}")
-    public ResponseEntity<?> findUser(@PathVariable String username) {
-        ServiceResult<User> user = userServiceAPI.get(username);
-        if (user.isSuccess()) {
-            User retrievedUser = user.getData();
-            return ResponseEntity.ok(retrievedUser);
-        } else {
-            String errorMessage = user.getErrorMessage();
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(errorMessage);
-        }
-    }
 
     @PutMapping(value = "/{username}")
-    public ResponseEntity<User> putUser(@PathVariable String username, @RequestBody User userChanges) {
+    public ResponseEntity<?> putUser(@PathVariable String username, @RequestBody User userChanges) {
         ServiceResult<User> user = userServiceAPI.put(username, userChanges);
-        return new ResponseEntity<User>(user.getData(), HttpStatus.OK);
+        if(user.getErrorMessage() == null) {
+        return new ResponseEntity<>(user.getData(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(user.getErrorMessage(), HttpStatus.NOT_FOUND);
+        }
     }
 
     @DeleteMapping(value = "/{username}")
