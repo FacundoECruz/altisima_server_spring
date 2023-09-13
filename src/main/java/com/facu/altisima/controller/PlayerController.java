@@ -13,10 +13,18 @@ import java.util.List;
 @RestController
 @RequestMapping("/players")
 public class PlayerController {
-
     @Autowired
     private PlayerServiceAPI playerServiceAPI;
 
+    @GetMapping(value = "/{username}")
+    public ResponseEntity<?> find(@PathVariable String username) {
+        ServiceResult<Player> player = playerServiceAPI.get(username);
+        if(player.getErrorMessage() == null) {
+            return new ResponseEntity<>(player.getData(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(player.getErrorMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
     @GetMapping
     public ResponseEntity<?> getAllPlayers() {
         ServiceResult<List<Player>> allPlayers = playerServiceAPI.getAll();
@@ -37,14 +45,6 @@ public class PlayerController {
         }
     }
 
-    @GetMapping(value = "/{username}")
-    public ResponseEntity<?> find(@PathVariable String username) {
-        ServiceResult<Player> player = playerServiceAPI.get(username);
-        if(player.getErrorMessage() == null) {
-            return new ResponseEntity<>(player.getData(), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(player.getErrorMessage(), HttpStatus.NOT_FOUND);
-        }
-    }
+    //ENDPOINT PARA EDITAR PLAYER Y AGREGARLE DATA DE LA PARTIDA QUE JUGO
 
 }
