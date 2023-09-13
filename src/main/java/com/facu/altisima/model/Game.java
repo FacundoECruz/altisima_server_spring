@@ -1,44 +1,48 @@
 package com.facu.altisima.model;
 
-import com.facu.altisima.controller.dto.GameState;
-import com.facu.altisima.controller.dto.PlayerResult;
 import com.facu.altisima.controller.dto.PlayerRound;
-import com.facu.altisima.controller.dto.RoundStatus;
+
 import org.springframework.data.annotation.Id;
 
 import java.util.*;
 
 public class Game {
     @Id
-    private UUID id;
-    private Date date;
+    private String id;
+    private String date;
     public Integer currentRound;
-
     public List<Integer> cardsPerRound;
-
     private List<String> players;
-
     private List<PlayerRound> roundResults;
-
     private Integer totalRounds;
 
     public Game() {
 
     }
 
-    public UUID getId() {
+    public Game(String id, String date, Integer currentRound, List<Integer> cardsPerRound, List<String> players, List<PlayerRound> roundResults, Integer totalRounds) {
+        this.id = id;
+        this.date = date;
+        this.currentRound = currentRound;
+        this.cardsPerRound = cardsPerRound;
+        this.players = players;
+        this.roundResults = roundResults;
+        this.totalRounds = totalRounds;
+    }
+
+    public String getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.date = date;
     }
 
@@ -94,17 +98,4 @@ public class Game {
     public int hashCode() {
         return Objects.hash(id, date, currentRound, cardsPerRound, players, roundResults, totalRounds);
     }
-
-    public Game(UUID id, Date date, Integer currentRound, List<Integer> cardsPerRound, List<String> players, List<PlayerRound> roundResults, Integer totalRounds) {
-        this.id = id;
-        this.date = date;
-        this.currentRound = currentRound;
-        this.cardsPerRound = cardsPerRound;
-        this.players = players;
-        this.roundResults = roundResults;
-        this.totalRounds = totalRounds;
-    }
-
-
-
 }
