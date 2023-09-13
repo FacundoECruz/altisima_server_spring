@@ -1,5 +1,6 @@
 package com.facu.altisima.controller;
 
+import com.facu.altisima.controller.dto.GameRequestDto;
 import com.facu.altisima.controller.dto.GameState;
 import com.facu.altisima.controller.dto.PlayerRound;
 import com.facu.altisima.controller.dto.Translate;
@@ -19,14 +20,20 @@ public class GameController {
     @Autowired
     private GameServiceAPI gameServiceAPI;
 
+    //    @GetMapping(value = "/{id}")
+//    public Game getGameById(@PathVariable String id) {
+//        return gameServiceAPI.getGame(id);
+//    }
+
 //    @GetMapping
 //    public List<Game> getAllGames() {
 //        return gameServiceAPI.getAllGames();
 //    }
 
     @PostMapping
-    public ResponseEntity<?> saveGame(@RequestBody List<String> players, Integer totalRounds) {
-        //Conviene poner el UUID aca?
+    public ResponseEntity<?> saveGame(@RequestBody GameRequestDto gameRequestDto) {
+        List<String> players = gameRequestDto.getPlayers();
+        Integer totalRounds = gameRequestDto.getTotalRounds();
         ServiceResult<Game> game = gameServiceAPI.createGame(players, totalRounds);
         if (game.getErrorMessage() == null) {
             return new ResponseEntity<>(game.getData(), HttpStatus.OK);
@@ -35,26 +42,12 @@ public class GameController {
         }
     }
 }
-//    @GetMapping(value = "/{id}")
-//    public Game getGameById(@PathVariable String id) {
-//        return gameServiceAPI.getGame(id);
-//    }
-//
-//    @DeleteMapping(value="/{id}")
-//    public String deleteGame(@PathVariable String id) {
-//        Game game = gameServiceAPI.getGame(id);
-//        if (game != null) {
-//            gameServiceAPI.delete(id);
-//        } else {
-//            return "Game does not exists";
-//        }
-//
-//        return "Successfully deleted";
-//    }
+
 //    @PutMapping(value="/{id}/next")
 //    public GameState nextRound(@PathVariable String id, @RequestBody List<PlayerRound> roundResults) {
 //        Game game = gameServiceAPI.nextRound(id, roundResults);
 //        Translate translator = new Translate();
+//
 //
 //        return translator.toGameState(game);
 //    }
