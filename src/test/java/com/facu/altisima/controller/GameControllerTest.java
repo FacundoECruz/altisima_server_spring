@@ -1,12 +1,11 @@
 package com.facu.altisima.controller;
 
-import com.facu.altisima.controller.dto.GameRequestDto;
+import com.facu.altisima.controller.dto.*;
 import com.facu.altisima.model.Game;
-import com.facu.altisima.model.User;
 import com.facu.altisima.service.impl.GameServiceImpl;
 import com.facu.altisima.utils.GameGenerator;
 import com.facu.altisima.service.utils.ServiceResult;
-import com.facu.altisima.utils.FixedIdGenerator;
+import com.facu.altisima.utils.GameStateGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,7 +17,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
@@ -35,13 +33,17 @@ public class GameControllerTest {
     ObjectMapper objectMapper = new ObjectMapper();
     GameGenerator gameGenerator = new GameGenerator();
 
+    GameStateGenerator gameStateGenerator = new GameStateGenerator();
+
     private List<String> players;
     Integer totalRounds = 9;
+
     @BeforeEach
     public void setup() {
         players = new ArrayList<>();
         players.add("Migue");
     }
+
     @Test
     public void saveGame() throws Exception {
         Game game = gameGenerator.generate(players, totalRounds);
@@ -176,53 +178,26 @@ public class GameControllerTest {
                 .andExpect(content().string(unsuccessfulDeleteMsg));
     }
 
-//
-//    @Test
-//    public void nextRound() throws Exception {
-//        Game game = generateGame();
-//
-//        List<PlayerRound> roundResults = generateRoundResults();
-//        String roundJson = objectMapper.writeValueAsString(roundResults);
-//
-//        when(gameService.nextRound(game.getId(), roundResults)).thenReturn(game);
-//
-//        Translate translator = new Translate();
-//        GameState gameState = translator.toGameState(game);
-//        String gameStateJson = objectMapper.writeValueAsString(gameState);
-//
-//        mockMvc.perform(put("/games/1/next")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(roundJson))
-//                .andExpect(status().isOk())
-//                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(content().string(gameStateJson));
-//
-//    }
-//
-//    @Test
-//    public void prevRound() throws Exception {
-//        Game game = generateGame();
-//
-//        List<PlayerRound> prevRound = generateRoundResults();
-//        String prevRoundJson = objectMapper.writeValueAsString(prevRound);
-//
-//        when(gameService.prevRound(game.getId())).thenReturn(prevRound);
-//
-//        mockMvc.perform(put("/games/1/prev"))
-//                .andExpect(status().isOk())
-//                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(content().string(prevRoundJson));
-//    }
-//
-//    @Test
-//    public void finishGame() throws Exception {
-//        Game game = generateGame();
-//        String expectedRes = "Game " + game.getId() + " saved in DB";
-//
-//        when(gameService.finishGame(game.getId())).thenReturn(game);
-//
-//        mockMvc.perform(put("/games/1/finish"))
-//                .andExpect(status().isOk())
-//                .andExpect(content().string(expectedRes));
-//    }
+    @Test
+    public void successfulNextRound() throws Exception {
+        Game game = gameGenerator.generate(players, totalRounds);
+        List<PlayerRound> playersRound = gameGenerator.generateRoundResults(players);
+
+        String urlTemplate = "/games/" + game.getId() + "/next";
+        String playersRoundJson = objectMapper.writeValueAsString(playersRound);
+
+        GameState gameState = gameStateGenerator.generate(playersRound);
+        String gameStateJson = objectMapper.writeValueAsString(gameState);
+
+        ServiceResult<GameState> gameStateResult = ServiceResult.success(gameState);
+        when(gameService.nextRound(game.getId(), playersRound)).thenReturn(gameStateResult);
+
+        mockMvc.perform(put(urlTemplate)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(playersRoundJson))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().string(gameStateJson));
+
+    }
 }

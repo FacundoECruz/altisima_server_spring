@@ -1,5 +1,6 @@
 package com.facu.altisima.service.impl;
 
+import com.facu.altisima.controller.dto.GameState;
 import com.facu.altisima.controller.dto.PlayerRound;
 import com.facu.altisima.dao.api.GameRepository;
 import com.facu.altisima.model.Game;
@@ -64,7 +65,7 @@ public class GameServiceImpl implements GameServiceAPI {
     }
 
 
-    public Game nextRound(String id, List<PlayerRound> roundResults) {
+    public ServiceResult<GameState> nextRound(String id, List<PlayerRound> roundResults) {
         return null;
     }
 

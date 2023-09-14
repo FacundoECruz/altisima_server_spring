@@ -1,13 +1,13 @@
 package com.facu.altisima.controller;
 
 import com.facu.altisima.controller.dto.GameRequestDto;
+
 import com.facu.altisima.controller.dto.GameState;
 import com.facu.altisima.controller.dto.PlayerRound;
-import com.facu.altisima.controller.dto.Translate;
 import com.facu.altisima.model.Game;
 import com.facu.altisima.service.api.GameServiceAPI;
 import com.facu.altisima.service.utils.ServiceResult;
-import org.apache.coyote.Response;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -62,33 +62,22 @@ public class GameController {
             gameServiceAPI.delete(gameToDelete.getId());
             return new ResponseEntity<>("Exitosamente borrado", HttpStatus.OK);
         } else {
-            return new ResponseEntity<>("No se encontro la partida", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PutMapping(value = "/{id}/next")
+    public ResponseEntity<?> nextRound(@PathVariable String id, @RequestBody List<PlayerRound> playersRound) {
+        ServiceResult<GameState> game = gameServiceAPI.nextRound(id, playersRound);
+        if(game.getErrorMessage() == null) {
+            GameState gameState = game.getData();
+            return new ResponseEntity<>(gameState, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(game.getErrorMessage(), HttpStatus.NOT_FOUND);
         }
     }
 }
 
-//    @PutMapping(value="/{id}/next")
-//    public GameState nextRound(@PathVariable String id, @RequestBody List<PlayerRound> roundResults) {
-//        Game game = gameServiceAPI.nextRound(id, roundResults);
-//        Translate translator = new Translate();
-//
-//
-//        return translator.toGameState(game);
-//    }
-//
-//    @PutMapping(value="/{id}/prev")
-//    public List<PlayerRound> prevRound(@PathVariable String id) {
-//        return gameServiceAPI.prevRound(id);
-//    }
-//
-//    @PutMapping(value="/{id}/finish")
-//    public String finishGame(@PathVariable String id) {
-//        Game game = gameServiceAPI.finishGame(id);
-//        if(game != null) {
-//            return "Game " + game.getId() + " saved in DB";
-//        } else {
-//            return "Game " + game.getId() + " is null";
-//        }
-//    }
-//}
+
+
 

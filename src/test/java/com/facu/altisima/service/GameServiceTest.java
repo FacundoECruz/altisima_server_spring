@@ -9,7 +9,6 @@ import com.facu.altisima.utils.GameGenerator;
 import com.facu.altisima.service.utils.IdGenerator;
 import com.facu.altisima.service.utils.ServiceResult;
 import com.facu.altisima.utils.FixedIdGenerator;
-import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -128,7 +127,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void incompleteDataToNextRound() {
+    public void incorrectDataToNextRound() {
 
     }
 
@@ -159,6 +158,21 @@ public class GameServiceTest {
 
     @Test
     public void thereIsNoPrevRound() {
+
+    }
+
+    @Test
+    public void successfulFinishedGame() {
+
+    }
+
+    @Test
+    public void insufficientNumberOfRounds() {
+
+    }
+
+    @Test
+    public void gameToFinishIsNotFound() {
 
     }
 }

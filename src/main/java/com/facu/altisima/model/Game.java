@@ -13,7 +13,7 @@ public class Game {
     public Integer currentRound;
     public List<Integer> cardsPerRound;
     private List<String> players;
-    private List<PlayerRound> roundResults;
+    private List<PlayerRound> roundResults;  //Este en realidad es una lista de listas!
     private Integer totalRounds;
 
     public Game() {
