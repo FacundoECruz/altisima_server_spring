@@ -104,10 +104,6 @@ public class UserServiceTest {
         verify(userRepository, times(1)).deleteById(user.getId());
     }
 
-    public void unsuccessfulDeleteUser() {
-
-    }
-
     @Test
     public void successfulEditedUser() {
         Optional<User> optionalUser = Optional.of(user);

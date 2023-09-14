@@ -53,6 +53,18 @@ public class GameController {
         }
 
     }
+
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<?> deleteGame(@PathVariable String id) {
+        ServiceResult<Game> game = gameServiceAPI.getGame(id);
+        if(game.getErrorMessage() == null) {
+            Game gameToDelete = game.getData();
+            gameServiceAPI.delete(gameToDelete.getId());
+            return new ResponseEntity<>("Exitosamente borrado", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("No se encontro la partida", HttpStatus.NOT_FOUND);
+        }
+    }
 }
 
 //    @PutMapping(value="/{id}/next")

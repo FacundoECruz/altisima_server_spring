@@ -17,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.ArrayList;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -50,15 +51,15 @@ public class GameServiceTest {
 
     @Test
     public void unsuccessfulCreatedGame() {
-        List<String> excededPlayersList = new ArrayList<>();
+        List<String> exceededPlayersList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            excededPlayersList.add("Migue" + i);
+            exceededPlayersList.add("Migue" + i);
         }
         Integer totalRounds = 9;
 
         String expectedErrMsg = "Demasiados jugadores";
 
-        ServiceResult<Game> returnedGame = gameService.createGame(excededPlayersList, totalRounds);
+        ServiceResult<Game> returnedGame = gameService.createGame(exceededPlayersList, totalRounds);
 
         assertEquals(expectedErrMsg, returnedGame.getErrorMessage());
     }
@@ -87,17 +88,38 @@ public class GameServiceTest {
         assertEquals(expectedErrMsg, serviceAllGames.getErrorMessage());
     }
 
-//    @Test
-//    public void successfulGetGame() {
-//        List<String> players = new ArrayList<>();
-//        players.add("Migue");
-//        Integer totalRounds = 9;
-//        Game game = gameGenerator.generate(players, totalRounds);
-//    }
+    @Test
+    public void successfulGetGame() {
+        Game game = gameGenerator.generate(players, totalRounds);
+        Optional<Game> successfulOptionalGame = Optional.of(game);
+        when(gameRepository.findById(game.getId())).thenReturn(successfulOptionalGame);
+
+        ServiceResult<Game> returnedGame = gameService.getGame(game.getId());
+
+        assertEquals(returnedGame.getData(), game);
+    }
 
     @Test
     public void idGameToGetNotFound() {
+        String gameNotFoundMsg = "No se encontro partida con ese id";
+        Game game = gameGenerator.generate(players, totalRounds);
+        Optional<Game> unsuccessfulOptionalGame = Optional.empty();
 
+        when(gameRepository.findById(game.getId())).thenReturn(unsuccessfulOptionalGame);
+
+        ServiceResult<Game> returnedGame = gameService.getGame(game.getId());
+
+        assertEquals(returnedGame.getErrorMessage(), gameNotFoundMsg);
+    }
+
+    @Test
+    public void successfulDeleteGame() {
+        Game game = gameGenerator.generate(players, totalRounds);
+        doNothing().when(gameRepository).deleteById(game.getId());
+
+        gameService.delete(game.getId());
+
+        verify(gameRepository, times(1)).deleteById(game.getId());
     }
 
     @Test
