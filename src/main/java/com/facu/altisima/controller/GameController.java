@@ -21,15 +21,10 @@ public class GameController {
     @Autowired
     private GameServiceAPI gameServiceAPI;
 
-    //    @GetMapping(value = "/{id}")
-//    public Game getGameById(@PathVariable String id) {
-//        return gameServiceAPI.getGame(id);
-//    }
-
     @GetMapping
     public ResponseEntity<?> getAllGames() {
         ServiceResult<List<Game>> allGames = gameServiceAPI.getAllGames();
-        if(allGames.getErrorMessage() == null) {
+        if (allGames.getErrorMessage() == null) {
             return new ResponseEntity<>(allGames.getData(), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(allGames.getErrorMessage(), HttpStatus.NOT_FOUND);
@@ -46,6 +41,17 @@ public class GameController {
         } else {
             return new ResponseEntity<>(game.getErrorMessage(), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<?> getGameById(@PathVariable String id) {
+        ServiceResult<Game> game = gameServiceAPI.getGame(id);
+        if(game.getErrorMessage() == null){
+            return new ResponseEntity<>(game.getData(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(game.getErrorMessage(), HttpStatus.NOT_FOUND);
+        }
+
     }
 }
 

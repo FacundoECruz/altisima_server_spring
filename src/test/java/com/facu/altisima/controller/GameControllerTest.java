@@ -88,15 +88,16 @@ public class GameControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(expectedErrMsg));
     }
+
     @Test
     public void getAllGames() throws Exception {
-            List<String> players = new ArrayList<>();
-            players.add("Migue");
-            Integer totalRounds = 9;
-            List<Game> games = new ArrayList<>();
-            games.add(gameGenerator.generate(players, totalRounds));
+        List<String> players = new ArrayList<>();
+        players.add("Migue");
+        Integer totalRounds = 9;
+        List<Game> games = new ArrayList<>();
+        games.add(gameGenerator.generate(players, totalRounds));
 
-            ServiceResult<List<Game>> serviceGames = ServiceResult.success(games);
+        ServiceResult<List<Game>> serviceGames = ServiceResult.success(games);
 
         when(gameService.getAllGames()).thenReturn((serviceGames));
         String expectedRes = objectMapper.writeValueAsString(serviceGames.getData());
@@ -118,20 +119,45 @@ public class GameControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(expectedErrMsg));
     }
-//
-//    @Test
-//    public void getGameById() throws Exception {
-//        Game game = generateGame();
-//
-//        when(gameService.getGame("1")).thenReturn(game);
-//
-//        String gameJson = objectMapper.writeValueAsString(game);
-//
-//        mockMvc.perform(get("/games/1"))
-//                .andExpect(status().isOk())
-//                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(content().string(gameJson));
-//    }
+
+
+    @Test
+    public void successfulGetGameById() throws Exception {
+        List<String> players = new ArrayList<>();
+        players.add("Migue");
+        Integer totalRounds = 9;
+        Game game = gameGenerator.generate(players, totalRounds);
+
+        ServiceResult<Game> expectedGame = ServiceResult.success(game);
+
+        when(gameService.getGame(game.getId())).thenReturn(expectedGame);
+
+        String urlTemplate = "/games/" + game.getId();
+        String expectedJson = objectMapper.writeValueAsString(game);
+
+        mockMvc.perform(get(urlTemplate))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().string(expectedJson));
+    }
+
+    @Test
+    public void gameWithGivenIdNotFound() throws Exception {
+        List<String> players = new ArrayList<>();
+        players.add("Migue");
+        Integer totalRounds = 9;
+        Game game = gameGenerator.generate(players, totalRounds);
+
+        String gameNotFoundMsg = "No se encontro partida con ese id";
+        ServiceResult<Game> gameNotFound = ServiceResult.error(gameNotFoundMsg);
+
+        when(gameService.getGame(game.getId())).thenReturn(gameNotFound);
+        String urlTemplate = "/games/" + game.getId();
+
+        mockMvc.perform(get(urlTemplate))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string(gameNotFoundMsg));
+    }
 //
 //    @Test
 //    public void deleteGame() throws Exception {
