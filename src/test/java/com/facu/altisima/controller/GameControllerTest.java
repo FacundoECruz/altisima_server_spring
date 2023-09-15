@@ -63,6 +63,7 @@ public class GameControllerTest {
                         .content(gameRequestJson))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                // Aca no hay que devolver el game, sino un dto, el gameCreated
                 .andExpect(content().string(gameJson));
     }
 
@@ -153,8 +154,7 @@ public class GameControllerTest {
         Game game = gameGenerator.generate(players, totalRounds);
         ServiceResult<Game> gameServiceResult = ServiceResult.success(game);
 
-        when(gameService.getGame(game.getId())).thenReturn(gameServiceResult);
-        doNothing().when(gameService).delete(game.getId());
+        when(gameService.delete(game.getId())).thenReturn(ServiceResult.success(successfulDeleteMsg));
 
         String urlTemplate = "/games/" + game.getId();
 
@@ -167,9 +167,9 @@ public class GameControllerTest {
     public void gameToDeleteNotFound() throws Exception {
         String unsuccessfulDeleteMsg = "No se encontro la partida";
         Game game = gameGenerator.generate(players, totalRounds);
-        ServiceResult<Game> gameServiceResult = ServiceResult.error("No se encontro partida con ese id");
+        ServiceResult<Game> gameServiceResult = ServiceResult.success(game);
 
-        when(gameService.getGame(game.getId())).thenReturn(gameServiceResult);
+        when(gameService.delete(game.getId())).thenReturn(ServiceResult.error(unsuccessfulDeleteMsg));
 
         String urlTemplate = "/games/" + game.getId();
 
@@ -180,17 +180,28 @@ public class GameControllerTest {
 
     @Test
     public void successfulNextRound() throws Exception {
+
+        //SETUP
+        // generar las condiciones para el test.
+            //inicializar variables, mockeo, etc.
+        //ACTION
+        // operacion que queres hacer (llamar a la funcion que vamos
+        // a testear en el servicio, "llamar" al endpoint en el controller)
+        //ASERT
+        // que los valores sean los esperados
+
+
         Game game = gameGenerator.generate(players, totalRounds);
-        List<PlayerRound> playersRound = gameGenerator.generateRoundResults(players);
+        List<PlayerRound> round = gameGenerator.generateRoundResults(players);
 
         String urlTemplate = "/games/" + game.getId() + "/next";
-        String playersRoundJson = objectMapper.writeValueAsString(playersRound);
+        String playersRoundJson = objectMapper.writeValueAsString(round);
 
-        GameState gameState = gameStateGenerator.generate(playersRound);
+        GameState gameState = gameStateGenerator.generate(round);
         String gameStateJson = objectMapper.writeValueAsString(gameState);
 
         ServiceResult<GameState> gameStateResult = ServiceResult.success(gameState);
-        when(gameService.nextRound(game.getId(), playersRound)).thenReturn(gameStateResult);
+        when(gameService.nextRound(game.getId(), round)).thenReturn(gameStateResult);
 
         mockMvc.perform(put(urlTemplate)
                         .contentType(MediaType.APPLICATION_JSON)

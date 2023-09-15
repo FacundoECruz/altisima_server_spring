@@ -22,5 +22,5 @@ public interface GameServiceAPI {
 
     ServiceResult<List<Game>> getAllGames();
 
-    void delete(String id);
+    ServiceResult<String> delete(String id);
 }

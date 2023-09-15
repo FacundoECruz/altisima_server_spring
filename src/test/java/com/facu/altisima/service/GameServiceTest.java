@@ -119,11 +119,27 @@ public class GameServiceTest {
     @Test
     public void successfulDeleteGame() {
         Game game = gameGenerator.generate(players, totalRounds);
+        Optional<Game> gameOptional= Optional.of(game);
+        when(gameRepository.findById(game.getId())).thenReturn(gameOptional);
         doNothing().when(gameRepository).deleteById(game.getId());
 
-        gameService.delete(game.getId());
+        String successfulDeleteMsg = "Exitosamente borrado";
+        ServiceResult<String> result = gameService.delete(game.getId());
 
         verify(gameRepository, times(1)).deleteById(game.getId());
+        assertEquals(result.getData(), successfulDeleteMsg);
+    }
+
+    @Test
+    public void unsuccessfulDeleteGame() {
+        Game game = gameGenerator.generate(players, totalRounds);
+        when(gameRepository.findById(game.getId())).thenReturn(Optional.empty());
+
+        String gameToDeleteNotFoundMsg = "No se encontro la partida";
+        ServiceResult<String> result = gameService.delete(game.getId());
+
+        verify(gameRepository, times(0)).deleteById(game.getId());
+        assertEquals(result.getErrorMessage(), gameToDeleteNotFoundMsg);
     }
 
     @Test
@@ -142,8 +158,6 @@ public class GameServiceTest {
 
         verify(gameRepository, times(1)).save(game);
         assertEquals(gameState, returnedGameState.getData());
-
-
     }
 
     @Test

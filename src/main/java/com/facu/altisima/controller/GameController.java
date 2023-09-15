@@ -56,13 +56,11 @@ public class GameController {
 
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<?> deleteGame(@PathVariable String id) {
-        ServiceResult<Game> game = gameServiceAPI.getGame(id);
-        if(game.getErrorMessage() == null) {
-            Game gameToDelete = game.getData();
-            gameServiceAPI.delete(gameToDelete.getId());
-            return new ResponseEntity<>("Exitosamente borrado", HttpStatus.OK);
+        ServiceResult<String> result = gameServiceAPI.delete(id);
+        if(result.getErrorMessage() == null) {
+            return new ResponseEntity<>(result.getData(), HttpStatus.OK);
         } else {
-            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(result.getErrorMessage(), HttpStatus.NOT_FOUND);
         }
     }
 

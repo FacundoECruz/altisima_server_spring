@@ -60,13 +60,30 @@ public class GameServiceImpl implements GameServiceAPI {
     }
 
     @Override
-    public void delete(String id) {
-        gameRepository.deleteById(id);
+    public ServiceResult<String> delete(String id) {
+        Optional<Game> gameToDelete = gameRepository.findById(id);
+        if(gameToDelete.isPresent()){
+            gameRepository.deleteById(id);
+            return ServiceResult.success("Exitosamente borrado");
+        } else {
+            return ServiceResult.error("No se encontro la partida");
+        }
     }
 
 
     public ServiceResult<GameState> nextRound(String id, List<PlayerRound> roundResults) {
-        return null;
+        Optional<Game> retrievedGameFromDb = gameRepository.findById(id);
+        if(retrievedGameFromDb.isPresent()){
+            Game game = retrievedGameFromDb.get();
+            Integer nextRound = game.getCurrentRound() + 1;
+            Integer cardsToDealInNextRound = game.getCardsPerRound().get(nextRound);
+            List<PlayerRound> prevScores = game.getRoundResults();
+
+            //....
+            return ServiceResult.error("Todavia no termine");
+        } else {
+            return ServiceResult.error("No se encontro la partida");
+        }
     }
 
     public List<PlayerRound> prevRound(String id) {
