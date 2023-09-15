@@ -12,7 +12,7 @@ public interface GameServiceAPI {
 
     ServiceResult<Game> nextRound(String id, List<PlayerRound> roundResults);
 
-    List<PlayerRound> prevRound(String id);
+    ServiceResult<List<PlayerRound>> prevRound(String id);
 
     Game finishGame(String id);
 

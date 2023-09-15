@@ -214,4 +214,35 @@ public class GameControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(expectedErrMsg));
     }
+
+    @Test
+    public void successfulPrevRound() throws Exception {
+        Game game = gameGenerator.generate(players, totalRounds);
+
+        String urlTemplate = "/games/" + game.getId() + "/prev";
+        List<PlayerRound> prevRoundBids = game.getLastBidsRound();
+        String prevRoundBidsJson = objectMapper.writeValueAsString(prevRoundBids);
+        ServiceResult<List<PlayerRound>> prevRoundBidsService= ServiceResult.success(prevRoundBids);
+
+        when(gameService.prevRound(game.getId())).thenReturn(prevRoundBidsService);
+
+        mockMvc.perform(put(urlTemplate))
+                .andExpect(status().isOk())
+                .andExpect(content().string(prevRoundBidsJson));
+    }
+
+    @Test
+    public void unsuccessfulPrevRound() throws Exception {
+        Game game = gameGenerator.generate(players, totalRounds);
+
+        String urlTemplate = "/games/" + game.getId() + "/prev";
+
+        String expectedErrMsg = "La partida no existe";
+        ServiceResult<List<PlayerRound>> prevRoundBidsError = ServiceResult.error(expectedErrMsg);
+        when(gameService.prevRound(game.getId())).thenReturn(prevRoundBidsError);
+
+        mockMvc.perform(put(urlTemplate))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string(expectedErrMsg));
+    }
 }

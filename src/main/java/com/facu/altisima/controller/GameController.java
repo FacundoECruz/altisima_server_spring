@@ -76,6 +76,16 @@ public class GameController {
             return new ResponseEntity<>(game.getErrorMessage(), HttpStatus.NOT_FOUND);
         }
     }
+
+    @PutMapping(value = "/{id}/prev")
+    public ResponseEntity<?> prevRound(@PathVariable String id) {
+        ServiceResult<List<PlayerRound>> prevRoundBids= gameServiceAPI.prevRound(id);
+        if(prevRoundBids.getErrorMessage() == null){
+            return new ResponseEntity<>(prevRoundBids.getData(), HttpStatus.OK);
+        } else {
+            return  new ResponseEntity<>(prevRoundBids.getErrorMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
 }
 
 

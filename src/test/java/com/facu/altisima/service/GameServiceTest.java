@@ -141,6 +141,9 @@ public class GameServiceTest {
 
     @Test
     public void successfulNextRound() {
+        //Aca estamos testeando el cablerio
+        //No estamos probando aun si al que pierde le resta lo que le tiene que restar
+
         Game game = gameGenerator.generate(players, totalRounds);
         Optional<Game> gameOptional = Optional.of(game);
 

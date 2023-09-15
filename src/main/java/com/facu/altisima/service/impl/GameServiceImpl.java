@@ -111,7 +111,7 @@ public class GameServiceImpl implements GameServiceAPI {
         }
     }
 
-    public List<PlayerRound> prevRound(String id) {
+    public ServiceResult<List<PlayerRound>> prevRound(String id) {
         return null;
     }
 
