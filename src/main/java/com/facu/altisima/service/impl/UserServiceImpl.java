@@ -54,8 +54,14 @@ public class UserServiceImpl implements UserServiceAPI {
     }
 
     @Override
-    public void delete(String id) {
-        userRepository.deleteById(id);
+    public ServiceResult<String> delete(String id) {
+        Optional<User> userToDelete = userRepository.findById(id);
+        if (userToDelete.isPresent()) {
+            userRepository.deleteById(id);
+            return ServiceResult.success("Exitosamente borrado");
+        } else {
+            return ServiceResult.error("No se encontro el usuario");
+        }
     }
 
 

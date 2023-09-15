@@ -19,13 +19,23 @@ public class GameState {
 
 
     }
-    public GameState(RoundStatus round, String status, List<PlayerResult> results) {
+    public GameState(Game game) {
+        RoundStatus round = new RoundStatus(game.getCurrentRound(), game.getCardsPerRound().get(game.getCurrentRound() - 1));
+        Integer lastRoundIndex = game.getRoundResults().size();
+        List<PlayerResult> results = game.getCurrentResults();
+
         this.round = round;
-        this.status = status;
+        this.status = checkStatus(game);
         this.results = results;
     }
 
-
+    private String checkStatus(Game game) {
+        if(game.getCurrentRound() >= game.getTotalRounds()){
+            return "finished";
+        } else {
+            return "inProgress";
+        }
+    }
 //    public void completeRound(List<PlayerRound> playersResults){
 //        if (isValid(playersResults)){
 //            playersResults.forEach(player -> {

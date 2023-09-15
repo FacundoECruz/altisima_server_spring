@@ -5,7 +5,6 @@ import com.facu.altisima.model.Game;
 import com.facu.altisima.service.impl.GameServiceImpl;
 import com.facu.altisima.utils.GameGenerator;
 import com.facu.altisima.service.utils.ServiceResult;
-import com.facu.altisima.utils.GameStateGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,8 +31,6 @@ public class GameControllerTest {
     MockMvc mockMvc;
     ObjectMapper objectMapper = new ObjectMapper();
     GameGenerator gameGenerator = new GameGenerator();
-
-    GameStateGenerator gameStateGenerator = new GameStateGenerator();
 
     private List<String> players;
     Integer totalRounds = 9;
@@ -178,28 +175,17 @@ public class GameControllerTest {
 
     @Test
     public void successfulNextRound() throws Exception {
-
-        //SETUP
-        // generar las condiciones para el test.
-            //inicializar variables, mockeo, etc.
-        //ACTION
-        // operacion que queres hacer (llamar a la funcion que vamos
-        // a testear en el servicio, "llamar" al endpoint en el controller)
-        //ASERT
-        // que los valores sean los esperados
-
-
         Game game = gameGenerator.generate(players, totalRounds);
-        List<PlayerRound> round = gameGenerator.generateRoundResults(players);
+        List<PlayerRound> round = gameGenerator.generateRoundBids(players);
 
         String urlTemplate = "/games/" + game.getId() + "/next";
         String playersRoundJson = objectMapper.writeValueAsString(round);
 
-        GameState gameState = gameStateGenerator.generate(round);
-        String gameStateJson = objectMapper.writeValueAsString(gameState);
+        ServiceResult<Game> gameResult = ServiceResult.success(game);
+        when(gameService.nextRound(game.getId(), round)).thenReturn(gameResult);
 
-        ServiceResult<GameState> gameStateResult = ServiceResult.success(gameState);
-        when(gameService.nextRound(game.getId(), round)).thenReturn(gameStateResult);
+        GameState gameState = new GameState(gameResult.getData());
+        String gameStateJson = objectMapper.writeValueAsString(gameState);
 
         mockMvc.perform(put(urlTemplate)
                         .contentType(MediaType.APPLICATION_JSON)

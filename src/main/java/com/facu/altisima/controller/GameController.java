@@ -68,9 +68,9 @@ public class GameController {
 
     @PutMapping(value = "/{id}/next")
     public ResponseEntity<?> nextRound(@PathVariable String id, @RequestBody List<PlayerRound> playersRound) {
-        ServiceResult<GameState> game = gameServiceAPI.nextRound(id, playersRound);
+        ServiceResult<Game> game = gameServiceAPI.nextRound(id, playersRound);
         if (game.getErrorMessage() == null) {
-            GameState gameState = game.getData();
+            GameState gameState = new GameState(game.getData());
             return new ResponseEntity<>(gameState, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(game.getErrorMessage(), HttpStatus.NOT_FOUND);

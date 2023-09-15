@@ -1,6 +1,6 @@
 package com.facu.altisima.service;
 
-import com.facu.altisima.controller.dto.GameState;
+import com.facu.altisima.controller.dto.PlayerResult;
 import com.facu.altisima.controller.dto.PlayerRound;
 import com.facu.altisima.dao.api.GameRepository;
 import com.facu.altisima.model.Game;
@@ -11,7 +11,6 @@ import com.facu.altisima.utils.GameGenerator;
 import com.facu.altisima.service.utils.IdGenerator;
 import com.facu.altisima.service.utils.ServiceResult;
 import com.facu.altisima.utils.FixedIdGenerator;
-import com.facu.altisima.utils.GameStateGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,8 +31,6 @@ public class GameServiceTest {
     IdGenerator idGenerator = new FixedIdGenerator("TestId");
     private final GameServiceAPI gameService = new GameServiceImpl(gameRepository, idGenerator);
     GameGenerator gameGenerator = new GameGenerator();
-
-    GameStateGenerator gameStateGenerator = new GameStateGenerator();
 
     private List<String> players;
     Integer totalRounds = 9;
@@ -147,17 +144,26 @@ public class GameServiceTest {
         Game game = gameGenerator.generate(players, totalRounds);
         Optional<Game> gameOptional = Optional.of(game);
 
-        List<PlayerRound> playersRound = gameGenerator.generateRoundResults(players);
-        GameState gameState = gameStateGenerator.generate(playersRound);
-        //Va a devolver score 0 pa todos.
+        List<PlayerRound> playersRound = gameGenerator.generateRoundBids(players);
+
+        game.setCurrentRound(game.getCurrentRound() + 1);
+        game.setLastBidsRound(playersRound);
+        List<PlayerResult> currentResults = game.getCurrentResults();
+        List<PlayerResult> updatedResults = new ArrayList<>();
+        for(int i = 0; i < currentResults.size(); i++) {
+            PlayerResult playerResult = currentResults.get(i);
+            playerResult.setScore(playerResult.getScore() + 5);
+            updatedResults.add(playerResult);
+        }
+        game.setCurrentResults(updatedResults);
 
         when(gameRepository.findById(game.getId())).thenReturn(gameOptional);
-        doNothing().when(gameRepository).save(game);
+        when(gameRepository.save(game)).thenReturn(game);
 
-        ServiceResult<GameState> returnedGameState = gameService.nextRound(game.getId(), playersRound);
+        ServiceResult<Game> returnedGameState = gameService.nextRound(game.getId(), playersRound);
 
         verify(gameRepository, times(1)).save(game);
-        assertEquals(gameState, returnedGameState.getData());
+        assertEquals(game, returnedGameState.getData());
     }
 
     @Test

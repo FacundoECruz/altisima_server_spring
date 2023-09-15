@@ -1,5 +1,6 @@
 package com.facu.altisima.model;
 
+import com.facu.altisima.controller.dto.PlayerResult;
 import com.facu.altisima.controller.dto.PlayerRound;
 
 import org.springframework.data.annotation.Id;
@@ -13,20 +14,22 @@ public class Game {
     public Integer currentRound;
     public List<Integer> cardsPerRound;
     private List<String> players;
-    private List<PlayerRound> roundResults;  //Este en realidad es una lista de listas!
+    private List<PlayerResult> currentResults;
+    private List<PlayerRound> lastBidsRound;
     private Integer totalRounds;
 
     public Game() {
 
     }
 
-    public Game(String id, String date, Integer currentRound, List<Integer> cardsPerRound, List<String> players, List<PlayerRound> roundResults, Integer totalRounds) {
+    public Game(String id, String date, Integer currentRound, List<Integer> cardsPerRound, List<String> players, List<PlayerResult> currentResults, List<PlayerRound> lastBidsRound, Integer totalRounds) {
         this.id = id;
         this.date = date;
         this.currentRound = currentRound;
         this.cardsPerRound = cardsPerRound;
         this.players = players;
-        this.roundResults = roundResults;
+        this.currentResults = currentResults;
+        this.lastBidsRound = lastBidsRound;
         this.totalRounds = totalRounds;
     }
 
@@ -70,12 +73,12 @@ public class Game {
         this.players = players;
     }
 
-    public List<PlayerRound> getRoundResults() {
-        return roundResults;
+    public List<PlayerResult> getRoundResults() {
+        return currentResults;
     }
 
-    public void setRoundResults(List<PlayerRound> roundResults) {
-        this.roundResults = roundResults;
+    public void setRoundResults(List<PlayerResult> roundResults) {
+        this.currentResults = roundResults;
     }
 
     public Integer getTotalRounds() {
@@ -86,16 +89,33 @@ public class Game {
         this.totalRounds = totalRounds;
     }
 
+    public List<PlayerResult> getCurrentResults() {
+        return currentResults;
+    }
+
+    public void setCurrentResults(List<PlayerResult> currentResults) {
+        this.currentResults = currentResults;
+    }
+
+    public List<PlayerRound> getLastBidsRound() {
+        return lastBidsRound;
+    }
+
+
+    public void setLastBidsRound(List<PlayerRound> lastBidsRound) {
+        this.lastBidsRound = lastBidsRound;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Game game = (Game) o;
-        return Objects.equals(id, game.id) && Objects.equals(date, game.date) && Objects.equals(currentRound, game.currentRound) && Objects.equals(cardsPerRound, game.cardsPerRound) && Objects.equals(players, game.players) && Objects.equals(roundResults, game.roundResults) && Objects.equals(totalRounds, game.totalRounds);
+        return Objects.equals(id, game.id) && Objects.equals(date, game.date) && Objects.equals(currentRound, game.currentRound) && Objects.equals(cardsPerRound, game.cardsPerRound) && Objects.equals(players, game.players) && Objects.equals(currentResults, game.currentResults) && Objects.equals(lastBidsRound, game.lastBidsRound) && Objects.equals(totalRounds, game.totalRounds);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, date, currentRound, cardsPerRound, players, roundResults, totalRounds);
+        return Objects.hash(id, date, currentRound, cardsPerRound, players, currentResults,lastBidsRound, totalRounds);
     }
 }

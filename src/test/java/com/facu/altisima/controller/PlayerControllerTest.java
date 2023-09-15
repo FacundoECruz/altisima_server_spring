@@ -33,8 +33,6 @@ public class PlayerControllerTest {
 
     Player player = new Player("1", "Facu", "www.image.com/facu", 0, 0, 0);
 
-
-
     @Test
     public void findPlayerByUsername() throws Exception {
         ServiceResult<Player> returnedPlayer = ServiceResult.success(player);
@@ -51,7 +49,7 @@ public class PlayerControllerTest {
     }
 
     @Test
-    public void usernameToGetDoesNotExist() throws Exception{
+    public void usernameToGetDoesNotExist() throws Exception {
         String expectedErrMsg = "El nombre de usuario no existe";
         ServiceResult<Player> returnedPlayer = ServiceResult.error(expectedErrMsg);
         String playerThatDoesNotExist = "DiegoArmando";
@@ -90,6 +88,7 @@ public class PlayerControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(expectedErrMsg));
     }
+
     @Test
     public void successfulSavePlayer() throws Exception {
         ServiceResult<Player> savedPlayer = ServiceResult.success(player);
@@ -114,10 +113,25 @@ public class PlayerControllerTest {
         when(playerService.save(player)).thenReturn(savedPlayer);
 
         mockMvc.perform(post("/players")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(player)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(player)))
                 .andExpect(status().isConflict())
                 .andExpect(content().string(expectedErrMsg));
     }
 
+//    @Test
+//    public void successfulEditPlayer() throws Exception {
+//        Player playerChanges = player;
+//        ServiceResult<Player> editedPlayer = ServiceResult.success(playerChanges);
+//
+//        when(playerService.edit(playerChanges)).thenReturn(editedPlayer);
+//        String urlTemplate = "/players/" + playerChanges.getUsername();
+//        String editedPlayerJson = objectMapper.writeValueAsString(editedPlayer);
+//
+//        mockMvc.perform(put(urlTemplate)
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(objectMapper.writeValueAsString(playerChanges)))
+//                .andExpect(status().isOk())
+//                .andExpect(content().string(editedPlayerJson));
+//    }
 }

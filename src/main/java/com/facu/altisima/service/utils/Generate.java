@@ -1,5 +1,6 @@
 package com.facu.altisima.service.utils;
 
+import com.facu.altisima.controller.dto.PlayerResult;
 import com.facu.altisima.controller.dto.PlayerRound;
 
 import java.util.ArrayList;
@@ -19,13 +20,23 @@ public class Generate {
         return cardsPerRound;
     }
 
-    public List<PlayerRound> roundResults(List<String> players) {
-        List<PlayerRound> roundResults = new ArrayList<>();
+    public List<PlayerRound> roundBids(List<String> players) {
+        List<PlayerRound> roundBids = new ArrayList<>();
 
         for(int i = 0; i < players.size(); i++){
             PlayerRound playerRound = new PlayerRound(players.get(i), 0, 0);
-            roundResults.add(playerRound);
+            roundBids.add(playerRound);
         }
-        return roundResults;
+        return roundBids;
+    }
+
+    public List<PlayerResult> roundResults(List<String> players) {
+        List<PlayerResult> playersResult = new ArrayList<>();
+
+        for(int i = 0; i < players.size(); i++) {
+            PlayerResult playerResult = new PlayerResult(players.get(i), 0);
+            playersResult.add(playerResult);
+        }
+        return playersResult;
     }
 }

@@ -12,7 +12,7 @@ public interface UserServiceAPI {
 
     ServiceResult<User> save (User entity);
 
-    void delete(String id);
+    ServiceResult<String> delete(String id);
 
     ServiceResult<User> get(String username);
 

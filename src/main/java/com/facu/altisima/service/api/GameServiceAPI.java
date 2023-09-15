@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface GameServiceAPI {
 
-    ServiceResult<GameState> nextRound(String id, List<PlayerRound> roundResults);
+    ServiceResult<Game> nextRound(String id, List<PlayerRound> roundResults);
 
     List<PlayerRound> prevRound(String id);
 

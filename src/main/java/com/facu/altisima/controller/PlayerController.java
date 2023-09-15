@@ -3,6 +3,7 @@ package com.facu.altisima.controller;
 import com.facu.altisima.model.Player;
 import com.facu.altisima.service.api.PlayerServiceAPI;
 import com.facu.altisima.service.utils.ServiceResult;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +37,7 @@ public class PlayerController {
     }
 
     @PostMapping
-    public ResponseEntity<?> savePlayers(@RequestBody Player player) {
+    public ResponseEntity<?> savePlayer(@RequestBody Player player) {
         ServiceResult<Player> savedPlayer = playerServiceAPI.save(player);
         if(savedPlayer.getErrorMessage() == null) {
             return new ResponseEntity<>(savedPlayer.getData(), HttpStatus.OK);
@@ -44,7 +45,5 @@ public class PlayerController {
             return new ResponseEntity<>(savedPlayer.getErrorMessage(), HttpStatus.CONFLICT);
         }
     }
-
-    //ENDPOINT PARA EDITAR PLAYER Y AGREGARLE DATA DE LA PARTIDA QUE JUGO
 
 }

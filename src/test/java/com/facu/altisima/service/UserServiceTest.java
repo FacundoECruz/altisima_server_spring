@@ -96,12 +96,26 @@ public class UserServiceTest {
 
     @Test
     public void successfulDeleteUser() {
+        Optional<User> optionalUser = Optional.of(user);
+        when(userRepository.findById(user.getId())).thenReturn(optionalUser);
 
-        doNothing().when(userRepository).deleteById(user.getId());
-
-        userService.delete(user.getId());
+        String successfulDeleteMsg = "Exitosamente borrado";
+        ServiceResult<String> result = userService.delete(user.getId());
 
         verify(userRepository, times(1)).deleteById(user.getId());
+        assertEquals(result, successfulDeleteMsg);
+    }
+
+    @Test
+    public void unsuccessfulDeleteUser() {
+        Optional<User> emptyOptional = Optional.empty();
+        when(userRepository.findById(user.getId())).thenReturn(emptyOptional);
+
+        String unsuccessfulDeleteMsg = "No se encontro el usuario";
+        ServiceResult<String> result = userService.delete(user.getId());
+
+        verify(userRepository, times(0)).deleteById(user.getId());
+        assertEquals(result.getErrorMessage(), unsuccessfulDeleteMsg);
     }
 
     @Test
