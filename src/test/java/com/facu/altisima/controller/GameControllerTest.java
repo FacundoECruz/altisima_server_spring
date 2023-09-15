@@ -51,20 +51,18 @@ public class GameControllerTest {
 
         when(gameService.createGame(players, totalRounds)).thenReturn(serviceGame);
 
-        GameRequestDto gameRequestDto = new GameRequestDto();
-        gameRequestDto.setPlayers(players);
-        gameRequestDto.setTotalRounds(totalRounds);
+        GameRequestDto gameRequestDto = new GameRequestDto(players, totalRounds);
 
         String gameRequestJson = objectMapper.writeValueAsString(gameRequestDto);
-        String gameJson = objectMapper.writeValueAsString(serviceGame.getData());
+        GameCreated gameCreated = new GameCreated(game);
+        String gameCreatedJson = objectMapper.writeValueAsString(gameCreated);
 
         mockMvc.perform(post("/games")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(gameRequestJson))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                // Aca no hay que devolver el game, sino un dto, el gameCreated
-                .andExpect(content().string(gameJson));
+                .andExpect(content().string(gameCreatedJson));
     }
 
     @Test

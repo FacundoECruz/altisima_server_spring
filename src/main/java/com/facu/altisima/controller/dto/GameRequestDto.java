@@ -11,6 +11,11 @@ public class GameRequestDto {
 
     }
 
+    public GameRequestDto(List<String> players, Integer totalRounds){
+        this.players = players;
+        this.totalRounds = totalRounds;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

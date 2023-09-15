@@ -26,13 +26,14 @@ public class PlayerControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
     @MockBean
     PlayerServiceImpl playerService;
 
     ObjectMapper objectMapper = new ObjectMapper();
 
     Player player = new Player("1", "Facu", "www.image.com/facu", 0, 0, 0);
+
+
 
     @Test
     public void findPlayerByUsername() throws Exception {
@@ -54,6 +55,7 @@ public class PlayerControllerTest {
         String expectedErrMsg = "El nombre de usuario no existe";
         ServiceResult<Player> returnedPlayer = ServiceResult.error(expectedErrMsg);
         String playerThatDoesNotExist = "DiegoArmando";
+
         when(playerService.get(playerThatDoesNotExist)).thenReturn(returnedPlayer);
 
         String urlTemplate = "/players/" + playerThatDoesNotExist;
@@ -117,4 +119,5 @@ public class PlayerControllerTest {
                 .andExpect(status().isConflict())
                 .andExpect(content().string(expectedErrMsg));
     }
+
 }

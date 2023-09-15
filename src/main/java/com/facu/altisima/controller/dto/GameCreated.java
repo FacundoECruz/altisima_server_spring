@@ -1,5 +1,7 @@
 package com.facu.altisima.controller.dto;
 
+import com.facu.altisima.model.Game;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -12,6 +14,12 @@ public class GameCreated {
         this.id = id;
         this.cardsPerRound = cardsPerRound;
         this.players = players;
+    }
+
+    public GameCreated(Game game) {
+        this.id = game.getId();
+        this.cardsPerRound = game.getCardsPerRound();
+        this.players = game.getPlayers();
     }
 
     @Override

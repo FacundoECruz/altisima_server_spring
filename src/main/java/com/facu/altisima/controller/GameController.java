@@ -1,5 +1,6 @@
 package com.facu.altisima.controller;
 
+import com.facu.altisima.controller.dto.GameCreated;
 import com.facu.altisima.controller.dto.GameRequestDto;
 
 import com.facu.altisima.controller.dto.GameState;
@@ -37,7 +38,8 @@ public class GameController {
         Integer totalRounds = gameRequestDto.getTotalRounds();
         ServiceResult<Game> game = gameServiceAPI.createGame(players, totalRounds);
         if (game.getErrorMessage() == null) {
-            return new ResponseEntity<>(game.getData(), HttpStatus.OK);
+            GameCreated gameCreated = new GameCreated(game.getData());
+            return new ResponseEntity<>(gameCreated, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(game.getErrorMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -46,7 +48,7 @@ public class GameController {
     @GetMapping(value = "/{id}")
     public ResponseEntity<?> getGameById(@PathVariable String id) {
         ServiceResult<Game> game = gameServiceAPI.getGame(id);
-        if(game.getErrorMessage() == null){
+        if (game.getErrorMessage() == null) {
             return new ResponseEntity<>(game.getData(), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(game.getErrorMessage(), HttpStatus.NOT_FOUND);
@@ -57,7 +59,7 @@ public class GameController {
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<?> deleteGame(@PathVariable String id) {
         ServiceResult<String> result = gameServiceAPI.delete(id);
-        if(result.getErrorMessage() == null) {
+        if (result.getErrorMessage() == null) {
             return new ResponseEntity<>(result.getData(), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(result.getErrorMessage(), HttpStatus.NOT_FOUND);
@@ -67,7 +69,7 @@ public class GameController {
     @PutMapping(value = "/{id}/next")
     public ResponseEntity<?> nextRound(@PathVariable String id, @RequestBody List<PlayerRound> playersRound) {
         ServiceResult<GameState> game = gameServiceAPI.nextRound(id, playersRound);
-        if(game.getErrorMessage() == null) {
+        if (game.getErrorMessage() == null) {
             GameState gameState = game.getData();
             return new ResponseEntity<>(gameState, HttpStatus.OK);
         } else {
