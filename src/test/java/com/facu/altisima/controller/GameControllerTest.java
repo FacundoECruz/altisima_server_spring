@@ -195,4 +195,23 @@ public class GameControllerTest {
                 .andExpect(content().string(gameStateJson));
 
     }
+
+    @Test
+    public void unsuccessfulNextRound() throws Exception {
+        Game game = gameGenerator.generate(players, totalRounds);
+        List<PlayerRound> round = gameGenerator.generateRoundBids(players);
+
+        String urlTemplate = "/games/" + game.getId() + "/next";
+        String playersRoundJson = objectMapper.writeValueAsString(round);
+        String expectedErrMsg = "Algun mensaje de error";
+
+        ServiceResult<Game> gameResult = ServiceResult.error(expectedErrMsg);
+        when(gameService.nextRound(game.getId(), round)).thenReturn(gameResult);
+
+        mockMvc.perform(put(urlTemplate)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(playersRoundJson))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string(expectedErrMsg));
+    }
 }
