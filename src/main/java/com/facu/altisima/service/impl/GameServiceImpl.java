@@ -77,6 +77,10 @@ public class GameServiceImpl implements GameServiceAPI {
         if (retrievedGameFromDb.isPresent()) {
             Game game = retrievedGameFromDb.get();
 
+            if(game.getCurrentRound() > game.getTotalRounds()){
+                return ServiceResult.error("La partida ya esta terminada");
+            }
+
             game.setLastBidsRound(roundResults);
             game.setCurrentRound(game.getCurrentRound() + 1);
 

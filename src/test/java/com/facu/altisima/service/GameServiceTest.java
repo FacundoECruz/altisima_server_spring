@@ -167,18 +167,31 @@ public class GameServiceTest {
     }
 
     @Test
-    public void incorrectDataToNextRound() {
-
-    }
-
-    @Test
     public void idGameToNextRoundNotFound() {
+        Game game = gameGenerator.generate(players, totalRounds);
+        when(gameRepository.findById(game.getId())).thenReturn(Optional.empty());
 
+        List<PlayerRound> playersRound = gameGenerator.generateRoundBids(players);
+
+        ServiceResult<Game> gameServiceResult = gameService.nextRound(game.getId(), playersRound);
+        String expectedErrMsg = "No se encontro la partida";
+
+        assertEquals(expectedErrMsg, gameServiceResult.getErrorMessage());
     }
 
     @Test
     public void requestedGameToNextRoundIsFinished() {
+        Game game = gameGenerator.generate(players, totalRounds);
+        game.setCurrentRound(10);
+        Optional<Game> gameOptional = Optional.of(game);
 
+        List<PlayerRound> playersRound = gameGenerator.generateRoundBids(players);
+        when(gameRepository.findById(game.getId())).thenReturn(gameOptional);
+
+        ServiceResult<Game> gameServiceResult = gameService.nextRound(game.getId(), playersRound);
+        String expectedErrMsg = "La partida ya esta terminada";
+
+        assertEquals(expectedErrMsg, gameServiceResult.getErrorMessage());
     }
 
     @Test
