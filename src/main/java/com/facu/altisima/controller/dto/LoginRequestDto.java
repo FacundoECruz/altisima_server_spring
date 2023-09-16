@@ -2,12 +2,12 @@ package com.facu.altisima.controller.dto;
 
 import java.util.Objects;
 
-public class LoginRequest {
+public class LoginRequestDto {
     private String username;
 
     private String password;
 
-    public LoginRequest(String username, String password) {
+    public LoginRequestDto(String username, String password) {
         this.username = username;
         this.password = password;
     }
@@ -16,7 +16,7 @@ public class LoginRequest {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        LoginRequest that = (LoginRequest) o;
+        LoginRequestDto that = (LoginRequestDto) o;
         return Objects.equals(username, that.username) && Objects.equals(password, that.password);
     }
 

@@ -1,6 +1,6 @@
 package com.facu.altisima.controller;
 
-import com.facu.altisima.controller.dto.LoginRequest;
+import com.facu.altisima.controller.dto.LoginRequestDto;
 import com.facu.altisima.model.User;
 import com.facu.altisima.service.api.UserServiceAPI;
 import com.facu.altisima.service.utils.ServiceResult;
@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
@@ -55,8 +54,8 @@ public class UserController {
     }
 
     @PostMapping(value = "/login")
-    public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
-        ServiceResult<User> user = userServiceAPI.login(loginRequest);
+    public ResponseEntity<?> loginUser(@RequestBody LoginRequestDto loginRequestDto) {
+        ServiceResult<User> user = userServiceAPI.login(loginRequestDto);
         if (user.isSuccess()) {
             User retrievedUser = user.getData();
             return ResponseEntity.ok(retrievedUser);

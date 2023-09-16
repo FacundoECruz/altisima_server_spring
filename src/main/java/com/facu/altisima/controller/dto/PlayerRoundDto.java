@@ -1,22 +1,19 @@
 package com.facu.altisima.controller.dto;
 
-import com.facu.altisima.model.Player;
-
-import java.util.Map;
 import java.util.Objects;
 
-public class PlayerRound {
+public class PlayerRoundDto {
     private String username;
     private Integer bid;
     private Integer bidsLost;
 
-    public PlayerRound(String username, Integer bid, Integer bidsLost) {
+    public PlayerRoundDto(String username, Integer bid, Integer bidsLost) {
         this.username = username;
         this.bid = bid;
         this.bidsLost = bidsLost;
     }
 
-    public PlayerRound() {
+    public PlayerRoundDto() {
 
     }
 
@@ -24,7 +21,7 @@ public class PlayerRound {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        PlayerRound that = (PlayerRound) o;
+        PlayerRoundDto that = (PlayerRoundDto) o;
         return Objects.equals(username, that.username) && Objects.equals(bid, that.bid) && Objects.equals(bidsLost, that.bidsLost);
     }
 

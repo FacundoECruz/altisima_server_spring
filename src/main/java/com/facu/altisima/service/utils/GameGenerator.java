@@ -1,7 +1,7 @@
 package com.facu.altisima.service.utils;
 
-import com.facu.altisima.controller.dto.PlayerResult;
-import com.facu.altisima.controller.dto.PlayerRound;
+import com.facu.altisima.controller.dto.PlayerResultDto;
+import com.facu.altisima.controller.dto.PlayerRoundDto;
 import com.facu.altisima.model.Game;
 
 import java.util.ArrayList;
@@ -28,22 +28,22 @@ public class GameGenerator {
         return cardsPerRound;
     }
 
-    public List<PlayerRound> generateBidsRound(List<String> players) {
-        List<PlayerRound> roundBids = new ArrayList<>();
+    public List<PlayerRoundDto> generateBidsRound(List<String> players) {
+        List<PlayerRoundDto> roundBids = new ArrayList<>();
 
         for(int i = 0; i < players.size(); i++){
-            PlayerRound playerRound = new PlayerRound(players.get(i), 0, 0);
-            roundBids.add(playerRound);
+            PlayerRoundDto playerRoundDto = new PlayerRoundDto(players.get(i), 0, 0);
+            roundBids.add(playerRoundDto);
         }
         return roundBids;
     }
 
-    public List<PlayerResult> generateCurrentResults(List<String> players) {
-        List<PlayerResult> currentResults = new ArrayList<>();
+    public List<PlayerResultDto> generateCurrentResults(List<String> players) {
+        List<PlayerResultDto> currentResults = new ArrayList<>();
 
         for (int i = 0; i < players.size(); i++) {
-            PlayerResult playerResult = new PlayerResult(players.get(i), 0);
-            currentResults.add(playerResult);
+            PlayerResultDto playerResultDto = new PlayerResultDto(players.get(i), 0);
+            currentResults.add(playerResultDto);
         }
         return currentResults;
     }
@@ -53,8 +53,8 @@ public class GameGenerator {
         String date = dateFormatter.formatDate(new Date());
         Integer currentRound = 1;
         List<Integer> cardsPerRound = generateCardsPerRound(players.size(), totalRounds);
-        List<PlayerRound> lastBidsRound = generateBidsRound(players);
-        List<PlayerResult> currentResults = generateCurrentResults(players);
+        List<PlayerRoundDto> lastBidsRound = generateBidsRound(players);
+        List<PlayerResultDto> currentResults = generateCurrentResults(players);
 
         return new Game(id, date, currentRound, cardsPerRound, players, currentResults, lastBidsRound, totalRounds);
     }

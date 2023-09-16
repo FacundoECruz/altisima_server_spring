@@ -1,6 +1,6 @@
 package com.facu.altisima.service.impl;
 
-import com.facu.altisima.controller.dto.LoginRequest;
+import com.facu.altisima.controller.dto.LoginRequestDto;
 import com.facu.altisima.dao.api.UserRepository;
 import com.facu.altisima.model.User;
 import com.facu.altisima.service.api.UserServiceAPI;
@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -79,12 +78,12 @@ public class UserServiceImpl implements UserServiceAPI {
         }
     }
 
-    public ServiceResult<User> login(LoginRequest loginRequest) {
-        Optional<User> user = userRepository.findByUsername(loginRequest.getUsername());
+    public ServiceResult<User> login(LoginRequestDto loginRequestDto) {
+        Optional<User> user = userRepository.findByUsername(loginRequestDto.getUsername());
 
         if (user.isPresent()) {
             User userToLogin = user.get();
-            if (userToLogin.getPassword() == loginRequest.getPassword()) {
+            if (userToLogin.getPassword() == loginRequestDto.getPassword()) {
                 return ServiceResult.success(userToLogin);
             } else {
                 return ServiceResult.error("Usuario o contraseña invalidos");

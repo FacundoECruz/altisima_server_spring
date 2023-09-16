@@ -1,7 +1,7 @@
 package com.facu.altisima.service;
 
-import com.facu.altisima.controller.dto.PlayerResult;
-import com.facu.altisima.controller.dto.PlayerRound;
+import com.facu.altisima.controller.dto.PlayerResultDto;
+import com.facu.altisima.controller.dto.PlayerRoundDto;
 import com.facu.altisima.dao.api.GameRepository;
 import com.facu.altisima.model.Game;
 import com.facu.altisima.service.api.GameServiceAPI;
@@ -147,16 +147,16 @@ public class GameServiceTest {
         Game game = gameGenerator.generate(players, totalRounds);
         Optional<Game> gameOptional = Optional.of(game);
 
-        List<PlayerRound> playersRound = gameGenerator.generateRoundBids(players);
+        List<PlayerRoundDto> playersRound = gameGenerator.generateRoundBids(players);
 
         game.setCurrentRound(game.getCurrentRound() + 1);
         game.setLastBidsRound(playersRound);
-        List<PlayerResult> currentResults = game.getCurrentResults();
-        List<PlayerResult> updatedResults = new ArrayList<>();
+        List<PlayerResultDto> currentResults = game.getCurrentResults();
+        List<PlayerResultDto> updatedResults = new ArrayList<>();
         for(int i = 0; i < currentResults.size(); i++) {
-            PlayerResult playerResult = currentResults.get(i);
-            playerResult.setScore(playerResult.getScore() + 5);
-            updatedResults.add(playerResult);
+            PlayerResultDto playerResultDto = currentResults.get(i);
+            playerResultDto.setScore(playerResultDto.getScore() + 5);
+            updatedResults.add(playerResultDto);
         }
         game.setCurrentResults(updatedResults);
 
@@ -174,7 +174,7 @@ public class GameServiceTest {
         Game game = gameGenerator.generate(players, totalRounds);
         when(gameRepository.findById(game.getId())).thenReturn(Optional.empty());
 
-        List<PlayerRound> playersRound = gameGenerator.generateRoundBids(players);
+        List<PlayerRoundDto> playersRound = gameGenerator.generateRoundBids(players);
 
         ServiceResult<Game> gameServiceResult = gameService.nextRound(game.getId(), playersRound);
         String expectedErrMsg = "No se encontro la partida";
@@ -188,7 +188,7 @@ public class GameServiceTest {
         game.setCurrentRound(10);
         Optional<Game> gameOptional = Optional.of(game);
 
-        List<PlayerRound> playersRound = gameGenerator.generateRoundBids(players);
+        List<PlayerRoundDto> playersRound = gameGenerator.generateRoundBids(players);
         when(gameRepository.findById(game.getId())).thenReturn(gameOptional);
 
         ServiceResult<Game> gameServiceResult = gameService.nextRound(game.getId(), playersRound);

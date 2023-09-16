@@ -1,7 +1,6 @@
 package com.facu.altisima.service.api;
 
-import com.facu.altisima.controller.dto.GameState;
-import com.facu.altisima.controller.dto.PlayerRound;
+import com.facu.altisima.controller.dto.PlayerRoundDto;
 import com.facu.altisima.model.Game;
 import com.facu.altisima.service.utils.ServiceResult;
 
@@ -10,9 +9,9 @@ import java.util.List;
 
 public interface GameServiceAPI {
 
-    ServiceResult<Game> nextRound(String id, List<PlayerRound> roundResults);
+    ServiceResult<Game> nextRound(String id, List<PlayerRoundDto> roundResults);
 
-    ServiceResult<List<PlayerRound>> prevRound(String id);
+    ServiceResult<List<PlayerRoundDto>> prevRound(String id);
 
     Game finishGame(String id);
 

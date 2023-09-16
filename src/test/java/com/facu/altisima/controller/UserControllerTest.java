@@ -1,6 +1,6 @@
 package com.facu.altisima.controller;
 
-import com.facu.altisima.controller.dto.LoginRequest;
+import com.facu.altisima.controller.dto.LoginRequestDto;
 import com.facu.altisima.model.User;
 import com.facu.altisima.service.impl.UserServiceImpl;
 import com.facu.altisima.service.utils.ServiceResult;
@@ -13,10 +13,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.security.Provider;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -124,13 +122,13 @@ public class UserControllerTest {
 
     @Test
     public void successfulLogin() throws Exception {
-        LoginRequest loginRequest = new LoginRequest("facu", "facu");
+        LoginRequestDto loginRequestDto = new LoginRequestDto("facu", "facu");
         ServiceResult<User> receivedUserFromService = ServiceResult.success(user);
 
-        String loginRequestJson = objectMapper.writeValueAsString(loginRequest);
+        String loginRequestJson = objectMapper.writeValueAsString(loginRequestDto);
         String expectedUserJson = objectMapper.writeValueAsString(user);
 
-        when(userService.login(loginRequest)).thenReturn(receivedUserFromService);
+        when(userService.login(loginRequestDto)).thenReturn(receivedUserFromService);
 
         mockMvc.perform(post("/users/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -142,12 +140,12 @@ public class UserControllerTest {
     @Test
     public void userToLoginDoesNotExist() throws Exception {
         String expectedErrMsg = "No se encontraron usuarios";
-        LoginRequest loginRequest = new LoginRequest("facu", "facu");
+        LoginRequestDto loginRequestDto = new LoginRequestDto("facu", "facu");
         ServiceResult<User> receivedUserFromService = ServiceResult.error(expectedErrMsg);
 
-        String loginRequestJson = objectMapper.writeValueAsString(loginRequest);
+        String loginRequestJson = objectMapper.writeValueAsString(loginRequestDto);
 
-        when(userService.login(loginRequest)).thenReturn(receivedUserFromService);
+        when(userService.login(loginRequestDto)).thenReturn(receivedUserFromService);
 
         mockMvc.perform(post("/users/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -159,12 +157,12 @@ public class UserControllerTest {
     @Test
     public void invalidPassword() throws Exception {
         String expectedErrMsg = "Usuario o contraseña invalidos";
-        LoginRequest loginRequest = new LoginRequest("facu", "facu");
+        LoginRequestDto loginRequestDto = new LoginRequestDto("facu", "facu");
         ServiceResult<User> receivedUserFromService = ServiceResult.error(expectedErrMsg);
 
-        String loginRequestJson = objectMapper.writeValueAsString(loginRequest);
+        String loginRequestJson = objectMapper.writeValueAsString(loginRequestDto);
 
-        when(userService.login(loginRequest)).thenReturn(receivedUserFromService);
+        when(userService.login(loginRequestDto)).thenReturn(receivedUserFromService);
 
         mockMvc.perform(post("/users/login")
                         .contentType(MediaType.APPLICATION_JSON)

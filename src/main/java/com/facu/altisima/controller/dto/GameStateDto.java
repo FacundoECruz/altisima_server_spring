@@ -1,28 +1,26 @@
 package com.facu.altisima.controller.dto;
 
 import com.facu.altisima.model.Game;
-import com.facu.altisima.model.Player;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
-public class GameState {
-    private RoundStatus round;
+public class GameStateDto {
+    private RoundStatusDto round;
     private String status;
-    private List<PlayerResult> results;
+    private List<PlayerResultDto> results;
 
 
 //    private Map<String, Integer> playersScore;
 
-    public GameState() {
+    public GameStateDto() {
 
 
     }
-    public GameState(Game game) {
-        RoundStatus round = new RoundStatus(game.getCurrentRound(), game.getCardsPerRound().get(game.getCurrentRound() - 1));
+    public GameStateDto(Game game) {
+        RoundStatusDto round = new RoundStatusDto(game.getCurrentRound(), game.getCardsPerRound().get(game.getCurrentRound() - 1));
         Integer lastRoundIndex = game.getRoundResults().size();
-        List<PlayerResult> results = game.getCurrentResults();
+        List<PlayerResultDto> results = game.getCurrentResults();
 
         this.round = round;
         this.status = checkStatus(game);
@@ -54,11 +52,11 @@ public class GameState {
 //
 //    }
 
-    public RoundStatus getRound() {
+    public RoundStatusDto getRound() {
         return round;
     }
 
-    public void setRound(RoundStatus round) {
+    public void setRound(RoundStatusDto round) {
         this.round = round;
     }
 
@@ -70,11 +68,11 @@ public class GameState {
         this.status = status;
     }
 
-    public List<PlayerResult> getResults() {
+    public List<PlayerResultDto> getResults() {
         return results;
     }
 
-    public void setResults(List<PlayerResult> results) {
+    public void setResults(List<PlayerResultDto> results) {
         this.results = results;
     }
 
@@ -82,8 +80,8 @@ public class GameState {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        GameState gameState = (GameState) o;
-        return Objects.equals(round, gameState.round) && Objects.equals(status, gameState.status) && Objects.equals(results, gameState.results);
+        GameStateDto gameStateDto = (GameStateDto) o;
+        return Objects.equals(round, gameStateDto.round) && Objects.equals(status, gameStateDto.status) && Objects.equals(results, gameStateDto.results);
     }
 
     @Override

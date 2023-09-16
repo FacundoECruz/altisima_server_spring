@@ -1,12 +1,10 @@
 package com.facu.altisima.service.api;
 
-import com.facu.altisima.controller.dto.LoginRequest;
+import com.facu.altisima.controller.dto.LoginRequestDto;
 import com.facu.altisima.model.User;
 import com.facu.altisima.service.utils.ServiceResult;
-import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface UserServiceAPI {
 
@@ -20,5 +18,5 @@ public interface UserServiceAPI {
 
     ServiceResult<User> put(String username, User userChanges);
 
-    ServiceResult<User> login(LoginRequest loginRequest);
+    ServiceResult<User> login(LoginRequestDto loginRequestDto);
 }

@@ -51,8 +51,8 @@ public class GameControllerTest {
         GameRequestDto gameRequestDto = new GameRequestDto(players, totalRounds);
 
         String gameRequestJson = objectMapper.writeValueAsString(gameRequestDto);
-        GameCreated gameCreated = new GameCreated(game);
-        String gameCreatedJson = objectMapper.writeValueAsString(gameCreated);
+        GameCreatedDto gameCreatedDto = new GameCreatedDto(game);
+        String gameCreatedJson = objectMapper.writeValueAsString(gameCreatedDto);
 
         mockMvc.perform(post("/games")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -176,7 +176,7 @@ public class GameControllerTest {
     @Test
     public void successfulNextRound() throws Exception {
         Game game = gameGenerator.generate(players, totalRounds);
-        List<PlayerRound> round = gameGenerator.generateRoundBids(players);
+        List<PlayerRoundDto> round = gameGenerator.generateRoundBids(players);
 
         String urlTemplate = "/games/" + game.getId() + "/next";
         String playersRoundJson = objectMapper.writeValueAsString(round);
@@ -184,8 +184,8 @@ public class GameControllerTest {
         ServiceResult<Game> gameResult = ServiceResult.success(game);
         when(gameService.nextRound(game.getId(), round)).thenReturn(gameResult);
 
-        GameState gameState = new GameState(gameResult.getData());
-        String gameStateJson = objectMapper.writeValueAsString(gameState);
+        GameStateDto gameStateDto = new GameStateDto(gameResult.getData());
+        String gameStateJson = objectMapper.writeValueAsString(gameStateDto);
 
         mockMvc.perform(put(urlTemplate)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -199,7 +199,7 @@ public class GameControllerTest {
     @Test
     public void unsuccessfulNextRound() throws Exception {
         Game game = gameGenerator.generate(players, totalRounds);
-        List<PlayerRound> round = gameGenerator.generateRoundBids(players);
+        List<PlayerRoundDto> round = gameGenerator.generateRoundBids(players);
 
         String urlTemplate = "/games/" + game.getId() + "/next";
         String playersRoundJson = objectMapper.writeValueAsString(round);
@@ -220,9 +220,9 @@ public class GameControllerTest {
         Game game = gameGenerator.generate(players, totalRounds);
 
         String urlTemplate = "/games/" + game.getId() + "/prev";
-        List<PlayerRound> prevRoundBids = game.getLastBidsRound();
+        List<PlayerRoundDto> prevRoundBids = game.getLastBidsRound();
         String prevRoundBidsJson = objectMapper.writeValueAsString(prevRoundBids);
-        ServiceResult<List<PlayerRound>> prevRoundBidsService= ServiceResult.success(prevRoundBids);
+        ServiceResult<List<PlayerRoundDto>> prevRoundBidsService= ServiceResult.success(prevRoundBids);
 
         when(gameService.prevRound(game.getId())).thenReturn(prevRoundBidsService);
 
@@ -238,7 +238,7 @@ public class GameControllerTest {
         String urlTemplate = "/games/" + game.getId() + "/prev";
 
         String expectedErrMsg = "La partida no existe";
-        ServiceResult<List<PlayerRound>> prevRoundBidsError = ServiceResult.error(expectedErrMsg);
+        ServiceResult<List<PlayerRoundDto>> prevRoundBidsError = ServiceResult.error(expectedErrMsg);
         when(gameService.prevRound(game.getId())).thenReturn(prevRoundBidsError);
 
         mockMvc.perform(put(urlTemplate))

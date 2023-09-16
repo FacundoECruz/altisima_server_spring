@@ -1,7 +1,7 @@
 package com.facu.altisima.model;
 
-import com.facu.altisima.controller.dto.PlayerResult;
-import com.facu.altisima.controller.dto.PlayerRound;
+import com.facu.altisima.controller.dto.PlayerResultDto;
+import com.facu.altisima.controller.dto.PlayerRoundDto;
 
 import org.springframework.data.annotation.Id;
 
@@ -14,15 +14,15 @@ public class Game {
     public Integer currentRound;
     public List<Integer> cardsPerRound;
     private List<String> players;
-    private List<PlayerResult> currentResults;
-    private List<PlayerRound> lastBidsRound;
+    private List<PlayerResultDto> currentResults;
+    private List<PlayerRoundDto> lastBidsRound;
     private Integer totalRounds;
 
     public Game() {
 
     }
 
-    public Game(String id, String date, Integer currentRound, List<Integer> cardsPerRound, List<String> players, List<PlayerResult> currentResults, List<PlayerRound> lastBidsRound, Integer totalRounds) {
+    public Game(String id, String date, Integer currentRound, List<Integer> cardsPerRound, List<String> players, List<PlayerResultDto> currentResults, List<PlayerRoundDto> lastBidsRound, Integer totalRounds) {
         this.id = id;
         this.date = date;
         this.currentRound = currentRound;
@@ -73,11 +73,11 @@ public class Game {
         this.players = players;
     }
 
-    public List<PlayerResult> getRoundResults() {
+    public List<PlayerResultDto> getRoundResults() {
         return currentResults;
     }
 
-    public void setRoundResults(List<PlayerResult> roundResults) {
+    public void setRoundResults(List<PlayerResultDto> roundResults) {
         this.currentResults = roundResults;
     }
 
@@ -89,20 +89,20 @@ public class Game {
         this.totalRounds = totalRounds;
     }
 
-    public List<PlayerResult> getCurrentResults() {
+    public List<PlayerResultDto> getCurrentResults() {
         return currentResults;
     }
 
-    public void setCurrentResults(List<PlayerResult> currentResults) {
+    public void setCurrentResults(List<PlayerResultDto> currentResults) {
         this.currentResults = currentResults;
     }
 
-    public List<PlayerRound> getLastBidsRound() {
+    public List<PlayerRoundDto> getLastBidsRound() {
         return lastBidsRound;
     }
 
 
-    public void setLastBidsRound(List<PlayerRound> lastBidsRound) {
+    public void setLastBidsRound(List<PlayerRoundDto> lastBidsRound) {
         this.lastBidsRound = lastBidsRound;
     }
 

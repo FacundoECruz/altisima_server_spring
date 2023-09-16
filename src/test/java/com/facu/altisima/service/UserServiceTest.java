@@ -1,6 +1,6 @@
 package com.facu.altisima.service;
 
-import com.facu.altisima.controller.dto.LoginRequest;
+import com.facu.altisima.controller.dto.LoginRequestDto;
 import com.facu.altisima.dao.api.UserRepository;
 import com.facu.altisima.model.User;
 import com.facu.altisima.service.api.UserServiceAPI;
@@ -145,10 +145,10 @@ public class UserServiceTest {
     @Test
     public void successfulLogin() {
         Optional<User> optionalUser = Optional.of(user);
-        LoginRequest loginRequest = new LoginRequest("Facu", "lapass");
-        when(userRepository.findByUsername(loginRequest.getUsername())).thenReturn(optionalUser);
+        LoginRequestDto loginRequestDto = new LoginRequestDto("Facu", "lapass");
+        when(userRepository.findByUsername(loginRequestDto.getUsername())).thenReturn(optionalUser);
 
-        ServiceResult<User> retrievedUser = userService.login(loginRequest);
+        ServiceResult<User> retrievedUser = userService.login(loginRequestDto);
 
         assertEquals(retrievedUser.getData(), user);
     }
@@ -158,9 +158,9 @@ public class UserServiceTest {
         Optional<User> optionalUser = Optional.empty();
         when(userRepository.findByUsername(user.getUsername())).thenReturn(optionalUser);
         String expectedMsg = "No se encontraron usuarios";
-        LoginRequest loginRequest = new LoginRequest("Facu", "facu");
+        LoginRequestDto loginRequestDto = new LoginRequestDto("Facu", "facu");
 
-        ServiceResult<User> retrievedUser = userService.login(loginRequest);
+        ServiceResult<User> retrievedUser = userService.login(loginRequestDto);
 
         assertEquals(retrievedUser.getErrorMessage(), expectedMsg);
     }
@@ -170,9 +170,9 @@ public class UserServiceTest {
         Optional<User> optionalUser = Optional.of(user);
         when(userRepository.findByUsername(user.getUsername())).thenReturn(optionalUser);
         String expectedMsg = "Usuario o contraseña invalidos";
-        LoginRequest loginRequest = new LoginRequest("Facu", "asdf");
+        LoginRequestDto loginRequestDto = new LoginRequestDto("Facu", "asdf");
 
-        ServiceResult<User> retrievedUser = userService.login(loginRequest);
+        ServiceResult<User> retrievedUser = userService.login(loginRequestDto);
 
         assertEquals(retrievedUser.getErrorMessage(), expectedMsg);
 

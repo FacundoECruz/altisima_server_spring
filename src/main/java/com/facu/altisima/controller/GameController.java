@@ -1,10 +1,10 @@
 package com.facu.altisima.controller;
 
-import com.facu.altisima.controller.dto.GameCreated;
+import com.facu.altisima.controller.dto.GameCreatedDto;
 import com.facu.altisima.controller.dto.GameRequestDto;
 
-import com.facu.altisima.controller.dto.GameState;
-import com.facu.altisima.controller.dto.PlayerRound;
+import com.facu.altisima.controller.dto.GameStateDto;
+import com.facu.altisima.controller.dto.PlayerRoundDto;
 import com.facu.altisima.model.Game;
 import com.facu.altisima.service.api.GameServiceAPI;
 import com.facu.altisima.service.utils.ServiceResult;
@@ -38,8 +38,8 @@ public class GameController {
         Integer totalRounds = gameRequestDto.getTotalRounds();
         ServiceResult<Game> game = gameServiceAPI.createGame(players, totalRounds);
         if (game.getErrorMessage() == null) {
-            GameCreated gameCreated = new GameCreated(game.getData());
-            return new ResponseEntity<>(gameCreated, HttpStatus.OK);
+            GameCreatedDto gameCreatedDto = new GameCreatedDto(game.getData());
+            return new ResponseEntity<>(gameCreatedDto, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(game.getErrorMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -67,11 +67,11 @@ public class GameController {
     }
 
     @PutMapping(value = "/{id}/next")
-    public ResponseEntity<?> nextRound(@PathVariable String id, @RequestBody List<PlayerRound> playersRound) {
+    public ResponseEntity<?> nextRound(@PathVariable String id, @RequestBody List<PlayerRoundDto> playersRound) {
         ServiceResult<Game> game = gameServiceAPI.nextRound(id, playersRound);
         if (game.getErrorMessage() == null) {
-            GameState gameState = new GameState(game.getData());
-            return new ResponseEntity<>(gameState, HttpStatus.OK);
+            GameStateDto gameStateDto = new GameStateDto(game.getData());
+            return new ResponseEntity<>(gameStateDto, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(game.getErrorMessage(), HttpStatus.NOT_FOUND);
         }
@@ -79,7 +79,7 @@ public class GameController {
 
     @PutMapping(value = "/{id}/prev")
     public ResponseEntity<?> prevRound(@PathVariable String id) {
-        ServiceResult<List<PlayerRound>> prevRoundBids= gameServiceAPI.prevRound(id);
+        ServiceResult<List<PlayerRoundDto>> prevRoundBids= gameServiceAPI.prevRound(id);
         if(prevRoundBids.getErrorMessage() == null){
             return new ResponseEntity<>(prevRoundBids.getData(), HttpStatus.OK);
         } else {

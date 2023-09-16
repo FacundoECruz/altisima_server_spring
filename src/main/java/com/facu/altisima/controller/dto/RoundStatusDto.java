@@ -2,11 +2,11 @@ package com.facu.altisima.controller.dto;
 
 import java.util.Objects;
 
-public class RoundStatus {
+public class RoundStatusDto {
     Integer current;
     Integer cardsToDeal;
 
-    public RoundStatus(Integer current, Integer cardsToDeal) {
+    public RoundStatusDto(Integer current, Integer cardsToDeal) {
         this.current = current;
         this.cardsToDeal = cardsToDeal;
     }
@@ -15,7 +15,7 @@ public class RoundStatus {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        RoundStatus that = (RoundStatus) o;
+        RoundStatusDto that = (RoundStatusDto) o;
         return Objects.equals(current, that.current) && Objects.equals(cardsToDeal, that.cardsToDeal);
     }
 

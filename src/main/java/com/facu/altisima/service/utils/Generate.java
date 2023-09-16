@@ -1,7 +1,7 @@
 package com.facu.altisima.service.utils;
 
-import com.facu.altisima.controller.dto.PlayerResult;
-import com.facu.altisima.controller.dto.PlayerRound;
+import com.facu.altisima.controller.dto.PlayerResultDto;
+import com.facu.altisima.controller.dto.PlayerRoundDto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,22 +20,22 @@ public class Generate {
         return cardsPerRound;
     }
 
-    public List<PlayerRound> roundBids(List<String> players) {
-        List<PlayerRound> roundBids = new ArrayList<>();
+    public List<PlayerRoundDto> roundBids(List<String> players) {
+        List<PlayerRoundDto> roundBids = new ArrayList<>();
 
         for(int i = 0; i < players.size(); i++){
-            PlayerRound playerRound = new PlayerRound(players.get(i), 0, 0);
-            roundBids.add(playerRound);
+            PlayerRoundDto playerRoundDto = new PlayerRoundDto(players.get(i), 0, 0);
+            roundBids.add(playerRoundDto);
         }
         return roundBids;
     }
 
-    public List<PlayerResult> roundResults(List<String> players) {
-        List<PlayerResult> playersResult = new ArrayList<>();
+    public List<PlayerResultDto> roundResults(List<String> players) {
+        List<PlayerResultDto> playersResult = new ArrayList<>();
 
         for(int i = 0; i < players.size(); i++) {
-            PlayerResult playerResult = new PlayerResult(players.get(i), 0);
-            playersResult.add(playerResult);
+            PlayerResultDto playerResultDto = new PlayerResultDto(players.get(i), 0);
+            playersResult.add(playerResultDto);
         }
         return playersResult;
     }

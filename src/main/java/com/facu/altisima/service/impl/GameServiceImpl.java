@@ -1,8 +1,7 @@
 package com.facu.altisima.service.impl;
 
-import com.facu.altisima.controller.dto.GameState;
-import com.facu.altisima.controller.dto.PlayerResult;
-import com.facu.altisima.controller.dto.PlayerRound;
+import com.facu.altisima.controller.dto.PlayerResultDto;
+import com.facu.altisima.controller.dto.PlayerRoundDto;
 import com.facu.altisima.dao.api.GameRepository;
 import com.facu.altisima.model.Game;
 import com.facu.altisima.service.api.GameServiceAPI;
@@ -72,7 +71,7 @@ public class GameServiceImpl implements GameServiceAPI {
     }
 
 
-    public ServiceResult<Game> nextRound(String id, List<PlayerRound> roundResults) {
+    public ServiceResult<Game> nextRound(String id, List<PlayerRoundDto> roundResults) {
         Optional<Game> retrievedGameFromDb = gameRepository.findById(id);
         if (retrievedGameFromDb.isPresent()) {
             Game game = retrievedGameFromDb.get();
@@ -84,23 +83,23 @@ public class GameServiceImpl implements GameServiceAPI {
             game.setLastBidsRound(roundResults);
             game.setCurrentRound(game.getCurrentRound() + 1);
 
-            List<PlayerResult> currentResults = game.getCurrentResults();
-            List<PlayerResult> updatedResults = new ArrayList<>();
+            List<PlayerResultDto> currentResults = game.getCurrentResults();
+            List<PlayerResultDto> updatedResults = new ArrayList<>();
 
             for (int i = 0; i < currentResults.size(); i++) {
-                PlayerRound playerRound = roundResults.get(i);
-                PlayerResult playerResult = currentResults.get(i);
+                PlayerRoundDto playerRoundDto = roundResults.get(i);
+                PlayerResultDto playerResultDto = currentResults.get(i);
 
-                if (playerRound.getUsername().equals(playerResult.getUsername())) {
-                    if (playerRound.getBidsLost() == 0) {
-                        playerResult.setScore(playerResult.getScore() + playerRound.getBid());
+                if (playerRoundDto.getUsername().equals(playerResultDto.getUsername())) {
+                    if (playerRoundDto.getBidsLost() == 0) {
+                        playerResultDto.setScore(playerResultDto.getScore() + playerRoundDto.getBid());
                     } else {
-                        playerResult.setScore(playerResult.getScore() - playerRound.getBidsLost());
+                        playerResultDto.setScore(playerResultDto.getScore() - playerRoundDto.getBidsLost());
                     }
                 } else {
                     return ServiceResult.error("Los nombres de los players no coinciden");
                 }
-                updatedResults.add(playerResult);
+                updatedResults.add(playerResultDto);
             }
             game.setCurrentResults(updatedResults);
 
@@ -111,7 +110,7 @@ public class GameServiceImpl implements GameServiceAPI {
         }
     }
 
-    public ServiceResult<List<PlayerRound>> prevRound(String id) {
+    public ServiceResult<List<PlayerRoundDto>> prevRound(String id) {
         return null;
     }
 
