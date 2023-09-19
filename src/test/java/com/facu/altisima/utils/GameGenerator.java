@@ -31,7 +31,12 @@ public class GameGenerator {
         List<PlayerRoundDto> roundBids = new ArrayList<>();
 
         for (int i = 0; i < players.size(); i++) {
-            PlayerRoundDto playerRoundDto = new PlayerRoundDto(players.get(i), 0, 0);
+            PlayerRoundDto playerRoundDto;
+            if(i == 0){
+                playerRoundDto = new PlayerRoundDto(players.get(i), 0, 1);
+            } else {
+                playerRoundDto = new PlayerRoundDto(players.get(i), 0, 0);
+            }
             roundBids.add(playerRoundDto);
         }
         return roundBids;

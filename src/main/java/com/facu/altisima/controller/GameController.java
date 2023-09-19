@@ -1,10 +1,7 @@
 package com.facu.altisima.controller;
 
-import com.facu.altisima.controller.dto.GameCreatedDto;
-import com.facu.altisima.controller.dto.GameRequestDto;
+import com.facu.altisima.controller.dto.*;
 
-import com.facu.altisima.controller.dto.GameStateDto;
-import com.facu.altisima.controller.dto.PlayerRoundDto;
 import com.facu.altisima.model.Game;
 import com.facu.altisima.service.api.GameServiceAPI;
 import com.facu.altisima.service.utils.ServiceResult;
@@ -84,6 +81,16 @@ public class GameController {
             return new ResponseEntity<>(prevRoundBids.getData(), HttpStatus.OK);
         } else {
             return  new ResponseEntity<>(prevRoundBids.getErrorMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PutMapping(value = "/{id}/finish")
+    public ResponseEntity<?> finish(FinishedGameDto finishedGameDto) {
+        ServiceResult<String> finishGameServiceResult = gameServiceAPI.finishGame(finishedGameDto);
+        if(finishGameServiceResult.isSuccess()){
+            return new ResponseEntity<>(finishGameServiceResult.getData(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(finishGameServiceResult.getErrorMessage(), HttpStatus.CONFLICT);
         }
     }
 }

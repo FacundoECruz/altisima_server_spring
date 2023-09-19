@@ -1,10 +1,10 @@
 package com.facu.altisima.controller.dto;
 
-public class Error {
+public class ErrorDto {
     String code;
     String message;
 
-    public Error(String code, String message) {
+    public ErrorDto(String code, String message) {
         this.code = code;
         this.message = message;
     }
