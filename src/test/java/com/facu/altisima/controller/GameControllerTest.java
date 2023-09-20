@@ -166,6 +166,8 @@ public class GameControllerTest {
     @Test
     public void unsuccessfulNextRound() throws Exception {
         List<PlayerRoundDto> round = gameGenerator.generateRoundBids(players);
+        String playersRoundJson = objectMapper.writeValueAsString(round);
+
         String urlTemplate = path + "/" + game.getId() + "/next";
         String expectedErrMsg = "Algun mensaje de error";
 
@@ -173,7 +175,7 @@ public class GameControllerTest {
         when(gameService.nextRound(game.getId(), round)).thenReturn(gameResult);
 
         mockMvc.perform(put(urlTemplate).contentType(MediaType.APPLICATION_JSON)
-                        .content(toJson(round)))
+                        .content(playersRoundJson))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(expectedErrMsg));
     }
@@ -182,13 +184,14 @@ public class GameControllerTest {
     public void successfulPrevRound() throws Exception {
         String urlTemplate = path + "/" + game.getId() + "/prev";
         List<PlayerRoundDto> prevRoundBids = game.getLastBidsRound();
+        String prevRoundBidsJson = objectMapper.writeValueAsString(prevRoundBids);
         ServiceResult<List<PlayerRoundDto>> prevRoundBidsService = ServiceResult.success(prevRoundBids);
 
         when(gameService.prevRound(game.getId())).thenReturn(prevRoundBidsService);
 
         mockMvc.perform(put(urlTemplate))
                 .andExpect(status().isOk())
-                .andExpect(content().string(toJson(prevRoundBids)));
+                .andExpect(content().string(prevRoundBidsJson));
     }
 
     @Test
