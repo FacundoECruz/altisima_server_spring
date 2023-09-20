@@ -29,12 +29,12 @@ public class PlayerControllerTest {
     PlayerServiceImpl playerService;
     ObjectMapper objectMapper = new ObjectMapper();
     Player player = new Player("1", "Facu", "www.image.com/facu", 0, 0, 0);
-
+    String path = "/players";
+    ServiceResult<Player> succeedPlayer = ServiceResult.success(player);
     @Test
     public void findPlayerByUsername() throws Exception {
-        ServiceResult<Player> returnedPlayer = ServiceResult.success(player);
-        when(playerService.get(player.getUsername())).thenReturn(returnedPlayer);
-        String urlTemplate = "/players/" + player.getUsername();
+        when(playerService.get(player.getUsername())).thenReturn(succeedPlayer);
+        String urlTemplate = path + "/" + player.getUsername();
         String playerJson = objectMapper.writeValueAsString(player);
 
         mockMvc.perform(get(urlTemplate)
@@ -50,7 +50,7 @@ public class PlayerControllerTest {
         ServiceResult<Player> returnedPlayer = ServiceResult.error(expectedErrMsg);
         String playerThatDoesNotExist = "DiegoArmando";
         when(playerService.get(playerThatDoesNotExist)).thenReturn(returnedPlayer);
-        String urlTemplate = "/players/" + playerThatDoesNotExist;
+        String urlTemplate = path + "/" + playerThatDoesNotExist;
 
         mockMvc.perform(get(urlTemplate)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -63,7 +63,7 @@ public class PlayerControllerTest {
         ServiceResult<List<Player>> players = ServiceResult.success(new ArrayList<>());
         when(playerService.getAll()).thenReturn(players);
 
-        mockMvc.perform(get("/players"))
+        mockMvc.perform(get(path))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string("[]"));
@@ -76,18 +76,17 @@ public class PlayerControllerTest {
         ServiceResult<List<Player>> players = ServiceResult.error(expectedErrMsg);
         when(playerService.getAll()).thenReturn(players);
 
-        mockMvc.perform(get("/players"))
+        mockMvc.perform(get(path))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(expectedErrMsg));
     }
 
     @Test
     public void successfulSavePlayer() throws Exception {
-        ServiceResult<Player> savedPlayer = ServiceResult.success(player);
-        when(playerService.save(player)).thenReturn(savedPlayer);
+        when(playerService.save(player)).thenReturn(succeedPlayer);
         String playerJson = objectMapper.writeValueAsString(player);
 
-        mockMvc.perform(post("/players")
+        mockMvc.perform(post(path)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(player)))
                 .andExpect(status().isOk())
@@ -101,7 +100,7 @@ public class PlayerControllerTest {
         ServiceResult<Player> savedPlayer = ServiceResult.error(expectedErrMsg);
         when(playerService.save(player)).thenReturn(savedPlayer);
 
-        mockMvc.perform(post("/players")
+        mockMvc.perform(post(path)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(player)))
                 .andExpect(status().isConflict())

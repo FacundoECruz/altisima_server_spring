@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -31,7 +32,6 @@ public class PlayerServiceTest {
     public void getAllPlayers() {
         List<Player> allPlayers = new ArrayList<>();
         allPlayers.add(player);
-
         when(playerRepository.findAll()).thenReturn(allPlayers);
 
         ServiceResult<List<Player>> returnedAllPlayersList = playerService.getAll();
@@ -73,7 +73,6 @@ public class PlayerServiceTest {
     @Test
     public void successfulGetPlayerById() {
         Optional<Player> optionalPlayer = Optional.of(player);
-
         when(playerRepository.findByUsername(player.getUsername())).thenReturn(optionalPlayer);
 
         ServiceResult<Player> returnedPlayer = playerService.get(player.getUsername());
@@ -84,9 +83,7 @@ public class PlayerServiceTest {
     @Test
     public void playerDoesNotExist() {
         String expectedMsg = "El nombre de usuario no existe";
-        Optional<Player> optionalPlayer = Optional.empty();
-
-        when(playerRepository.findByUsername(player.getUsername())).thenReturn(optionalPlayer);
+        when(playerRepository.findByUsername(player.getUsername())).thenReturn(Optional.empty());
 
         ServiceResult<Player> returnedPlayer = playerService.get(player.getUsername());
 
