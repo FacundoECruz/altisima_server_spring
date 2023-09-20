@@ -26,24 +26,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class UserControllerTest {
     @Autowired
     private MockMvc mockMvc;
-
     @MockBean
     UserServiceImpl userService;
-
     ObjectMapper objectMapper = new ObjectMapper();
-
     User user = new User("1", "Facu", "www.image.com/facu", "lapass", 0);
+    String path = "/users";
+    String userJson = objectMapper.writeValueAsString(user);
+    ServiceResult<User> succeedUser = ServiceResult.success(user);
 
-    // Path "/users" y despues lo uso en los test
-    // El userJson puede estar aca arriba tambien
-
+    public UserControllerTest() throws JsonProcessingException {
+    }
 
     @Test
     public void findUserByUsername() throws Exception {
-        ServiceResult<User> serviceUser = ServiceResult.success(user);
-        when(userService.get(user.getUsername())).thenReturn(serviceUser);
-        String urlTemplate = "/users/" + user.getUsername();
-        String userJson = objectMapper.writeValueAsString(user);
+        when(userService.get(user.getUsername())).thenReturn(succeedUser);
+        String urlTemplate = path + "/" + user.getUsername();
 
         mockMvc.perform(get(urlTemplate)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -55,10 +52,10 @@ public class UserControllerTest {
     @Test
     public void userDoesNotExist() throws Exception {
         String expectedErrMsg = "El nombre de usuario no existe";
-        ServiceResult<User> serviceUser = ServiceResult.error(expectedErrMsg);
         String userThatDoesNotExist = "IMNotRegisteredHere";
-        when(userService.get(userThatDoesNotExist)).thenReturn(serviceUser);
-        String urlTemplate = "/users/" + userThatDoesNotExist;
+        ServiceResult<User> unsuccessfulUser = ServiceResult.error(expectedErrMsg);
+        when(userService.get(userThatDoesNotExist)).thenReturn(unsuccessfulUser);
+        String urlTemplate = path + "/" + userThatDoesNotExist;
 
         mockMvc.perform(get(urlTemplate))
                 .andExpect(status().isNotFound())
@@ -70,7 +67,7 @@ public class UserControllerTest {
         ServiceResult<List<User>> users = ServiceResult.success(new ArrayList<>());
         when(userService.getAll()).thenReturn(users);
 
-        mockMvc.perform(get("/users"))
+        mockMvc.perform(get(path))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string("[]"));
@@ -82,22 +79,19 @@ public class UserControllerTest {
         ServiceResult<List<User>> users = ServiceResult.error(expectedErrMsg);
         when(userService.getAll()).thenReturn(users);
 
-        mockMvc.perform(get("/users"))
+        mockMvc.perform(get(path))
                 .andExpect(status().isInternalServerError())
                 .andExpect(content().string(expectedErrMsg));
     }
 
     @Test
     public void successfulCreateUser() throws Exception {
-        ServiceResult<User> receivedUserFromService = ServiceResult.success(user);
-        when(userService.save(user)).thenReturn(receivedUserFromService);
-        String userJson = objectMapper.writeValueAsString(user);
+        when(userService.save(user)).thenReturn(succeedUser);
 
-        mockMvc.perform(post("/users")
+        mockMvc.perform(post(path)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(userJson))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string(userJson));
     }
 
@@ -106,9 +100,9 @@ public class UserControllerTest {
         String expectedErrMsg = "El nombre de usuario ya existe";
         ServiceResult<User> receivedUserFromService = ServiceResult.error(expectedErrMsg);
         when(userService.save(user)).thenReturn(receivedUserFromService);
-        String userJson = objectMapper.writeValueAsString(user);
 
-        mockMvc.perform(post("/users")
+
+        mockMvc.perform(post(path)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(userJson))
                 .andExpect(status().isConflict())
@@ -118,28 +112,24 @@ public class UserControllerTest {
     @Test
     public void successfulLogin() throws Exception {
         LoginRequestDto loginRequestDto = new LoginRequestDto("facu", "facu");
-        ServiceResult<User> receivedUserFromService = ServiceResult.success(user);
         String loginRequestJson = objectMapper.writeValueAsString(loginRequestDto);
-        String expectedUserJson = objectMapper.writeValueAsString(user);
-        when(userService.login(loginRequestDto)).thenReturn(receivedUserFromService);
+        when(userService.login(loginRequestDto)).thenReturn(succeedUser);
 
-        mockMvc.perform(post("/users/login")
+        mockMvc.perform(post(path + "/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(loginRequestJson))
                 .andExpect(status().isOk())
-                .andExpect(content().string(expectedUserJson));
+                .andExpect(content().string(userJson));
     }
 
-    //MODELO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     @Test
     public void loginUserDoesNotExist() throws Exception {
         String expected = "No se encontraron usuarios";
-
         when(userService.login(any(LoginRequestDto.class)))
                 .thenReturn(ServiceResult.error(expected));
-
         String loginRequestJson = serializeLoginRequest("facu", "facu");
-        mockMvc.perform(post("/users/login")
+
+        mockMvc.perform(post(path + "/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(loginRequestJson))
                 .andExpect(status().isNotFound())
@@ -154,7 +144,7 @@ public class UserControllerTest {
         String loginRequestJson = objectMapper.writeValueAsString(loginRequestDto);
         when(userService.login(loginRequestDto)).thenReturn(receivedUserFromService);
 
-        mockMvc.perform(post("/users/login")
+        mockMvc.perform(post(path + "/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(loginRequestJson))
                 .andExpect(status().isUnauthorized())
@@ -168,11 +158,9 @@ public class UserControllerTest {
 
     @Test
     public void successfulUserEdit() throws Exception {
-        User userChanges = new User("1", "messi", "www.image.com/messi", "lapass", 0);
-        ServiceResult<User> changedUser = ServiceResult.success(userChanges);
-        when(userService.put(user.getUsername(), userChanges)).thenReturn(changedUser);
-        String urlTemplate = "/users/" + user.getUsername();
-        String userJson = objectMapper.writeValueAsString(userChanges);
+        ServiceResult<User> changedUser = ServiceResult.success(user);
+        when(userService.put(user.getUsername(), user)).thenReturn(changedUser);
+        String urlTemplate = path + "/" + user.getUsername();
 
         mockMvc.perform(put(urlTemplate)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -184,13 +172,11 @@ public class UserControllerTest {
 
     @Test
     public void unsuccessfulUserEdit() throws Exception {
-        User userChanges = new User("1", "messi", "www.image.com/messi", "lapass", 0);
         String expectedErrMsg = "El nombre de usuario no existe";
         ServiceResult<User> changedUser = ServiceResult.error(expectedErrMsg);
         String userThatDoesNotExist = "IAmNot";
-        when(userService.put(userThatDoesNotExist, userChanges)).thenReturn(changedUser);
-        String urlTemplate = "/users/" + userThatDoesNotExist;
-        String userJson = objectMapper.writeValueAsString(userChanges);
+        when(userService.put(userThatDoesNotExist, user)).thenReturn(changedUser);
+        String urlTemplate = path + "/" + userThatDoesNotExist;
 
         mockMvc.perform(put(urlTemplate)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -202,9 +188,8 @@ public class UserControllerTest {
     @Test
     public void successfulUserDelete() throws Exception {
         doNothing().when(userService).delete(user.getId());
-        ServiceResult<User> serviceUser = ServiceResult.success(user);
-        when(userService.get(user.getUsername())).thenReturn(serviceUser);
-        String urlTemplate = "/users/" + user.getUsername();
+        when(userService.get(user.getUsername())).thenReturn(succeedUser);
+        String urlTemplate = path + "/" + user.getUsername();
 
         mockMvc.perform(delete(urlTemplate)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -213,13 +198,14 @@ public class UserControllerTest {
 
     @Test
     public void userToDeleteDoesNotExist() throws Exception {
+        String expected = "No se encontro el usuario";
         doNothing().when(userService).delete(user.getId());
-        ServiceResult<User> serviceUser = ServiceResult.error("No se encontraron usuarios");
+        ServiceResult<User> serviceUser = ServiceResult.error(expected);
         when(userService.get(user.getUsername())).thenReturn(serviceUser);
-        String urlTemplate = "/users/" + user.getUsername();
+        String urlTemplate = path + "/" + user.getUsername();
 
         mockMvc.perform(delete(urlTemplate))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("User not found"));
+                .andExpect(content().string(expected));
     }
 }

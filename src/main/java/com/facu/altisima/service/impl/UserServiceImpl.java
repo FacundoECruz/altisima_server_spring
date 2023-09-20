@@ -30,7 +30,6 @@ public class UserServiceImpl implements UserServiceAPI {
 
     @Override
     public ServiceResult<User> save(User user) {
-
         Optional<User> dbUser = userRepository.findByUsername(user.getUsername());
 
         if (dbUser.isPresent()) {
@@ -53,13 +52,10 @@ public class UserServiceImpl implements UserServiceAPI {
     }
 
     @Override
-    public ServiceResult<String> delete(String id) {
+    public void delete(String id) {
         Optional<User> userToDelete = userRepository.findById(id);
         if (userToDelete.isPresent()) {
             userRepository.deleteById(id);
-            return ServiceResult.success("Exitosamente borrado");
-        } else {
-            return ServiceResult.error("No se encontro el usuario");
         }
     }
 

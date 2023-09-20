@@ -85,9 +85,9 @@ public class UserController {
         if (user.getErrorMessage() == null) {
             User userToDelete = user.getData();
             userServiceAPI.delete(userToDelete.getId());
-            return new ResponseEntity<>("Successfully deleted", HttpStatus.OK);
+            return new ResponseEntity<>("Exitosamente borrado", HttpStatus.OK);
         } else {
-            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("No se encontro el usuario", HttpStatus.NOT_FOUND);
         }
     }
 }

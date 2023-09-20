@@ -8,9 +8,9 @@ import java.util.List;
 
 public interface UserServiceAPI {
 
-    ServiceResult<User> save (User entity);
+    ServiceResult<User> save(User entity);
 
-    ServiceResult<String> delete(String id);
+    void delete(String id);
 
     ServiceResult<User> get(String username);
 
