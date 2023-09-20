@@ -38,11 +38,13 @@ public class GameServiceTest {
     private GameServiceAPI gameService;
     GameGenerator gameGenerator = new GameGenerator();
     private List<String> players;
+    Game game;
     Integer totalRounds = 9;
     @BeforeEach
     public void setup() {
         players = new ArrayList<>();
         players.add("Migue");
+        game = gameGenerator.generate(players, totalRounds);
         this.gameRepository = mock(GameRepository.class);
         this.playerRepository = mock(PlayerRepository.class);
         this.userRepository = mock(UserRepository.class);
@@ -51,8 +53,6 @@ public class GameServiceTest {
 
     @Test
     public void successfullyCreatedGame() {
-        Game game = gameGenerator.generate(players, totalRounds);
-
         when(gameRepository.save(any(Game.class))).thenReturn(game);
 
         ServiceResult<Game> returnedGame = gameService.createGame(players, totalRounds);
@@ -66,8 +66,6 @@ public class GameServiceTest {
         for (int i = 0; i < 10; i++) {
             exceededPlayersList.add("Migue" + i);
         }
-        Integer totalRounds = 9;
-
         String expectedErrMsg = "Demasiados jugadores";
 
         ServiceResult<Game> returnedGame = gameService.createGame(exceededPlayersList, totalRounds);
@@ -78,8 +76,7 @@ public class GameServiceTest {
     @Test
     public void successfulGetAllGames() {
         List<Game> games = new ArrayList<>();
-        games.add(gameGenerator.generate(players, totalRounds));
-
+        games.add(game);
         when(gameRepository.findAll()).thenReturn(games);
 
         ServiceResult<List<Game>> serviceAllGames = gameService.getAllGames();
@@ -91,7 +88,6 @@ public class GameServiceTest {
     public void unsuccessfulGetAllGames() {
         String expectedErrMsg = "No se encontraron partidas";
         List<Game> emptyList = new ArrayList<>();
-
         when(gameRepository.findAll()).thenReturn(emptyList);
 
         ServiceResult<List<Game>> serviceAllGames = gameService.getAllGames();
@@ -101,7 +97,6 @@ public class GameServiceTest {
 
     @Test
     public void successfulGetGame() {
-        Game game = gameGenerator.generate(players, totalRounds);
         Optional<Game> successfulOptionalGame = Optional.of(game);
         when(gameRepository.findById(game.getId())).thenReturn(successfulOptionalGame);
 
@@ -113,10 +108,7 @@ public class GameServiceTest {
     @Test
     public void idGameToGetNotFound() {
         String gameNotFoundMsg = "No se encontro partida con ese id";
-        Game game = gameGenerator.generate(players, totalRounds);
-        Optional<Game> unsuccessfulOptionalGame = Optional.empty();
-
-        when(gameRepository.findById(game.getId())).thenReturn(unsuccessfulOptionalGame);
+        when(gameRepository.findById(game.getId())).thenReturn(Optional.empty());
 
         ServiceResult<Game> returnedGame = gameService.getGame(game.getId());
 
@@ -125,12 +117,11 @@ public class GameServiceTest {
 
     @Test
     public void successfulDeleteGame() {
-        Game game = gameGenerator.generate(players, totalRounds);
         Optional<Game> gameOptional= Optional.of(game);
         when(gameRepository.findById(game.getId())).thenReturn(gameOptional);
         doNothing().when(gameRepository).deleteById(game.getId());
-
         String successfulDeleteMsg = "Exitosamente borrado";
+
         ServiceResult<String> result = gameService.delete(game.getId());
 
         verify(gameRepository, times(1)).deleteById(game.getId());
@@ -139,7 +130,6 @@ public class GameServiceTest {
 
     @Test
     public void gameToDeleteDoesNotExist() {
-        Game game = gameGenerator.generate(players, totalRounds);
         when(gameRepository.findById(game.getId())).thenReturn(Optional.empty());
 
         String gameToDeleteNotFoundMsg = "No se encontro la partida";
@@ -151,9 +141,9 @@ public class GameServiceTest {
 
     @Test
     public void successfulNextRound() {
-        Game game = gameGenerator.generate(players, totalRounds);
         Optional<Game> gameOptional = Optional.of(game);
         List<PlayerRoundDto> playersRound = gameGenerator.generateRoundBids(players);
+
         PlayerResultDto expectedPlayerResult = new PlayerResultDto(players.get(0), -1);
         List<PlayerResultDto> expectedResults = new ArrayList<>();
         expectedResults.add(expectedPlayerResult);
@@ -174,35 +164,29 @@ public class GameServiceTest {
 
     @Test
     public void idGameToNextRoundNotFound() {
-        Game game = gameGenerator.generate(players, totalRounds);
+        String expectedErrMsg = "No se encontro la partida";
         when(gameRepository.findById(game.getId())).thenReturn(Optional.empty());
-
         List<PlayerRoundDto> playersRound = gameGenerator.generateRoundBids(players);
 
         ServiceResult<Game> gameServiceResult = gameService.nextRound(game.getId(), playersRound);
-        String expectedErrMsg = "No se encontro la partida";
 
         assertEquals(expectedErrMsg, gameServiceResult.getErrorMessage());
     }
 
     @Test
     public void requestedGameToNextRoundIsFinished() {
-        Game game = gameGenerator.generate(players, totalRounds);
+        String expectedErrMsg = "La partida ya esta terminada";
         game.setCurrentRound(10);
-        Optional<Game> gameOptional = Optional.of(game);
-
         List<PlayerRoundDto> playersRound = gameGenerator.generateRoundBids(players);
-        when(gameRepository.findById(game.getId())).thenReturn(gameOptional);
+        when(gameRepository.findById(game.getId())).thenReturn(Optional.of(game));
 
         ServiceResult<Game> gameServiceResult = gameService.nextRound(game.getId(), playersRound);
-        String expectedErrMsg = "La partida ya esta terminada";
 
         assertEquals(expectedErrMsg, gameServiceResult.getErrorMessage());
     }
 
     @Test
     public void successfulPrevRound() {
-        Game game = gameGenerator.generate(players, totalRounds);
         when(gameRepository.findById(game.getId())).thenReturn(Optional.of(game));
 
         ServiceResult<List<PlayerRoundDto>> expectedResult = ServiceResult.success(game.getLastBidsRound());
@@ -212,9 +196,8 @@ public class GameServiceTest {
 
     @Test
     public void idGameToPrevRoundNotFound() {
-        Game game = gameGenerator.generate(players, totalRounds);
-        when(gameRepository.findById(game.getId())).thenReturn(Optional.empty());
         String expectedErrMsg = "No se encontro la partida";
+        when(gameRepository.findById(game.getId())).thenReturn(Optional.empty());
 
         ServiceResult<List<PlayerRoundDto>> expectedResult = ServiceResult.error(expectedErrMsg);
 
@@ -223,14 +206,15 @@ public class GameServiceTest {
 
     @Test
     public void successfulFinishedGame() {
-        Game game = gameGenerator.generate(players, totalRounds);
-        Player player = new Player("23","Batman","www.image.com/batman", 0, 0, 0);
-        User user = new User("43", "Mister", "www.image.com/image", "asdf", 0);
         when(gameRepository.findById(game.getId())).thenReturn(Optional.of(game));
-        when(playerRepository.findByUsername(any(String.class))).thenReturn(Optional.of(player));
-        when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
-        String expectedMsg = "Se guardaron los datos de la partida";
 
+        Player player = new Player("23","Batman","www.image.com/batman", 0, 0, 0);
+        when(playerRepository.findByUsername(any(String.class))).thenReturn(Optional.of(player));
+
+        User user = new User("43", "Mister", "www.image.com/image", "asdf", 0);
+        when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
+
+        String expectedMsg = "Se guardaron los datos de la partida";
         FinishedGameDto finishedGameDto = new FinishedGameDto(game.getId(), "Facu", "Migue");
 
         ServiceResult<String> finishGameServiceResult = gameService.finishGame(finishedGameDto);
