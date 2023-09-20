@@ -35,11 +35,39 @@ public class GameServiceImpl implements GameServiceAPI {
         this.idGenerator = idGenerator;
     }
 
+
+//    public ServiceResult<GameV1> createGameV1(List<PlayersRoundAndScoreDto> players){
+//        if (players.size() > 8) {
+//            return ServiceResult.error("Demasiados jugadores");
+//        } else {
+//            Integer totalRounds = 9;
+//            List<List<PlayersRoundAndScoreDto>> results = new ArrayList<>();
+//            results.add(players);
+//
+//            List<String> playersNames = new ArrayList<>();
+//            for(int i = 0; i < players.size(); i++) {
+//                playersNames.add(players.get(i).getUsername());
+//            }
+//
+//            GameV1 gameV1 = new GameV1(generate.cardsPerRound(players.size(), totalRounds), results, dateFormatter.formatDate(new Date()), 1, playersNames);
+//
+//            GameV1 savedGameV1 = gameRepository.save(gameV1);
+//
+//            return ServiceResult.success(savedGameV1);
+//        }
+//    }
     public ServiceResult<Game> createGame(List<String> players, Integer totalRounds) {
         if (players.size() > 8) {
             return ServiceResult.error("Demasiados jugadores");
         } else {
-            Game game = new Game(idGenerator.generate(), dateFormatter.formatDate(new Date()), 1, generate.cardsPerRound(players.size(), totalRounds), players, generate.roundResults(players), generate.roundBids(players), totalRounds);
+            List<String> playersImgs = new ArrayList<>();
+            for(int i = 0; i < players.size(); i++){
+                Optional<Player> playerFromDb = playerRepository.findByUsername(players.get(i));
+                if(playerFromDb.isPresent()){
+                    playersImgs.add(playerFromDb.get().getImage());
+                }
+            }
+            Game game = new Game(idGenerator.generate(), dateFormatter.formatDate(new Date()), 1, generate.cardsPerRound(players.size(), totalRounds), players, generate.roundResults(players), generate.roundBids(players), totalRounds, playersImgs);
 
             Game savedGame = gameRepository.save(game);
 

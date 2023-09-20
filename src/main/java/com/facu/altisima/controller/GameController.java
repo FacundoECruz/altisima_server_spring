@@ -3,6 +3,7 @@ package com.facu.altisima.controller;
 import com.facu.altisima.controller.dto.*;
 
 import com.facu.altisima.model.Game;
+import com.facu.altisima.model.Player;
 import com.facu.altisima.service.api.GameServiceAPI;
 import com.facu.altisima.service.utils.ServiceResult;
 
@@ -11,7 +12,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/games")
@@ -28,6 +31,8 @@ public class GameController {
             return new ResponseEntity<>(allGames.getErrorMessage(), HttpStatus.NOT_FOUND);
         }
     }
+
+
 
     @PostMapping
     public ResponseEntity<?> saveGame(@RequestBody GameRequestDto gameRequestDto) {

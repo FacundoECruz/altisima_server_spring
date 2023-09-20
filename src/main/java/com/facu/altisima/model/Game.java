@@ -17,12 +17,13 @@ public class Game {
     private List<PlayerResultDto> currentResults;
     private List<PlayerRoundDto> lastBidsRound;
     private Integer totalRounds;
+    private List<String> playersImgs;
 
     public Game() {
 
     }
 
-    public Game(String id, String date, Integer currentRound, List<Integer> cardsPerRound, List<String> players, List<PlayerResultDto> currentResults, List<PlayerRoundDto> lastBidsRound, Integer totalRounds) {
+    public Game(String id, String date, Integer currentRound, List<Integer> cardsPerRound, List<String> players, List<PlayerResultDto> currentResults, List<PlayerRoundDto> lastBidsRound, Integer totalRounds, List<String> playersImgs) {
         this.id = id;
         this.date = date;
         this.currentRound = currentRound;
@@ -31,6 +32,15 @@ public class Game {
         this.currentResults = currentResults;
         this.lastBidsRound = lastBidsRound;
         this.totalRounds = totalRounds;
+        this.playersImgs = playersImgs;
+    }
+
+    public List<String> getPlayersImgs() {
+        return playersImgs;
+    }
+
+    public void setPlayersImgs(List<String> playersImgs) {
+        this.playersImgs = playersImgs;
     }
 
     public String getId() {
@@ -111,11 +121,11 @@ public class Game {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Game game = (Game) o;
-        return Objects.equals(id, game.id) && Objects.equals(date, game.date) && Objects.equals(currentRound, game.currentRound) && Objects.equals(cardsPerRound, game.cardsPerRound) && Objects.equals(players, game.players) && Objects.equals(currentResults, game.currentResults) && Objects.equals(lastBidsRound, game.lastBidsRound) && Objects.equals(totalRounds, game.totalRounds);
+        return Objects.equals(id, game.id) && Objects.equals(date, game.date) && Objects.equals(currentRound, game.currentRound) && Objects.equals(cardsPerRound, game.cardsPerRound) && Objects.equals(players, game.players) && Objects.equals(currentResults, game.currentResults) && Objects.equals(lastBidsRound, game.lastBidsRound) && Objects.equals(totalRounds, game.totalRounds) && Objects.equals(playersImgs, game.playersImgs);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, date, currentRound, cardsPerRound, players, currentResults,lastBidsRound, totalRounds);
+        return Objects.hash(id, date, currentRound, cardsPerRound, players, currentResults, lastBidsRound, totalRounds, playersImgs);
     }
 }
