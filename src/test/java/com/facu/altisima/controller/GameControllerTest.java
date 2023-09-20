@@ -5,6 +5,7 @@ import com.facu.altisima.model.Game;
 import com.facu.altisima.service.impl.GameServiceImpl;
 import com.facu.altisima.utils.GameGenerator;
 import com.facu.altisima.service.utils.ServiceResult;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,36 +47,30 @@ public class GameControllerTest {
         succeedGame = ServiceResult.success(game);
     }
 
-
     @Test
     public void saveGame() throws Exception {
         when(gameService.createGame(players, totalRounds)).thenReturn(succeedGame);
         GameRequestDto gameRequestDto = new GameRequestDto(players, totalRounds);
-        String gameRequestJson = objectMapper.writeValueAsString(gameRequestDto);
         GameCreatedDto gameCreatedDto = new GameCreatedDto(game);
-        String gameCreatedJson = objectMapper.writeValueAsString(gameCreatedDto);
 
         mockMvc.perform(post(path)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(gameRequestJson))
+                        .content(toJson(gameRequestDto)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().string(gameCreatedJson));
+                .andExpect(content().string(toJson(gameCreatedDto)));
     }
 
     @Test
     public void tooManyPlayersForTheGame() throws Exception {
         String expectedErrMsg = "Demasiados jugadores";
         ServiceResult<Game> serviceGame = ServiceResult.error(expectedErrMsg);
-
         when(gameService.createGame(players, totalRounds)).thenReturn(serviceGame);
-
         GameRequestDto gameRequestDto = new GameRequestDto(players, totalRounds);
-        String gameRequestJson = objectMapper.writeValueAsString(gameRequestDto);
 
         mockMvc.perform(post(path)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(gameRequestJson))
+                        .content(toJson(gameRequestDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(expectedErrMsg));
     }
@@ -84,9 +79,7 @@ public class GameControllerTest {
     public void getAllGames() throws Exception {
         List<Game> games = new ArrayList<>();
         games.add(game);
-
         ServiceResult<List<Game>> serviceGames = ServiceResult.success(games);
-
         when(gameService.getAllGames()).thenReturn((serviceGames));
         String expectedRes = objectMapper.writeValueAsString(serviceGames.getData());
 
@@ -112,12 +105,11 @@ public class GameControllerTest {
         when(gameService.getGame(game.getId())).thenReturn(succeedGame);
 
         String urlTemplate = path + "/" + game.getId();
-        String expectedJson = objectMapper.writeValueAsString(game);
 
         mockMvc.perform(get(urlTemplate))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().string(expectedJson));
+                .andExpect(content().string(toJson(game)));
     }
 
     @Test
@@ -136,9 +128,7 @@ public class GameControllerTest {
     @Test
     public void deleteGame() throws Exception {
         String successfulDeleteMsg = "Exitosamente borrado";
-
         when(gameService.delete(game.getId())).thenReturn(ServiceResult.success(successfulDeleteMsg));
-
         String urlTemplate = path + "/" + game.getId();
 
         mockMvc.perform(delete(urlTemplate))
@@ -149,9 +139,7 @@ public class GameControllerTest {
     @Test
     public void gameToDeleteNotFound() throws Exception {
         String unsuccessfulDeleteMsg = "No se encontro la partida";
-
         when(gameService.delete(game.getId())).thenReturn(ServiceResult.error(unsuccessfulDeleteMsg));
-
         String urlTemplate = path + "/" + game.getId();
 
         mockMvc.perform(delete(urlTemplate))
@@ -162,28 +150,22 @@ public class GameControllerTest {
     @Test
     public void successfulNextRound() throws Exception {
         List<PlayerRoundDto> round = gameGenerator.generateRoundBids(players);
-        String playersRoundJson = objectMapper.writeValueAsString(round);
-
         String urlTemplate = path + "/" + game.getId() + "/next";
-
         when(gameService.nextRound(game.getId(), round)).thenReturn(succeedGame);
-
         GameStateDto gameStateDto = new GameStateDto(succeedGame.getData());
-        String gameStateJson = objectMapper.writeValueAsString(gameStateDto);
+
 
         mockMvc.perform(put(urlTemplate)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(playersRoundJson))
+                        .content(toJson(round)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().string(gameStateJson));
+                .andExpect(content().string(toJson(gameStateDto)));
     }
 
     @Test
     public void unsuccessfulNextRound() throws Exception {
         List<PlayerRoundDto> round = gameGenerator.generateRoundBids(players);
-        String playersRoundJson = objectMapper.writeValueAsString(round);
-
         String urlTemplate = path + "/" + game.getId() + "/next";
         String expectedErrMsg = "Algun mensaje de error";
 
@@ -191,7 +173,7 @@ public class GameControllerTest {
         when(gameService.nextRound(game.getId(), round)).thenReturn(gameResult);
 
         mockMvc.perform(put(urlTemplate).contentType(MediaType.APPLICATION_JSON)
-                        .content(playersRoundJson))
+                        .content(toJson(round)))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(expectedErrMsg));
     }
@@ -200,14 +182,13 @@ public class GameControllerTest {
     public void successfulPrevRound() throws Exception {
         String urlTemplate = path + "/" + game.getId() + "/prev";
         List<PlayerRoundDto> prevRoundBids = game.getLastBidsRound();
-        String prevRoundBidsJson = objectMapper.writeValueAsString(prevRoundBids);
         ServiceResult<List<PlayerRoundDto>> prevRoundBidsService = ServiceResult.success(prevRoundBids);
 
         when(gameService.prevRound(game.getId())).thenReturn(prevRoundBidsService);
 
         mockMvc.perform(put(urlTemplate))
                 .andExpect(status().isOk())
-                .andExpect(content().string(prevRoundBidsJson));
+                .andExpect(content().string(toJson(prevRoundBids)));
     }
 
     @Test
@@ -227,16 +208,17 @@ public class GameControllerTest {
         String urlTemplate = path + "/" + game.getId() + "/finish";
         String expectedMsg = "Se guardaron los datos de la partida";
         FinishedGameDto finishedGameDto = new FinishedGameDto(game.getId(), "Facu", "Migue");
-        String finishedGameDtoJson = objectMapper.writeValueAsString(finishedGameDto);
         ServiceResult<String> serviceResult = ServiceResult.success(expectedMsg);
         when(gameService.finishGame(any(FinishedGameDto.class))).thenReturn(serviceResult);
 
         mockMvc.perform(put(urlTemplate)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(finishedGameDtoJson))
+                        .content(toJson(finishedGameDto)))
                 .andExpect(status().isOk())
                 .andExpect(content().string(expectedMsg));
     }
 
-
+    private <T> String toJson(T obj) throws JsonProcessingException {
+        return objectMapper.writeValueAsString(obj);
+    }
 }
