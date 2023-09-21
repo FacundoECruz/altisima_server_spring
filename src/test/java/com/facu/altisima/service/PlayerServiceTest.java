@@ -26,7 +26,7 @@ public class PlayerServiceTest {
     @MockBean
     PlayerRepository playerRepository;
 
-    Player player = new Player("1", "batman", "www.image.com/batman", 0, 0, 0);
+    Player player = new Player("batman", "www.image.com/batman", 0, 0, 0);
 
     @Test
     public void getAllPlayers() {
