@@ -5,8 +5,6 @@ import org.springframework.data.annotation.Id;
 import java.util.Objects;
 
 public class Player {
-    @Id
-    private String id;
     private String username;
     private String image;
     private Integer gamesWon;
@@ -22,29 +20,20 @@ public class Player {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Player player = (Player) o;
-        return Objects.equals(id, player.id) && Objects.equals(username, player.username) && Objects.equals(image, player.image) && Objects.equals(gamesWon, player.gamesWon) && Objects.equals(gamesPlayed, player.gamesPlayed) && Objects.equals(totalScore, player.totalScore);
+        return Objects.equals(username, player.username) && Objects.equals(image, player.image) && Objects.equals(gamesWon, player.gamesWon) && Objects.equals(gamesPlayed, player.gamesPlayed) && Objects.equals(totalScore, player.totalScore);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, username, image, gamesWon, gamesPlayed, totalScore);
+        return Objects.hash(username, image, gamesWon, gamesPlayed, totalScore);
     }
 
-    public Player(String id, String username, String image, Integer gamesWon, Integer gamesPlayed, Integer totalScore) {
-        this.id = id;
+    public Player(String username, String image, Integer gamesWon, Integer gamesPlayed, Integer totalScore) {
         this.username = username;
         this.image = image;
         this.gamesWon = gamesWon;
         this.gamesPlayed = gamesPlayed;
         this.totalScore = totalScore;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public String getUsername() {
