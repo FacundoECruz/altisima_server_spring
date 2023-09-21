@@ -1,6 +1,7 @@
 package com.facu.altisima.controller;
 
 import com.facu.altisima.controller.dto.LoginRequestDto;
+import com.facu.altisima.controller.dto.legacyDtos.EditUserDto;
 import com.facu.altisima.model.User;
 import com.facu.altisima.service.impl.UserServiceImpl;
 import com.facu.altisima.service.utils.ServiceResult;
@@ -29,11 +30,11 @@ public class UserControllerTest {
     @MockBean
     UserServiceImpl userService;
     ObjectMapper objectMapper = new ObjectMapper();
-    User user = new User("1", "Facu", "www.image.com/facu", "lapass", 0);
+    User user = new User("Facu", "facu@gmail.com","www.image.com/facu", "lapass", 0);
     String path = "/users";
     String userJson = objectMapper.writeValueAsString(user);
     ServiceResult<User> succeedUser = ServiceResult.success(user);
-
+    EditUserDto userChanges = new EditUserDto("qwerty", "www.image.com/otraImagen");
     public UserControllerTest() throws JsonProcessingException {
     }
 
@@ -159,7 +160,7 @@ public class UserControllerTest {
     @Test
     public void successfulUserEdit() throws Exception {
         ServiceResult<User> changedUser = ServiceResult.success(user);
-        when(userService.put(user.getUsername(), user)).thenReturn(changedUser);
+        when(userService.put(any(String.class), any(EditUserDto.class))).thenReturn(changedUser);
         String urlTemplate = path + "/" + user.getUsername();
 
         mockMvc.perform(put(urlTemplate)
@@ -175,7 +176,7 @@ public class UserControllerTest {
         String expectedErrMsg = "El nombre de usuario no existe";
         ServiceResult<User> changedUser = ServiceResult.error(expectedErrMsg);
         String userThatDoesNotExist = "IAmNot";
-        when(userService.put(userThatDoesNotExist, user)).thenReturn(changedUser);
+        when(userService.put(any(String.class), any(EditUserDto.class))).thenReturn(changedUser);
         String urlTemplate = path + "/" + userThatDoesNotExist;
 
         mockMvc.perform(put(urlTemplate)
@@ -187,7 +188,7 @@ public class UserControllerTest {
 
     @Test
     public void successfulUserDelete() throws Exception {
-        doNothing().when(userService).delete(user.getId());
+        doNothing().when(userService).delete(user.getUsername());
         when(userService.get(user.getUsername())).thenReturn(succeedUser);
         String urlTemplate = path + "/" + user.getUsername();
 
@@ -199,7 +200,7 @@ public class UserControllerTest {
     @Test
     public void userToDeleteDoesNotExist() throws Exception {
         String expected = "No se encontro el usuario";
-        doNothing().when(userService).delete(user.getId());
+        doNothing().when(userService).delete(user.getUsername());
         ServiceResult<User> serviceUser = ServiceResult.error(expected);
         when(userService.get(user.getUsername())).thenReturn(serviceUser);
         String urlTemplate = path + "/" + user.getUsername();

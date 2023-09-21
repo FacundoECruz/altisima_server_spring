@@ -1,6 +1,7 @@
 package com.facu.altisima.service.impl;
 
 import com.facu.altisima.controller.dto.LoginRequestDto;
+import com.facu.altisima.controller.dto.legacyDtos.EditUserDto;
 import com.facu.altisima.dao.api.UserRepository;
 import com.facu.altisima.model.User;
 import com.facu.altisima.service.api.UserServiceAPI;
@@ -31,7 +32,7 @@ public class UserServiceImpl implements UserServiceAPI {
     @Override
     public ServiceResult<User> save(User user) {
         Optional<User> dbUser = userRepository.findByUsername(user.getUsername());
-
+        //ACA HAY QUE CREAR EL PLAYER TAMBIEN
         if (dbUser.isPresent()) {
             return ServiceResult.error("El nombre de usuario ya existe");
         } else {
@@ -52,19 +53,19 @@ public class UserServiceImpl implements UserServiceAPI {
     }
 
     @Override
-    public void delete(String id) {
-        Optional<User> userToDelete = userRepository.findById(id);
+    public void delete(String username) {
+        Optional<User> userToDelete = userRepository.findById(username);
         if (userToDelete.isPresent()) {
-            userRepository.deleteById(id);
+            userRepository.deleteByUsername(username);
         }
     }
 
 
-    public ServiceResult<User> put(String username, User userChanges) {
+    public ServiceResult<User> put(String username, EditUserDto userChanges) {
         Optional<User> user = userRepository.findByUsername(username);
+        //HAY QUE ACTUALIZAR TAMBIEN EL PLAYER
         if (user.isPresent()) {
             User userToChange = user.get();
-            userToChange.setUsername(userChanges.getUsername());
             userToChange.setImage(userChanges.getImage());
             userToChange.setPassword(userChanges.getPassword());
             User changedUser = userRepository.save(userToChange);

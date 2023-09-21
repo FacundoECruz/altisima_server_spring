@@ -5,9 +5,8 @@ import org.springframework.data.annotation.Id;
 import java.util.Objects;
 
 public class User {
-    @Id
-    private String id;
     private String username;
+    private String email;
     private String image;
     private String password;
     private Integer createdGames;
@@ -21,28 +20,28 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equals(id, user.id) && Objects.equals(username, user.username) && Objects.equals(image, user.image) && Objects.equals(password, user.password) && Objects.equals(createdGames, user.createdGames);
+        return Objects.equals(username, user.username) && Objects.equals(email, user.email) && Objects.equals(image, user.image) && Objects.equals(password, user.password) && Objects.equals(createdGames, user.createdGames);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, username, image, password, createdGames);
+        return Objects.hash(username, email, image, password, createdGames);
     }
 
-    public User(String id, String username, String image, String password, Integer createdGames) {
-        this.id = id;
+    public User(String username, String email, String image, String password, Integer createdGames) {
         this.username = username;
+        this.email = email;
         this.image = image;
         this.password = password;
         this.createdGames = createdGames;
     }
 
-    public String getId() {
-        return id;
+    public String getEmail() {
+        return email;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getUsername() {

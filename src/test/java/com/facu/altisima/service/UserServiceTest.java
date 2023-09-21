@@ -1,6 +1,7 @@
 package com.facu.altisima.service;
 
 import com.facu.altisima.controller.dto.LoginRequestDto;
+import com.facu.altisima.controller.dto.legacyDtos.EditUserDto;
 import com.facu.altisima.dao.api.UserRepository;
 import com.facu.altisima.model.User;
 import com.facu.altisima.service.api.UserServiceAPI;
@@ -26,7 +27,7 @@ public class UserServiceTest {
     @MockBean
     UserRepository userRepository;
 
-    User user = new User("1", "Facu", "www.image.com/facu", "lapass", 0);
+    User user = new User("Facu", "facu@gmail.com", "www.image.com/facu", "lapass", 0);
     Optional<User> optionalUser = Optional.of(user);
     Optional<User> emptyOptional = Optional.empty();
     List<User> users = new ArrayList<>();
@@ -82,49 +83,50 @@ public class UserServiceTest {
     @Test
     public void userToGetDoesNotExists() {
         String expectedMsg = "El nombre de usuario no existe";
-        when(userRepository.findById(user.getId())).thenReturn((emptyOptional));
+        when(userRepository.findById(user.getUsername())).thenReturn((emptyOptional));
 
-        ServiceResult<User> retrievedUser = userService.get(user.getId());
+        ServiceResult<User> retrievedUser = userService.get(user.getUsername());
 
         assertEquals(retrievedUser.getErrorMessage(), expectedMsg);
     }
 
     @Test
     public void successfulDeleteUser() {
-        when(userRepository.findById(user.getId())).thenReturn(optionalUser);
+        when(userRepository.findByUsername(user.getUsername())).thenReturn(optionalUser);
 
-        userService.delete(user.getId());
+        userService.delete(user.getUsername());
 
-        verify(userRepository, times(1)).deleteById(user.getId());
+        verify(userRepository, times(1)).deleteByUsername(user.getUsername());
     }
 
     @Test
     public void unsuccessfulDeleteUser() {
-        when(userRepository.findById(user.getId())).thenReturn(emptyOptional);
+        when(userRepository.findByUsername(user.getUsername())).thenReturn(emptyOptional);
 
-        userService.delete(user.getId());
+        userService.delete(user.getUsername());
 
-        verify(userRepository, times(0)).deleteById(user.getId());
+        verify(userRepository, times(0)).deleteByUsername(user.getUsername());
     }
 
     @Test
     public void successfulEditedUser() {
         when(userRepository.findByUsername(user.getUsername())).thenReturn(optionalUser);
-        User userChanges = new User("1", "Jorge", "www.image.com/jorge", "jorge", 0);
-        when(userRepository.save(userChanges)).thenReturn(userChanges);
+        EditUserDto userChanges = new EditUserDto("newPasswords", "newImage");
+        when(userRepository.save(any(User.class))).thenReturn(user);
 
         ServiceResult<User> retrievedUser = userService.put(user.getUsername(), userChanges);
 
-        assertEquals(userChanges, retrievedUser.getData());
+        assertEquals(userChanges.getPassword(), retrievedUser.getData().getPassword());
+        assertEquals(userChanges.getImage(), retrievedUser.getData().getImage());
     }
 
     @Test
     public void userToEditDoesNotExists() {
         String expectedMsg = "El nombre de usuario no existe";
         when(userRepository.findByUsername(user.getUsername())).thenReturn(emptyOptional);
-        User userChanges = new User("1", "Jorge", "www.image.com/jorge", "jorge", 0);
+        EditUserDto userChanges = new EditUserDto("newPasword", "newImage");
 
-        ServiceResult<User> retrievedUser = userService.put(user.getId(), userChanges);
+        ServiceResult<User> retrievedUser = userService.put(user.getUsername(), userChanges);
 
         assertEquals(retrievedUser.getErrorMessage(), expectedMsg);
     }

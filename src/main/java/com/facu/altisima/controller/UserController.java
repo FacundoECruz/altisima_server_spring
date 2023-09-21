@@ -1,6 +1,7 @@
 package com.facu.altisima.controller;
 
 import com.facu.altisima.controller.dto.LoginRequestDto;
+import com.facu.altisima.controller.dto.legacyDtos.EditUserDto;
 import com.facu.altisima.model.User;
 import com.facu.altisima.service.api.UserServiceAPI;
 import com.facu.altisima.service.utils.ServiceResult;
@@ -70,7 +71,7 @@ public class UserController {
     }
 
     @PutMapping(value = "/{username}")
-    public ResponseEntity<?> putUser(@PathVariable String username, @RequestBody User userChanges) {
+    public ResponseEntity<?> putUser(@PathVariable String username, @RequestBody EditUserDto userChanges) {
         ServiceResult<User> user = userServiceAPI.put(username, userChanges);
         if(user.getErrorMessage() == null) {
         return new ResponseEntity<>(user.getData(), HttpStatus.OK);
@@ -84,7 +85,7 @@ public class UserController {
         ServiceResult<User> user = userServiceAPI.get(username);
         if (user.getErrorMessage() == null) {
             User userToDelete = user.getData();
-            userServiceAPI.delete(userToDelete.getId());
+            userServiceAPI.delete(userToDelete.getUsername());
             return new ResponseEntity<>("Exitosamente borrado", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("No se encontro el usuario", HttpStatus.NOT_FOUND);

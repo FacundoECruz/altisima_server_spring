@@ -1,6 +1,7 @@
 package com.facu.altisima.service.api;
 
 import com.facu.altisima.controller.dto.LoginRequestDto;
+import com.facu.altisima.controller.dto.legacyDtos.EditUserDto;
 import com.facu.altisima.model.User;
 import com.facu.altisima.service.utils.ServiceResult;
 
@@ -16,7 +17,7 @@ public interface UserServiceAPI {
 
     ServiceResult<List<User>> getAll();
 
-    ServiceResult<User> put(String username, User userChanges);
+    ServiceResult<User> put(String username, EditUserDto userChanges);
 
     ServiceResult<User> login(LoginRequestDto loginRequestDto);
 }
