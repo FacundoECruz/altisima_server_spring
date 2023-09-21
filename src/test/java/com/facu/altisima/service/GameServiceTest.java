@@ -143,7 +143,7 @@ public class GameServiceTest {
         Optional<Game> gameOptional = Optional.of(game);
         List<PlayerRoundDto> playersRound = gameGenerator.generateRoundBids(players);
 
-        PlayerResultDto expectedPlayerResult = new PlayerResultDto(players.get(0), -1);
+        PlayerResultDto expectedPlayerResult = new PlayerResultDto(players.get(0), -1, new ArrayList<>());
         List<PlayerResultDto> expectedResults = new ArrayList<>();
         expectedResults.add(expectedPlayerResult);
 
@@ -207,18 +207,17 @@ public class GameServiceTest {
     public void successfulFinishedGame() {
         when(gameRepository.findById(game.getId())).thenReturn(Optional.of(game));
 
-        Player player = new Player("23","Batman","www.image.com/batman", 0, 0, 0);
+        Player player = new Player("Batman","www.image.com/batman", 0, 0, 0);
         when(playerRepository.findByUsername(any(String.class))).thenReturn(Optional.of(player));
 
         User user = new User("43", "Mister", "www.image.com/image", "asdf", 0);
         when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
 
-        String expectedMsg = "Se guardaron los datos de la partida";
         FinishedGameDto finishedGameDto = new FinishedGameDto(game.getId(), "Facu", "Migue");
 
-        ServiceResult<String> finishGameServiceResult = gameService.finishGame(finishedGameDto);
+        ServiceResult<Game> finishedGame = gameService.finishGame(finishedGameDto);
 
-        assertEquals(expectedMsg, finishGameServiceResult.getData());
+        assertEquals(game, finishedGame.getData());
     }
 
 }

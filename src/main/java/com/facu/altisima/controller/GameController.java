@@ -81,17 +81,17 @@ public class GameController {
 
     @PutMapping(value = "/{id}/prev")
     public ResponseEntity<?> prevRound(@PathVariable String id) {
-        ServiceResult<List<PlayerRoundDto>> prevRoundBids= gameServiceAPI.prevRound(id);
-        if(prevRoundBids.getErrorMessage() == null){
-            return new ResponseEntity<>(prevRoundBids.getData(), HttpStatus.OK);
+        ServiceResult<Game> game = gameServiceAPI.prevRound(id);
+        if(game.getErrorMessage() == null){
+            return new ResponseEntity<>(game.getData(), HttpStatus.OK);
         } else {
-            return  new ResponseEntity<>(prevRoundBids.getErrorMessage(), HttpStatus.NOT_FOUND);
+            return  new ResponseEntity<>(game.getErrorMessage(), HttpStatus.NOT_FOUND);
         }
     }
 
     @PutMapping(value = "/{id}/finish")
     public ResponseEntity<?> finish(FinishedGameDto finishedGameDto) {
-        ServiceResult<String> finishGameServiceResult = gameServiceAPI.finishGame(finishedGameDto);
+        ServiceResult<Game> finishGameServiceResult = gameServiceAPI.finishGame(finishedGameDto);
         if(finishGameServiceResult.isSuccess()){
             return new ResponseEntity<>(finishGameServiceResult.getData(), HttpStatus.OK);
         } else {

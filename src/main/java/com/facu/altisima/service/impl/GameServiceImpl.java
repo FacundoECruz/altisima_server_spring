@@ -35,27 +35,6 @@ public class GameServiceImpl implements GameServiceAPI {
         this.idGenerator = idGenerator;
     }
 
-
-//    public ServiceResult<GameV1> createGameV1(List<PlayersRoundAndScoreDto> players){
-//        if (players.size() > 8) {
-//            return ServiceResult.error("Demasiados jugadores");
-//        } else {
-//            Integer totalRounds = 9;
-//            List<List<PlayersRoundAndScoreDto>> results = new ArrayList<>();
-//            results.add(players);
-//
-//            List<String> playersNames = new ArrayList<>();
-//            for(int i = 0; i < players.size(); i++) {
-//                playersNames.add(players.get(i).getUsername());
-//            }
-//
-//            GameV1 gameV1 = new GameV1(generate.cardsPerRound(players.size(), totalRounds), results, dateFormatter.formatDate(new Date()), 1, playersNames);
-//
-//            GameV1 savedGameV1 = gameRepository.save(gameV1);
-//
-//            return ServiceResult.success(savedGameV1);
-//        }
-//    }
     public ServiceResult<Game> createGame(List<String> players, Integer totalRounds) {
         if (players.size() > 8) {
             return ServiceResult.error("Demasiados jugadores");
@@ -149,24 +128,23 @@ public class GameServiceImpl implements GameServiceAPI {
         }
     }
 
-    public ServiceResult<List<PlayerRoundDto>> prevRound(String id) {
+    public ServiceResult<Game> prevRound(String id) {
         Optional<Game> retrievedGameFromDb = gameRepository.findById(id);
         if (retrievedGameFromDb.isPresent()) {
-            List<PlayerRoundDto> prevRoundBids = retrievedGameFromDb.get().getLastBidsRound();
-            return ServiceResult.success(prevRoundBids);
+            return ServiceResult.success(retrievedGameFromDb.get());
         } else {
             return ServiceResult.error("No se encontro la partida");
         }
     }
 
-    public ServiceResult<String> finishGame(FinishedGameDto finishedGameDto) {
+    public ServiceResult<Game> finishGame(FinishedGameDto finishedGameDto) {
         String id = finishedGameDto.getId();
         String host = finishedGameDto.getHost();
         String winner = finishedGameDto.getWinner();
         Optional<Game> retrievedGameFromDb = gameRepository.findById(id);
         if (retrievedGameFromDb.isPresent()) {
             assignResultsToPlayers(retrievedGameFromDb.get(), host, winner);
-            return ServiceResult.success("Se guardaron los datos de la partida");
+            return ServiceResult.success(retrievedGameFromDb.get());
         } else {
             return ServiceResult.error("No se encontro la partida");
         }

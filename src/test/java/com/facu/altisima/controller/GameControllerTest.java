@@ -37,7 +37,6 @@ public class GameControllerTest {
     Integer totalRounds = 9;
     Game game;
     ServiceResult<Game> succeedGame;
-
     String path = "/games";
     @BeforeEach
     public void setup() {
@@ -185,9 +184,9 @@ public class GameControllerTest {
         String urlTemplate = path + "/" + game.getId() + "/prev";
         List<PlayerRoundDto> prevRoundBids = game.getLastBidsRound();
         String prevRoundBidsJson = objectMapper.writeValueAsString(prevRoundBids);
-        ServiceResult<List<PlayerRoundDto>> prevRoundBidsService = ServiceResult.success(prevRoundBids);
+        ServiceResult<Game> gameResult = ServiceResult.success(game);
 
-        when(gameService.prevRound(game.getId())).thenReturn(prevRoundBidsService);
+        when(gameService.prevRound(game.getId())).thenReturn(gameResult);
 
         mockMvc.perform(put(urlTemplate))
                 .andExpect(status().isOk())
@@ -198,8 +197,8 @@ public class GameControllerTest {
     public void idGamePrevRoundNotFound() throws Exception {
         String urlTemplate = path + "/" + game.getId() + "/prev";
         String expectedErrMsg = "La partida no existe";
-        ServiceResult<List<PlayerRoundDto>> prevRoundBidsError = ServiceResult.error(expectedErrMsg);
-        when(gameService.prevRound(game.getId())).thenReturn(prevRoundBidsError);
+        ServiceResult<Game> gameResult = ServiceResult.error(expectedErrMsg);
+        when(gameService.prevRound(game.getId())).thenReturn(gameResult);
 
         mockMvc.perform(put(urlTemplate))
                 .andExpect(status().isNotFound())
@@ -209,16 +208,15 @@ public class GameControllerTest {
     @Test
     public void successfulFinishedGame() throws Exception {
         String urlTemplate = path + "/" + game.getId() + "/finish";
-        String expectedMsg = "Se guardaron los datos de la partida";
         FinishedGameDto finishedGameDto = new FinishedGameDto(game.getId(), "Facu", "Migue");
-        ServiceResult<String> serviceResult = ServiceResult.success(expectedMsg);
+        ServiceResult<Game> serviceResult = ServiceResult.success(game);
         when(gameService.finishGame(any(FinishedGameDto.class))).thenReturn(serviceResult);
 
         mockMvc.perform(put(urlTemplate)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(toJson(finishedGameDto)))
                 .andExpect(status().isOk())
-                .andExpect(content().string(expectedMsg));
+                .andExpect(content().string(toJson(game)));
     }
 
     private <T> String toJson(T obj) throws JsonProcessingException {

@@ -46,7 +46,7 @@ public class GameGenerator {
         List<PlayerResultDto> currentResults = new ArrayList<>();
 
         for (int i = 0; i < players.size(); i++) {
-            PlayerResultDto playerResultDto = new PlayerResultDto(players.get(i), 0);
+            PlayerResultDto playerResultDto = new PlayerResultDto(players.get(i), 0, new ArrayList<>());
             currentResults.add(playerResultDto);
         }
         return currentResults;
@@ -59,7 +59,17 @@ public class GameGenerator {
         List<Integer> cardsPerRound = generateCardsPerRound(players.size(), totalRounds);
         List<PlayerRoundDto> lastBidsRound = generateRoundBids(players);
         List<PlayerResultDto> currentResults = generateCurrentResults(players);
+        List<String> playersImgs = generatePlayersImgs(players);
 
-        return new Game(id, date, currentRound, cardsPerRound, players, currentResults, lastBidsRound, totalRounds);
+        return new Game(id, date, currentRound, cardsPerRound, players, currentResults, lastBidsRound, totalRounds, playersImgs);
+    }
+
+    private static List<String> generatePlayersImgs(List<String> players) {
+        List<String> playersImgs = new ArrayList<>();
+        for(int i = 0; i < players.size(); i++){
+            String fakeImageUrl = "fakeImageUrl" + i;
+            playersImgs.add(fakeImageUrl);
+        }
+        return playersImgs;
     }
 }
