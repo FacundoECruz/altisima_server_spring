@@ -1,5 +1,6 @@
 package com.facu.altisima.controller;
 
+import com.facu.altisima.controller.dto.FinishedGameDto;
 import com.facu.altisima.controller.dto.PlayerResultDto;
 import com.facu.altisima.controller.dto.PlayerRoundDto;
 import com.facu.altisima.controller.dto.legacyDtos.*;
@@ -70,7 +71,7 @@ public class GameControllerLegacy {
 
         //Translate for frontend
         List<PlayerRoundWithHistory> newRoundState = getPlayerRoundWithHistories(game);
-        NextRoundResponseDto nextRoundResponse = new NextRoundResponseDto(game.getCurrentRound(), newRoundState, "inProgress");
+        RoundResponseDto nextRoundResponse = new RoundResponseDto(game.getCurrentRound(), newRoundState, "in progress");
 
         return new ResponseEntity<>(nextRoundResponse, HttpStatus.OK);
     }
@@ -96,5 +97,23 @@ public class GameControllerLegacy {
         return newRoundState;
     }
 
+    //PREV ROUND
+    @PutMapping(value = "/prev")
+    public ResponseEntity<?> prevRound(@RequestBody String gameId) {
+        ServiceResult<Game> gameServiceResult = gameServiceAPI.prevRound(gameId);
+        Game game = gameServiceResult.getData();
 
+        //Translate for frontend
+        List<PlayerRoundWithHistory> newRoundState = getPlayerRoundWithHistories(game);
+        RoundResponseDto prevRoundResponse = new RoundResponseDto(game.getCurrentRound(), newRoundState, "in progress");
+
+        return new ResponseEntity<>(prevRoundResponse, HttpStatus.OK);
+    }
+
+    @PutMapping(value = "/finish")
+    public ResponseEntity<?> finishGame(@RequestBody FinishGameDto finishGameDto) {
+        FinishedGameDto finishedGameDto = new FinishedGameDto(finishGameDto.getGameId(), finishGameDto.getHost().getUsername(), finishGameDto.getWinner().getUsername());
+        ServiceResult<Game> finishedGame = gameServiceAPI.finishGame(finishedGameDto);
+        return new ResponseEntity<>(finishedGame, HttpStatus.OK);
+    }
 }
