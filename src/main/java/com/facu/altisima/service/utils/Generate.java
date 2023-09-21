@@ -34,7 +34,7 @@ public class Generate {
         List<PlayerResultDto> playersResult = new ArrayList<>();
 
         for(int i = 0; i < players.size(); i++) {
-            PlayerResultDto playerResultDto = new PlayerResultDto(players.get(i), 0);
+            PlayerResultDto playerResultDto = new PlayerResultDto(players.get(i), 0, new ArrayList<>());
             playersResult.add(playerResultDto);
         }
         return playersResult;
