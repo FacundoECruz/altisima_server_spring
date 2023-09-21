@@ -109,6 +109,7 @@ public class GameServiceImpl implements GameServiceAPI {
 
     public ServiceResult<Game> nextRound(String id, List<PlayerRoundDto> roundResults) {
         Optional<Game> retrievedGameFromDb = gameRepository.findById(id);
+        Integer baseScoreForWinning = 5;
         if (retrievedGameFromDb.isPresent()) {
             Game game = retrievedGameFromDb.get();
 
@@ -119,18 +120,20 @@ public class GameServiceImpl implements GameServiceAPI {
             game.setLastBidsRound(roundResults);
             game.setCurrentRound(game.getCurrentRound() + 1);
 
-            List<PlayerResultDto> currentResults = game.getCurrentResults();
-            List<PlayerResultDto> updatedResults = new ArrayList<>();
+            List<PlayerResultDto> resultsUntilThePrevRound = game.getCurrentResults();
 
-            for (int i = 0; i < currentResults.size(); i++) {
+            List<PlayerResultDto> updatedResults = new ArrayList<>();
+            for (int i = 0; i < resultsUntilThePrevRound.size(); i++) {
                 PlayerRoundDto playerRoundDto = roundResults.get(i);
-                PlayerResultDto playerResultDto = currentResults.get(i);
+                PlayerResultDto playerResultDto = resultsUntilThePrevRound.get(i);
 
                 if (playerRoundDto.getUsername().equals(playerResultDto.getUsername())) {
                     if (playerRoundDto.getBidsLost() == 0) {
-                        playerResultDto.setScore(playerResultDto.getScore() + playerRoundDto.getBid());
+                        playerResultDto.setScore(playerResultDto.getScore() + playerRoundDto.getBid() + baseScoreForWinning);
+                        playerResultDto.updateHistory(playerRoundDto.getBid() + baseScoreForWinning);
                     } else {
                         playerResultDto.setScore(playerResultDto.getScore() - playerRoundDto.getBidsLost());
+                        playerResultDto.updateHistory(playerRoundDto.getBidsLost());
                     }
                 } else {
                     return ServiceResult.error("Los nombres de los players no coinciden");

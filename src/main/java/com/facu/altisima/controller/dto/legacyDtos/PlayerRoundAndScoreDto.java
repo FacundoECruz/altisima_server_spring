@@ -2,13 +2,13 @@ package com.facu.altisima.controller.dto.legacyDtos;
 
 import java.util.Objects;
 
-public class PlayersRoundAndScoreDto {
+public class PlayerRoundAndScoreDto {
     private String username;
     private Integer score;
     private Integer bid;
     private Integer bidsLost;
 
-    public PlayersRoundAndScoreDto(String username, Integer score, Integer bid, Integer bidsLost) {
+    public PlayerRoundAndScoreDto(String username, Integer score, Integer bid, Integer bidsLost) {
         this.username = username;
         this.score = score;
         this.bid = bid;
@@ -50,7 +50,7 @@ public class PlayersRoundAndScoreDto {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        PlayersRoundAndScoreDto that = (PlayersRoundAndScoreDto) o;
+        PlayerRoundAndScoreDto that = (PlayerRoundAndScoreDto) o;
         return Objects.equals(username, that.username) && Objects.equals(score, that.score) && Objects.equals(bid, that.bid) && Objects.equals(bidsLost, that.bidsLost);
     }
 
