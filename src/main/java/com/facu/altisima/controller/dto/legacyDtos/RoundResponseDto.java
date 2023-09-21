@@ -3,12 +3,12 @@ package com.facu.altisima.controller.dto.legacyDtos;
 import java.util.List;
 import java.util.Objects;
 
-public class NextRoundResponseDto {
+public class RoundResponseDto {
     private Integer round;
     private List<PlayerRoundWithHistory> newRoundState;
     private String status;
 
-    public NextRoundResponseDto(Integer round, List<PlayerRoundWithHistory> newRoundState, String status) {
+    public RoundResponseDto(Integer round, List<PlayerRoundWithHistory> newRoundState, String status) {
         this.round = round;
         this.newRoundState = newRoundState;
         this.status = status;
@@ -42,7 +42,7 @@ public class NextRoundResponseDto {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        NextRoundResponseDto that = (NextRoundResponseDto) o;
+        RoundResponseDto that = (RoundResponseDto) o;
         return Objects.equals(round, that.round) && Objects.equals(newRoundState, that.newRoundState) && Objects.equals(status, that.status);
     }
 
