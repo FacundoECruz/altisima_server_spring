@@ -1,10 +1,12 @@
 package com.facu.altisima.model;
 
+import com.facu.altisima.controller.dto.legacyDtos.EditUserDto;
 import org.springframework.data.annotation.Id;
 
 import java.util.Objects;
 
 public class User {
+    @Id
     private String username;
     private String email;
     private String image;
@@ -13,6 +15,10 @@ public class User {
 
     public User() {
 
+    }
+
+    public Player toPlayer() {
+        return new Player(this.getUsername(), this.getImage(), 0, 0, 0);
     }
 
     @Override

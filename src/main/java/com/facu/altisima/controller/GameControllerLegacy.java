@@ -18,11 +18,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/v1/games")
+@CrossOrigin(origins = "*")
 public class GameControllerLegacy {
     @Autowired
     private GameServiceAPI gameServiceAPI;
 
-    //CREATE GAME
     @PostMapping
     public ResponseEntity<?> saveGameV1(@RequestBody List<PlayerRoundAndScoreDto> players){
         //Translate for service
@@ -33,8 +33,8 @@ public class GameControllerLegacy {
         Game game = receivedGameFromService.getData();
 
         //Translate for frontend
-        List<PlayerWithImageV1> playersWithImagesList = getPlayerWithImageV1s(players, game);
-        GameCreatedV1Dto gameCreatedV1 = new GameCreatedV1Dto(game.getId(), game.getCurrentRound(), game.getCardsPerRound(), "inProgress", playersWithImagesList);
+        List<PlayerWithImageV1> playersWithImages = getPlayerWithImageV1s(players, game);
+        GameCreatedV1Dto gameCreatedV1 = new GameCreatedV1Dto(game.getId(), game.getCurrentRound(), game.getCardsPerRound(), "inProgress", playersWithImages);
 
         return new ResponseEntity<>(gameCreatedV1, HttpStatus.OK);
     }
@@ -58,7 +58,6 @@ public class GameControllerLegacy {
         return playersWithImagesList;
     }
 
-    //NEXT ROUND
     @PutMapping(value = "/next")
     public ResponseEntity<?> nextRound(@RequestBody NextRoundDto nextRoundDto) {
         //Translate for service
@@ -93,11 +92,11 @@ public class GameControllerLegacy {
             String playerImage = game.getPlayersImgs().get(i);
             PlayerResultDto playerResult = tableScore.get(i);
             PlayerRoundWithHistory playerRoundWithHistory = new PlayerRoundWithHistory(playerResult.getUsername(), playerResult.getScore(), 0, 0, playerImage, playerResult.getHistory());
+            newRoundState.add(playerRoundWithHistory);
         }
         return newRoundState;
     }
 
-    //PREV ROUND
     @PutMapping(value = "/prev")
     public ResponseEntity<?> prevRound(@RequestBody String gameId) {
         ServiceResult<Game> gameServiceResult = gameServiceAPI.prevRound(gameId);

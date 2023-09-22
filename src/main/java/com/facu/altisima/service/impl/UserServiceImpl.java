@@ -60,16 +60,14 @@ public class UserServiceImpl implements UserServiceAPI {
         }
     }
 
-
     public ServiceResult<User> put(String username, EditUserDto userChanges) {
         Optional<User> user = userRepository.findByUsername(username);
-        //HAY QUE ACTUALIZAR TAMBIEN EL PLAYER
         if (user.isPresent()) {
             User userToChange = user.get();
             userToChange.setImage(userChanges.getImage());
             userToChange.setPassword(userChanges.getPassword());
-            User changedUser = userRepository.save(userToChange);
-            return ServiceResult.success(changedUser);
+            userRepository.save(userToChange);
+            return ServiceResult.success(userToChange);
         } else {
             return ServiceResult.error("El nombre de usuario no existe");
         }
@@ -80,7 +78,7 @@ public class UserServiceImpl implements UserServiceAPI {
 
         if (user.isPresent()) {
             User userToLogin = user.get();
-            if (userToLogin.getPassword() == loginRequestDto.getPassword()) {
+            if (userToLogin.getPassword().equals(loginRequestDto.getPassword())) {
                 return ServiceResult.success(userToLogin);
             } else {
                 return ServiceResult.error("Usuario o contraseña invalidos");

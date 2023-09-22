@@ -12,6 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/players")
+@CrossOrigin(origins = "*")
 public class PlayerController {
     @Autowired
     private PlayerServiceAPI playerServiceAPI;

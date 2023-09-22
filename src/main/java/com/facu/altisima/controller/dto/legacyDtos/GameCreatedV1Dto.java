@@ -8,14 +8,18 @@ public class GameCreatedV1Dto {
     private Integer round;
     private List<Integer> cardsPerRound;
     private String status;
-    private List<PlayerWithImageV1> playersWithImages;
+    private List<PlayerWithImageV1> players;
 
-    public GameCreatedV1Dto(String id, Integer round, List<Integer> cardsPerRound, String status, List<PlayerWithImageV1> playersWithImages) {
+    public GameCreatedV1Dto(String id, Integer round, List<Integer> cardsPerRound, String status, List<PlayerWithImageV1> players) {
         this.id = id;
         this.round = round;
         this.cardsPerRound = cardsPerRound;
         this.status = status;
-        this.playersWithImages = playersWithImages;
+        this.players = players;
+    }
+
+    public GameCreatedV1Dto(){
+
     }
 
     public String getId() {
@@ -50,12 +54,12 @@ public class GameCreatedV1Dto {
         this.status = status;
     }
 
-    public List<PlayerWithImageV1> getPlayersWithImages() {
-        return playersWithImages;
+    public List<PlayerWithImageV1> getPlayers() {
+        return players;
     }
 
-    public void setPlayersWithImages(List<PlayerWithImageV1> playersWithImages) {
-        this.playersWithImages = playersWithImages;
+    public void setPlayers(List<PlayerWithImageV1> players) {
+        this.players = players;
     }
 
     @Override
@@ -63,11 +67,11 @@ public class GameCreatedV1Dto {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         GameCreatedV1Dto that = (GameCreatedV1Dto) o;
-        return Objects.equals(id, that.id) && Objects.equals(round, that.round) && Objects.equals(cardsPerRound, that.cardsPerRound) && Objects.equals(status, that.status) && Objects.equals(playersWithImages, that.playersWithImages);
+        return Objects.equals(id, that.id) && Objects.equals(round, that.round) && Objects.equals(cardsPerRound, that.cardsPerRound) && Objects.equals(status, that.status) && Objects.equals(players, that.players);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, round, cardsPerRound, status, playersWithImages);
+        return Objects.hash(id, round, cardsPerRound, status, players);
     }
 }

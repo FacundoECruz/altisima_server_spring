@@ -14,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/users")
+@CrossOrigin(origins = "*")
 public class UserController {
     @Autowired
     private UserServiceAPI userServiceAPI;
@@ -23,7 +24,7 @@ public class UserController {
         ServiceResult<User> user = userServiceAPI.get(username);
         if (user.isSuccess()) {
             User retrievedUser = user.getData();
-            return ResponseEntity.ok(retrievedUser);
+            return new ResponseEntity<>(retrievedUser, HttpStatus.OK);
         } else {
             String errorMessage = user.getErrorMessage();
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);

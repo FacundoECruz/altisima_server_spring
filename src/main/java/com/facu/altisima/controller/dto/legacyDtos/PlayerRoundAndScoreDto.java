@@ -14,6 +14,10 @@ public class PlayerRoundAndScoreDto {
         this.bid = bid;
         this.bidsLost = bidsLost;
     }
+
+    public PlayerRoundAndScoreDto() {
+
+    }
     public String getUsername() {
         return username;
     }
