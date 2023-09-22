@@ -2,7 +2,9 @@ package com.facu.altisima.service.impl;
 
 import com.facu.altisima.controller.dto.LoginRequestDto;
 import com.facu.altisima.controller.dto.legacyDtos.EditUserDto;
+import com.facu.altisima.dao.api.PlayerRepository;
 import com.facu.altisima.dao.api.UserRepository;
+import com.facu.altisima.model.Player;
 import com.facu.altisima.model.User;
 import com.facu.altisima.service.api.UserServiceAPI;
 
@@ -19,6 +21,8 @@ public class UserServiceImpl implements UserServiceAPI {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private PlayerRepository playerRepository;
     @Override
     public ServiceResult<List<User>> getAll() {
         List<User> users = userRepository.findAll();
@@ -67,6 +71,13 @@ public class UserServiceImpl implements UserServiceAPI {
             userToChange.setImage(userChanges.getImage());
             userToChange.setPassword(userChanges.getPassword());
             userRepository.save(userToChange);
+
+            Optional<Player> player = playerRepository.findByUsername(userToChange.getUsername());
+            if(player.isPresent()){
+                Player playerToChange = player.get();
+                playerToChange.setImage(userChanges.getImage());
+                playerRepository.save(playerToChange);
+            }
             return ServiceResult.success(userToChange);
         } else {
             return ServiceResult.error("El nombre de usuario no existe");

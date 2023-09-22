@@ -41,7 +41,7 @@ public class PlayerServiceImpl implements PlayerServiceAPI {
     @Override
     public ServiceResult<Player> get(String username) {
         Optional<Player> player = playerRepository.findByUsername(username);
-        if(player.isPresent()) {
+        if(player != null && player.isPresent()) {
             return ServiceResult.success(player.get());
         } else {
             return ServiceResult.error("El nombre de usuario no existe");

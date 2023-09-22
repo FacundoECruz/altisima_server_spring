@@ -1,10 +1,15 @@
 package com.facu.altisima.model;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Objects;
 
+@Document
 public class Player {
+    @Id
+    private ObjectId _id;
     private String username;
     private String image;
     private Integer gamesWon;
