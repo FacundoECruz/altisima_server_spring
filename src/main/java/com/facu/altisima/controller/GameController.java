@@ -2,6 +2,7 @@ package com.facu.altisima.controller;
 
 import com.facu.altisima.controller.dto.*;
 
+import com.facu.altisima.controller.dto.legacyDtos.GameIdDto;
 import com.facu.altisima.model.Game;
 import com.facu.altisima.service.api.GameServiceAPI;
 import com.facu.altisima.service.utils.ServiceResult;
@@ -79,8 +80,8 @@ public class GameController {
     }
 
     @PutMapping(value = "/{id}/prev")
-    public ResponseEntity<?> prevRound(@PathVariable String id) {
-        ServiceResult<Game> game = gameServiceAPI.prevRound(id);
+    public ResponseEntity<?> prevRound(@PathVariable GameIdDto id) {
+        ServiceResult<Game> game = gameServiceAPI.prevRound(id.getId());
         if(game.getErrorMessage() == null){
             return new ResponseEntity<>(game.getData(), HttpStatus.OK);
         } else {

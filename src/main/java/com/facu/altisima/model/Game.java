@@ -11,7 +11,7 @@ import java.util.*;
 @Document
 public class Game {
     @Id
-    private ObjectId _id;
+    private String _id;
     private String date;
     public Integer currentRound;
     public List<Integer> cardsPerRound;
@@ -25,7 +25,7 @@ public class Game {
 
     }
 
-    public Game(ObjectId _id, String date, Integer currentRound, List<Integer> cardsPerRound, List<String> players, List<PlayerResultDto> currentResults, List<PlayerRoundDto> lastBidsRound, Integer totalRounds, List<String> playersImgs) {
+    public Game(String _id, String date, Integer currentRound, List<Integer> cardsPerRound, List<String> players, List<PlayerResultDto> currentResults, List<PlayerRoundDto> lastBidsRound, Integer totalRounds, List<String> playersImgs) {
         this._id = _id;
         this.date = date;
         this.currentRound = currentRound;
@@ -45,11 +45,11 @@ public class Game {
         this.playersImgs = playersImgs;
     }
 
-    public ObjectId getId() {
+    public String getId() {
         return _id;
     }
 
-    public void setId(ObjectId id) {
+    public void setId(String id) {
         this._id = _id;
     }
 

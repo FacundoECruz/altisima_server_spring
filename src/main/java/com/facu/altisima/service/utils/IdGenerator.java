@@ -4,5 +4,5 @@ package com.facu.altisima.service.utils;
 import org.bson.types.ObjectId;
 
 public interface IdGenerator {
-    ObjectId generate();
+    String generate();
 }

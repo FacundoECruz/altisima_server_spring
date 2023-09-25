@@ -7,6 +7,10 @@ public class NextRoundDto {
     private List<PlayerRoundWithHistory> playersRound;
     private String gameId;
 
+    public NextRoundDto() {
+
+    }
+
     public NextRoundDto(List<PlayerRoundWithHistory> playersRound, String gameId) {
         this.playersRound = playersRound;
         this.gameId = gameId;

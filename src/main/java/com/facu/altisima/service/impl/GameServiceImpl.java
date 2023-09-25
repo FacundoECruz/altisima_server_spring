@@ -3,6 +3,7 @@ package com.facu.altisima.service.impl;
 import com.facu.altisima.controller.dto.FinishedGameDto;
 import com.facu.altisima.controller.dto.PlayerResultDto;
 import com.facu.altisima.controller.dto.PlayerRoundDto;
+import com.facu.altisima.controller.dto.legacyDtos.GameIdDto;
 import com.facu.altisima.dao.api.GameRepository;
 import com.facu.altisima.dao.api.PlayerRepository;
 import com.facu.altisima.dao.api.UserRepository;
@@ -14,6 +15,7 @@ import com.facu.altisima.service.utils.DateFormatter;
 import com.facu.altisima.service.utils.Generate;
 import com.facu.altisima.service.utils.IdGenerator;
 import com.facu.altisima.service.utils.ServiceResult;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -129,6 +131,7 @@ public class GameServiceImpl implements GameServiceAPI {
     }
 
     public ServiceResult<Game> prevRound(String id) {
+
         Optional<Game> retrievedGameFromDb = gameRepository.findById(id);
         if (retrievedGameFromDb.isPresent()) {
             return ServiceResult.success(retrievedGameFromDb.get());

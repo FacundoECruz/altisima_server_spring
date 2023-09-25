@@ -2,6 +2,7 @@ package com.facu.altisima.service.api;
 
 import com.facu.altisima.controller.dto.FinishedGameDto;
 import com.facu.altisima.controller.dto.PlayerRoundDto;
+import com.facu.altisima.controller.dto.legacyDtos.GameIdDto;
 import com.facu.altisima.model.Game;
 import com.facu.altisima.service.utils.ServiceResult;
 
