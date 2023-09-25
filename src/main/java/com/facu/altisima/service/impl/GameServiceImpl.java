@@ -181,18 +181,21 @@ public class GameServiceImpl implements GameServiceAPI {
                 Player player = optionalPlayer.get();
                 player.setGamesPlayed(player.getGamesPlayed() + 1);
                 player.setTotalScore(player.getTotalScore() + playerResults.getScore());
+                playerRepository.save(player);
             }
         }
         Optional<User> retrievedUserHost = userRepository.findByUsername(host);
         if (retrievedUserHost.isPresent()) {
             User user = retrievedUserHost.get();
             user.setCreatedGames(user.getCreatedGames() + 1);
+            userRepository.save(user);
         }
 
         Optional<Player> retrievedPlayer = playerRepository.findByUsername(winner);
         if (retrievedPlayer.isPresent()) {
             Player player = retrievedPlayer.get();
             player.setGamesWon(player.getGamesWon() + 1);
+            playerRepository.save(player);
         }
     }
 }

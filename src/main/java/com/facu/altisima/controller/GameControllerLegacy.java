@@ -134,8 +134,8 @@ public class GameControllerLegacy {
     }
 
     @PutMapping(value = "/finish")
-    public ResponseEntity<?> finishGame(@RequestBody FinishGameDto finishGameDto) {
-        FinishedGameDto finishedGameDto = new FinishedGameDto(finishGameDto.getGameId(), finishGameDto.getHost().getUsername(), finishGameDto.getWinner().getUsername());
+    public ResponseEntity<?> finishGame(@RequestBody FinishGameRequestDto finishGameDto) {
+        FinishedGameDto finishedGameDto = new FinishedGameDto(finishGameDto.getGameId(), finishGameDto.getHost(), finishGameDto.getWinner());
         ServiceResult<Game> finishedGame = gameServiceAPI.finishGame(finishedGameDto);
         return new ResponseEntity<>(finishedGame, HttpStatus.OK);
     }

@@ -15,6 +15,10 @@ public class WinnerDto {
         this.history = history;
     }
 
+    public WinnerDto() {
+
+    }
+
     public String getUsername() {
         return username;
     }
