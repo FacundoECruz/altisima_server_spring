@@ -1,5 +1,8 @@
 package com.facu.altisima.controller.dto.legacyDtos;
 
+import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
+
 import java.util.List;
 import java.util.Objects;
 

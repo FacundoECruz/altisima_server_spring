@@ -1,23 +1,24 @@
 package com.facu.altisima.controller.dto;
 
 import com.facu.altisima.model.Game;
+import org.bson.types.ObjectId;
 
 import java.util.List;
 import java.util.Objects;
 
 public class GameCreatedDto {
-    String id;
+    ObjectId _id;
     List<Integer> cardsPerRound;
     List<String> players;
 
-    public GameCreatedDto(String id, List<Integer> cardsPerRound, List<String> players) {
-        this.id = id;
+    public GameCreatedDto(ObjectId _id, List<Integer> cardsPerRound, List<String> players) {
+        this._id = _id;
         this.cardsPerRound = cardsPerRound;
         this.players = players;
     }
 
     public GameCreatedDto(Game game) {
-        this.id = game.getId();
+        this._id = game.getId();
         this.cardsPerRound = game.getCardsPerRound();
         this.players = game.getPlayers();
     }
@@ -27,19 +28,19 @@ public class GameCreatedDto {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         GameCreatedDto that = (GameCreatedDto) o;
-        return Objects.equals(id, that.id) && Objects.equals(cardsPerRound, that.cardsPerRound) && Objects.equals(players, that.players);
+        return Objects.equals(_id, that._id) && Objects.equals(cardsPerRound, that.cardsPerRound) && Objects.equals(players, that.players);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, cardsPerRound, players);
+        return Objects.hash(_id, cardsPerRound, players);
     }
 
-    public String getId() {
-        return id;
+    public ObjectId getId() {
+        return _id;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setId(ObjectId id) {
+        this._id = _id;
     }
 }

@@ -112,7 +112,7 @@ public class GameServiceImpl implements GameServiceAPI {
                         playerResultDto.updateHistory(playerRoundDto.getBid() + baseScoreForWinning);
                     } else {
                         playerResultDto.setScore(playerResultDto.getScore() - playerRoundDto.getBidsLost());
-                        playerResultDto.updateHistory(playerRoundDto.getBidsLost());
+                        playerResultDto.updateHistory(-playerRoundDto.getBidsLost());
                     }
                 } else {
                     return ServiceResult.error("Los nombres de los players no coinciden");

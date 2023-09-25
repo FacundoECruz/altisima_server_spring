@@ -100,6 +100,9 @@ public class GameControllerLegacy {
     @PutMapping(value = "/prev")
     public ResponseEntity<?> prevRound(@RequestBody String gameId) {
         ServiceResult<Game> gameServiceResult = gameServiceAPI.prevRound(gameId);
+        if(gameServiceResult.isError()){
+            return new ResponseEntity<>(gameServiceResult.getErrorMessage(), HttpStatus.NOT_FOUND);
+        }
         Game game = gameServiceResult.getData();
 
         //Translate for frontend

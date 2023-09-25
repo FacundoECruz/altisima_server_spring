@@ -20,7 +20,6 @@ import java.util.Optional;
 public class UserServiceImpl implements UserServiceAPI {
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private PlayerRepository playerRepository;
     @Override

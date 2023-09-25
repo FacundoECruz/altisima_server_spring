@@ -3,13 +3,15 @@ package com.facu.altisima.model;
 import com.facu.altisima.controller.dto.PlayerResultDto;
 import com.facu.altisima.controller.dto.PlayerRoundDto;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.*;
-
+@Document
 public class Game {
     @Id
-    private String id;
+    private ObjectId _id;
     private String date;
     public Integer currentRound;
     public List<Integer> cardsPerRound;
@@ -23,8 +25,8 @@ public class Game {
 
     }
 
-    public Game(String id, String date, Integer currentRound, List<Integer> cardsPerRound, List<String> players, List<PlayerResultDto> currentResults, List<PlayerRoundDto> lastBidsRound, Integer totalRounds, List<String> playersImgs) {
-        this.id = id;
+    public Game(ObjectId _id, String date, Integer currentRound, List<Integer> cardsPerRound, List<String> players, List<PlayerResultDto> currentResults, List<PlayerRoundDto> lastBidsRound, Integer totalRounds, List<String> playersImgs) {
+        this._id = _id;
         this.date = date;
         this.currentRound = currentRound;
         this.cardsPerRound = cardsPerRound;
@@ -43,12 +45,12 @@ public class Game {
         this.playersImgs = playersImgs;
     }
 
-    public String getId() {
-        return id;
+    public ObjectId getId() {
+        return _id;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setId(ObjectId id) {
+        this._id = _id;
     }
 
     public String getDate() {
@@ -121,11 +123,11 @@ public class Game {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Game game = (Game) o;
-        return Objects.equals(id, game.id) && Objects.equals(date, game.date) && Objects.equals(currentRound, game.currentRound) && Objects.equals(cardsPerRound, game.cardsPerRound) && Objects.equals(players, game.players) && Objects.equals(currentResults, game.currentResults) && Objects.equals(lastBidsRound, game.lastBidsRound) && Objects.equals(totalRounds, game.totalRounds) && Objects.equals(playersImgs, game.playersImgs);
+        return Objects.equals(_id, game._id) && Objects.equals(date, game.date) && Objects.equals(currentRound, game.currentRound) && Objects.equals(cardsPerRound, game.cardsPerRound) && Objects.equals(players, game.players) && Objects.equals(currentResults, game.currentResults) && Objects.equals(lastBidsRound, game.lastBidsRound) && Objects.equals(totalRounds, game.totalRounds) && Objects.equals(playersImgs, game.playersImgs);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, date, currentRound, cardsPerRound, players, currentResults, lastBidsRound, totalRounds, playersImgs);
+        return Objects.hash(_id, date, currentRound, cardsPerRound, players, currentResults, lastBidsRound, totalRounds, playersImgs);
     }
 }
