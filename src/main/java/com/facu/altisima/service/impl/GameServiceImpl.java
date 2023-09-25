@@ -4,6 +4,7 @@ import com.facu.altisima.controller.dto.FinishedGameDto;
 import com.facu.altisima.controller.dto.PlayerResultDto;
 import com.facu.altisima.controller.dto.PlayerRoundDto;
 import com.facu.altisima.controller.dto.legacyDtos.GameIdDto;
+import com.facu.altisima.controller.dto.legacyDtos.PlayerRoundWithHistory;
 import com.facu.altisima.dao.api.GameRepository;
 import com.facu.altisima.dao.api.PlayerRepository;
 import com.facu.altisima.dao.api.UserRepository;
@@ -131,15 +132,33 @@ public class GameServiceImpl implements GameServiceAPI {
     }
 
     public ServiceResult<Game> prevRound(String id) {
-
         Optional<Game> retrievedGameFromDb = gameRepository.findById(id);
         if (retrievedGameFromDb.isPresent()) {
-            return ServiceResult.success(retrievedGameFromDb.get());
+            Game game = turnBackOneRound(retrievedGameFromDb.get());
+            gameRepository.save(game);
+            return ServiceResult.success(game);
         } else {
             return ServiceResult.error("No se encontro la partida");
         }
     }
 
+    private static Game turnBackOneRound(Game game) {
+        Integer prevRound = game.getCurrentRound() - 1;
+        List<PlayerResultDto> prevRoundResults = new ArrayList<>();
+        for (int i = 0; i < game.getPlayers().size(); i++){
+            PlayerResultDto prevPlayerScore = game.getCurrentResults().get(i).prevRoundState();
+            prevRoundResults.add(prevPlayerScore);
+        }
+        return new Game(game.getId(),
+                game.getDate(),
+                prevRound,
+                game.getCardsPerRound(),
+                game.getPlayers(),
+                prevRoundResults,
+                game.getLastBidsRound(),
+                game.getTotalRounds(),
+                game.getPlayersImgs());
+    }
     public ServiceResult<Game> finishGame(FinishedGameDto finishedGameDto) {
         String id = finishedGameDto.getId();
         String host = finishedGameDto.getHost();

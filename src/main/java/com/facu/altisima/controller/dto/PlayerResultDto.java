@@ -17,9 +17,20 @@ public class PlayerResultDto {
     public PlayerResultDto() {
 
     }
+
+    public PlayerResultDto prevRoundState() {
+        Integer lastRoundScore = this.getHistory().get(getHistory().size() - 1);
+        this.getHistory().remove(this.getHistory().size() - 1);
+        PlayerResultDto prevRound = new PlayerResultDto(this.getUsername(),
+                this.getScore() - lastRoundScore,
+                this.getHistory());
+        return prevRound;
+    }
+
     public void updateHistory(Integer roundScore) {
         this.history.add(roundScore);
     }
+
     public List<Integer> getHistory() {
         return history;
     }

@@ -11,11 +11,7 @@ public class FixedIdGenerator implements IdGenerator {
     }
 
     @Override
-    public ObjectId generate() {
-        try {
-            return new ObjectId(fixedId);
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
+    public String generate() {
+        return fixedId;
     }
 }

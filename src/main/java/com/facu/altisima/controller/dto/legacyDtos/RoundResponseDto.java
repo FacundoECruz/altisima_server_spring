@@ -1,5 +1,8 @@
 package com.facu.altisima.controller.dto.legacyDtos;
 
+import com.facu.altisima.model.Game;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -12,6 +15,28 @@ public class RoundResponseDto {
         this.round = round;
         this.newRoundState = newRoundState;
         this.status = status;
+    }
+
+    public RoundResponseDto() {
+
+    }
+    public RoundResponseDto generate(Game game) {
+        Integer round = game.getCurrentRound();
+        List<PlayerRoundWithHistory> newRoundState = new ArrayList<>();
+        for (int i = 0; i < game.getPlayers().size(); i++) {
+            PlayerRoundWithHistory player = new PlayerRoundWithHistory(
+                    game.getCurrentResults().get(i).getUsername(),
+                    game.getCurrentResults().get(i).getScore(),
+                    game.getLastBidsRound().get(i).getBid(),
+                    game.getLastBidsRound().get(i).getBidsLost(),
+                    game.getPlayersImgs().get(i),
+                    game.getCurrentResults().get(i).getHistory()
+            );
+            newRoundState.add(player);
+        }
+        String status = "in progress";
+
+        return new RoundResponseDto(round, newRoundState, status);
     }
 
     public Integer getRound() {

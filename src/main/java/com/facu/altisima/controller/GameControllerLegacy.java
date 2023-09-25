@@ -112,21 +112,19 @@ public class GameControllerLegacy {
             return new ResponseEntity<>(gameServiceResult.getErrorMessage(), HttpStatus.NOT_FOUND);
         }
         Game game = gameServiceResult.getData();
-
-        //Translate for frontend
-        List<PlayerRoundWithHistory> newRoundState = generatePrevRoundResponse(game);
-        RoundResponseDto prevRoundResponse = new RoundResponseDto(game.getCurrentRound(), newRoundState, "in progress");
-
-        return new ResponseEntity<>(prevRoundResponse, HttpStatus.OK);
+        RoundResponseDto prevRoundResponse = new RoundResponseDto();
+        return new ResponseEntity<>(prevRoundResponse.generate(game), HttpStatus.OK);
     }
 
     private static List<PlayerRoundWithHistory> generatePrevRoundResponse(Game game) {
+        //CAMBIAR ESTO, VAMOS A RECIBIR UN GAME Y TENEMOS QUE
+        //ARMAR EL DTO
         List<PlayerRoundWithHistory> newRoundState = new ArrayList<>();
         List<PlayerResultDto> tableScore = game.getCurrentResults();
         List<PlayerRoundDto> prevRoundBids = game.getLastBidsRound();
         for (int i = 0; i < game.getPlayers().size(); i++) {
             String playerImage = game.getPlayersImgs().get(i);
-            PlayerResultDto playerResult = tableScore.get(i);
+            PlayerResultDto playerResult = tableScore.get(i).prevRoundState();
             Integer lastRoundBid = prevRoundBids.get(i).getBid();
             Integer lastRoundLost = prevRoundBids.get(i).getBidsLost();
             PlayerRoundWithHistory playerRoundWithHistory = new PlayerRoundWithHistory(playerResult.getUsername(), playerResult.getScore(),lastRoundBid, lastRoundLost, playerImage, playerResult.getHistory());
