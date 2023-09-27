@@ -28,7 +28,8 @@ public class PlayerControllerTest {
     @MockBean
     PlayerServiceImpl playerService;
     ObjectMapper objectMapper = new ObjectMapper();
-    Player player = new Player("Facu", "www.image.com/facu", 0, 0, 0);
+    Player player = null;
+//            new Player("Facu", "www.image.com/facu", 0, 0, 0);
     String path = "/players";
     ServiceResult<Player> succeedPlayer = ServiceResult.success(player);
     @Test

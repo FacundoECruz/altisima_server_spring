@@ -207,10 +207,12 @@ public class GameServiceTest {
     public void successfulFinishedGame() {
         when(gameRepository.findById(game.getId())).thenReturn(Optional.of(game));
 
-        Player player = new Player("Batman","www.image.com/batman", 0, 0, 0);
+        Player player = null;
+//                new Player("Batman","www.image.com/batman", 0, 0, 0);
         when(playerRepository.findByUsername(any(String.class))).thenReturn(Optional.of(player));
 
-        User user = new User("43", "Mister", "www.image.com/image", "asdf", 0);
+        User user = null;
+//                new User("43", "Mister", "www.image.com/image", "asdf", 0);
         when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
 
         FinishedGameDto finishedGameDto = new FinishedGameDto(game.getId(), "Facu", "Migue");

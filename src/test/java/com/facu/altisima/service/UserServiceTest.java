@@ -27,7 +27,8 @@ public class UserServiceTest {
     @MockBean
     UserRepository userRepository;
 
-    User user = new User("Facu", "facu@gmail.com", "www.image.com/facu", "lapass", 0);
+    User user = null;
+//            new User("Facu", "facu@gmail.com", "www.image.com/facu", "lapass", 0);
     Optional<User> optionalUser = Optional.of(user);
     Optional<User> emptyOptional = Optional.empty();
     List<User> users = new ArrayList<>();
@@ -114,7 +115,7 @@ public class UserServiceTest {
         EditUserDto userChanges = new EditUserDto("newPasswords", "newImage");
         when(userRepository.save(any(User.class))).thenReturn(user);
 
-        ServiceResult<User> retrievedUser = userService.put(user.getUsername(), userChanges);
+        ServiceResult<User> retrievedUser = userService.put(null);
 
         assertEquals(userChanges.getPassword(), retrievedUser.getData().getPassword());
         assertEquals(userChanges.getImage(), retrievedUser.getData().getImage());
@@ -126,7 +127,7 @@ public class UserServiceTest {
         when(userRepository.findByUsername(user.getUsername())).thenReturn(emptyOptional);
         EditUserDto userChanges = new EditUserDto("newPasword", "newImage");
 
-        ServiceResult<User> retrievedUser = userService.put(user.getUsername(), userChanges);
+        ServiceResult<User> retrievedUser = userService.put(null);
 
         assertEquals(retrievedUser.getErrorMessage(), expectedMsg);
     }
@@ -136,7 +137,7 @@ public class UserServiceTest {
         LoginRequestDto loginRequestDto = new LoginRequestDto("Facu", "lapass");
         when(userRepository.findByUsername(loginRequestDto.getUsername())).thenReturn(optionalUser);
 
-        ServiceResult<User> retrievedUser = userService.login(loginRequestDto);
+        ServiceResult<User> retrievedUser = userService.login(null);
 
         assertEquals(retrievedUser.getData(), user);
     }
@@ -147,7 +148,7 @@ public class UserServiceTest {
         String expectedMsg = "No se encontraron usuarios";
         LoginRequestDto loginRequestDto = new LoginRequestDto("Facu", "facu");
 
-        ServiceResult<User> retrievedUser = userService.login(loginRequestDto);
+        ServiceResult<User> retrievedUser = userService.login(null);
 
         assertEquals(retrievedUser.getErrorMessage(), expectedMsg);
     }
@@ -158,7 +159,7 @@ public class UserServiceTest {
         String expectedMsg = "Usuario o contraseña invalidos";
         LoginRequestDto loginRequestDto = new LoginRequestDto("Facu", "asdf");
 
-        ServiceResult<User> retrievedUser = userService.login(loginRequestDto);
+        ServiceResult<User> retrievedUser = userService.login(null);
 
         assertEquals(retrievedUser.getErrorMessage(), expectedMsg);
 

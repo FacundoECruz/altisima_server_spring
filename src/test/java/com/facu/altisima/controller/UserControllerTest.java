@@ -30,7 +30,7 @@ public class UserControllerTest {
     @MockBean
     UserServiceImpl userService;
     ObjectMapper objectMapper = new ObjectMapper();
-    User user = new User("Facu", "facu@gmail.com","www.image.com/facu", "lapass", 0);
+    User user = null;
     String path = "/users";
     String userJson = objectMapper.writeValueAsString(user);
     ServiceResult<User> succeedUser = ServiceResult.success(user);
@@ -114,7 +114,7 @@ public class UserControllerTest {
     public void successfulLogin() throws Exception {
         LoginRequestDto loginRequestDto = new LoginRequestDto("facu", "facu");
         String loginRequestJson = objectMapper.writeValueAsString(loginRequestDto);
-        when(userService.login(loginRequestDto)).thenReturn(succeedUser);
+        when(userService.login(null)).thenReturn(succeedUser);
 
         mockMvc.perform(post(path + "/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -126,7 +126,7 @@ public class UserControllerTest {
     @Test
     public void loginUserDoesNotExist() throws Exception {
         String expected = "No se encontraron usuarios";
-        when(userService.login(any(LoginRequestDto.class)))
+        when(userService.login(null))
                 .thenReturn(ServiceResult.error(expected));
         String loginRequestJson = serializeLoginRequest("facu", "facu");
 
@@ -143,7 +143,7 @@ public class UserControllerTest {
         LoginRequestDto loginRequestDto = new LoginRequestDto("facu", "facu");
         ServiceResult<User> receivedUserFromService = ServiceResult.error(expectedErrMsg);
         String loginRequestJson = objectMapper.writeValueAsString(loginRequestDto);
-        when(userService.login(loginRequestDto)).thenReturn(receivedUserFromService);
+        when(userService.login(null)).thenReturn(receivedUserFromService);
 
         mockMvc.perform(post(path + "/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -160,7 +160,7 @@ public class UserControllerTest {
     @Test
     public void successfulUserEdit() throws Exception {
         ServiceResult<User> changedUser = ServiceResult.success(user);
-        when(userService.put(any(String.class), any(EditUserDto.class))).thenReturn(changedUser);
+        when(userService.put(null)).thenReturn(null);
         String urlTemplate = path + "/" + user.getUsername();
 
         mockMvc.perform(put(urlTemplate)
@@ -176,7 +176,7 @@ public class UserControllerTest {
         String expectedErrMsg = "El nombre de usuario no existe";
         ServiceResult<User> changedUser = ServiceResult.error(expectedErrMsg);
         String userThatDoesNotExist = "IAmNot";
-        when(userService.put(any(String.class), any(EditUserDto.class))).thenReturn(changedUser);
+        when(userService.put(null)).thenReturn(changedUser);
         String urlTemplate = path + "/" + userThatDoesNotExist;
 
         mockMvc.perform(put(urlTemplate)
