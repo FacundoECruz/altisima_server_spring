@@ -1,22 +1,32 @@
 package com.facu.altisima.controller.dto.legacyDtos;
 
+import com.facu.altisima.controller.dto.EditUser;
+import com.facu.altisima.controller.dto.PasswordDto;
+
 import java.util.Objects;
 
 public class EditUserDto {
-    private String password;
+    private PasswordDto password;
     private String image;
 
     public EditUserDto(String password, String image) {
-        this.password = password;
+        this.password = new PasswordDto(password);
         this.image = image;
     }
 
+    protected void validate() throws RuntimeException {
+        password.validate();
+    }
+    public EditUser toDomain(String username) throws RuntimeException{
+        validate();
+        return new EditUser(username, password.getValue(), image);
+    }
     public String getPassword() {
-        return password;
+        return password.getValue();
     }
 
     public void setPassword(String password) {
-        this.password = password;
+        this.password = new PasswordDto(password);
     }
 
     public String getImage() {
