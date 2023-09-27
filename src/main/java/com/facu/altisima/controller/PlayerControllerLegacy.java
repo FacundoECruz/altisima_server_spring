@@ -3,7 +3,9 @@ package com.facu.altisima.controller;
 import com.facu.altisima.controller.dto.legacyDtos.CreatePlayerDto;
 import com.facu.altisima.model.Player;
 import com.facu.altisima.service.api.PlayerServiceAPI;
+import com.facu.altisima.service.utils.IdGenerator;
 import com.facu.altisima.service.utils.ServiceResult;
+import com.facu.altisima.service.utils.UUIDGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -19,11 +21,13 @@ public class PlayerControllerLegacy {
     @Autowired
     private PlayerServiceAPI playerService;
 
+    IdGenerator idGenerator = new UUIDGenerator();
+
     @PostMapping
     public ResponseEntity<?> savePlayerV1(@RequestBody CreatePlayerDto playerName) {
         System.out.println(playerName);
         String defaultPlayerImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSwUmQOGfv3HMATaiRo8hDCdcu23Otwqg2pEg&usqp=CAU";
-        Player player = new Player(playerName.getUsername(), defaultPlayerImageUrl, 0, 0, 0);
+        Player player = new Player(idGenerator.generate(), playerName.getUsername(), defaultPlayerImageUrl, 0, 0, 0);
         ServiceResult<Player> servicePlayer = playerService.save(player);
         Player createdPlayer = servicePlayer.getData();
 

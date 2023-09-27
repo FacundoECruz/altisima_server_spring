@@ -9,7 +9,7 @@ import java.util.Objects;
 @Document
 public class Player {
     @Id
-    private ObjectId _id;
+    private String _id;
     private String username;
     private String image;
     private Integer gamesWon;
@@ -33,7 +33,8 @@ public class Player {
         return Objects.hash(username, image, gamesWon, gamesPlayed, totalScore);
     }
 
-    public Player(String username, String image, Integer gamesWon, Integer gamesPlayed, Integer totalScore) {
+    public Player(String _id, String username, String image, Integer gamesWon, Integer gamesPlayed, Integer totalScore) {
+        this._id = _id;
         this.username = username;
         this.image = image;
         this.gamesWon = gamesWon;

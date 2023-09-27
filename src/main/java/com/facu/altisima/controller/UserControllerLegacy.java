@@ -18,30 +18,30 @@ import org.springframework.web.bind.annotation.*;
 public class UserControllerLegacy {
     @Autowired
     private UserServiceAPI userService;
-
     @Autowired
     private PlayerServiceAPI playerService;
 
     @PostMapping
     public ResponseEntity<?> saveUserV1(@RequestBody CreateUserDto userData) {
-        User user = new User(userData.getUsername(), userData.getEmail(), userData.getImage(), userData.getPassword(), 0);
-        ServiceResult<User> saveUserResult = userService.save(user);
-        ServiceResult<Player> savePlayerResult = playerService.save(user.toPlayer());
-        if (savePlayerResult.isSuccess())
-            return buildResponse(saveUserResult);
-        else
-            return new ResponseEntity<>(savePlayerResult.getErrorMessage(), HttpStatus.CONFLICT);
-
+        try {
+            ServiceResult<User> savedUser = saveUser(userData);
+            return new Response().build(savedUser);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
-
+    @NotNull
+    private ServiceResult<User> saveUser(CreateUserDto userData) {
+        User user = userData.toDomain();
+        playerService.save(user.toPlayer());
+        ServiceResult<User> saveUserResult = userService.save(user);
+        return saveUserResult;
+    }
     @NotNull
     private static <A> ResponseEntity<?> buildResponse(ServiceResult<A> result) {
         if (result.isSuccess())
             return new ResponseEntity<>(result.getData(), HttpStatus.OK);
         else
             return new ResponseEntity<>(result.getErrorMessage(), HttpStatus.CONFLICT);
-
     }
-
-
 }

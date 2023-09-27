@@ -1,6 +1,8 @@
 package com.facu.altisima.model;
 
 import com.facu.altisima.controller.dto.legacyDtos.EditUserDto;
+import com.facu.altisima.service.utils.IdGenerator;
+import com.facu.altisima.service.utils.UUIDGenerator;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -10,7 +12,7 @@ import java.util.Objects;
 @Document
 public class User {
     @Id
-    private ObjectId _id;
+    private String _id;
     private String username;
     private String email;
     private String image;
@@ -22,7 +24,8 @@ public class User {
     }
 
     public Player toPlayer() {
-        return new Player(this.getUsername(), this.getImage(), 0, 0, 0);
+        IdGenerator idGenerator = new UUIDGenerator();
+        return new Player(idGenerator.generate(),this.getUsername(), this.getImage(), 0, 0, 0);
     }
 
     @Override
@@ -37,13 +40,17 @@ public class User {
     public int hashCode() {
         return Objects.hash(username, email, image, password, createdGames);
     }
-
-    public User(String username, String email, String image, String password, Integer createdGames) {
+    public User(String _id, String username, String email, String image, String password, Integer createdGames) {
+        this._id = _id;
         this.username = username;
         this.email = email;
         this.image = image;
         this.password = password;
         this.createdGames = createdGames;
+    }
+
+    public String get_id() {
+        return _id;
     }
 
     public String getEmail() {
