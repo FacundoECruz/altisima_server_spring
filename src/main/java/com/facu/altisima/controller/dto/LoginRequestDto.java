@@ -2,6 +2,8 @@ package com.facu.altisima.controller.dto;
 
 import java.util.Objects;
 
+import static com.facu.altisima.controller.dto.PasswordDto.EMPTY_FIELD_MSG;
+
 public class LoginRequestDto {
     private String username;
     private String password;
@@ -13,6 +15,17 @@ public class LoginRequestDto {
 
     public LoginRequestDto() {
 
+    }
+
+    public LoginRequest toDomain() {
+        validate();
+        return new LoginRequest(username, password);
+    }
+
+    private void validate() {
+        if(username.equals("") || password.equals("")) {
+            throw new RuntimeException(EMPTY_FIELD_MSG);
+        }
     }
 
     @Override
