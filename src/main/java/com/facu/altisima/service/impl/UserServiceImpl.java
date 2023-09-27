@@ -1,6 +1,9 @@
 package com.facu.altisima.service.impl;
 
+import com.facu.altisima.controller.dto.EditUser;
+import com.facu.altisima.controller.dto.LoginRequest;
 import com.facu.altisima.controller.dto.LoginRequestDto;
+import com.facu.altisima.controller.dto.legacyDtos.CreateUserDto;
 import com.facu.altisima.controller.dto.legacyDtos.EditUserDto;
 import com.facu.altisima.dao.api.PlayerRepository;
 import com.facu.altisima.dao.api.UserRepository;
@@ -22,6 +25,7 @@ public class UserServiceImpl implements UserServiceAPI {
     private UserRepository userRepository;
     @Autowired
     private PlayerRepository playerRepository;
+
     @Override
     public ServiceResult<List<User>> getAll() {
         List<User> users = userRepository.findAll();
@@ -36,6 +40,7 @@ public class UserServiceImpl implements UserServiceAPI {
     public ServiceResult<User> save(User user) {
         Optional<User> dbUser = userRepository.findByUsername(user.getUsername());
         //ACA HAY QUE CREAR EL PLAYER TAMBIEN
+        //Lo estamos creando en el controller legacy.
         if (dbUser.isPresent()) {
             return ServiceResult.error("El nombre de usuario ya existe");
         } else {
@@ -57,45 +62,49 @@ public class UserServiceImpl implements UserServiceAPI {
 
     @Override
     public void delete(String username) {
-        Optional<User> userToDelete = userRepository.findById(username);
+        Optional<User> userToDelete = userRepository.findByUsername(username);
         if (userToDelete.isPresent()) {
             userRepository.deleteByUsername(username);
         }
     }
 
-    public ServiceResult<User> put(String username, EditUserDto userChanges) {
-        Optional<User> user = userRepository.findByUsername(username);
+    public ServiceResult<User> put(EditUser userChanges) {
+        Optional<User> user = userRepository.findByUsername(userChanges.getUsername());
         if (user.isPresent()) {
-            User userToChange = user.get();
-            userToChange.setImage(userChanges.getImage());
-            userToChange.setPassword(userChanges.getPassword());
-            userRepository.save(userToChange);
-
-            Optional<Player> player = playerRepository.findByUsername(userToChange.getUsername());
-            if(player.isPresent()){
-                Player playerToChange = player.get();
-                playerToChange.setImage(userChanges.getImage());
-                playerRepository.save(playerToChange);
-            }
-            return ServiceResult.success(userToChange);
+            User editedUser = editUser(user.get(), userChanges);
+            return ServiceResult.success(editedUser);
         } else {
             return ServiceResult.error("El nombre de usuario no existe");
         }
     }
 
-    public ServiceResult<User> login(LoginRequestDto loginRequestDto) {
-        Optional<User> user = userRepository.findByUsername(loginRequestDto.getUsername());
+    private User editUser(User userToEdit, EditUser userChanges) {
+        userToEdit.setImage(userChanges.getImage());
+        userToEdit.setPassword(userChanges.getPassword());
+        editPlayer(userChanges);
+        userRepository.save(userToEdit);
+        return userToEdit;
+    }
 
-        if (user.isPresent()) {
-            User userToLogin = user.get();
-            if (userToLogin.getPassword().equals(loginRequestDto.getPassword())) {
-                return ServiceResult.success(userToLogin);
-            } else {
-                return ServiceResult.error("Usuario o contraseña invalidos");
-            }
-        } else {
-            return ServiceResult.error("No se encontraron usuarios");
+    private void editPlayer(EditUser userChanges) {
+        Optional<Player> player = playerRepository.findByUsername(userChanges.getUsername());
+        if (player.isPresent()) {
+            Player playerToEdit = player.get();
+            playerToEdit.setImage(userChanges.getImage());
+            playerRepository.save(playerToEdit);
         }
     }
 
+    public ServiceResult<User> login(LoginRequest loginRequest) {
+        Optional<User> user = userRepository.findByUsername(loginRequest.getUsername());
+        if (user.isPresent()) {
+            try {
+                loginRequest.validate(user.get());
+                return ServiceResult.success(user.get());
+            } catch (RuntimeException e) {
+                return ServiceResult.error(e.getMessage());
+            }
+        } else
+            return ServiceResult.error("Usuario no encontrado");
+    }
 }

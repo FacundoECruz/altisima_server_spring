@@ -1,5 +1,7 @@
 package com.facu.altisima.controller;
 
+import com.facu.altisima.controller.dto.EditUser;
+import com.facu.altisima.controller.dto.LoginRequest;
 import com.facu.altisima.controller.dto.LoginRequestDto;
 import com.facu.altisima.controller.dto.legacyDtos.EditUserDto;
 import com.facu.altisima.model.User;
@@ -30,6 +32,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
         }
     }
+
     @GetMapping
     public ResponseEntity<?> getUsers() {
         ServiceResult<List<User>> result = userServiceAPI.getAll();
@@ -57,28 +60,32 @@ public class UserController {
 
     @PostMapping(value = "/login")
     public ResponseEntity<?> loginUser(@RequestBody LoginRequestDto loginRequestDto) {
-        ServiceResult<User> user = userServiceAPI.login(loginRequestDto);
-        if (user.isSuccess()) {
-            User retrievedUser = user.getData();
-            return ResponseEntity.ok(retrievedUser);
-        } else {
-            String errorMessage = user.getErrorMessage();
-            if(errorMessage == "No se encontraron usuarios") {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
-            } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
-            }
+        try {
+            ServiceResult<User> user = userLogin(loginRequestDto);
+            return new Response().build(user);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
     }
 
+    private ServiceResult<User> userLogin(LoginRequestDto loginRequestDto) {
+        LoginRequest loginRequest = loginRequestDto.toDomain();
+        return userServiceAPI.login(loginRequest);
+    }
+
     @PutMapping(value = "/{username}")
-    public ResponseEntity<?> putUser(@PathVariable String username, @RequestBody EditUserDto userChanges) {
-        ServiceResult<User> user = userServiceAPI.put(username, userChanges);
-        if(user.getErrorMessage() == null) {
-        return new ResponseEntity<>(user.getData(), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(user.getErrorMessage(), HttpStatus.NOT_FOUND);
+    public ResponseEntity<?> putUser(@PathVariable String username, @RequestBody EditUserDto userChangesDto) {
+        try {
+            ServiceResult<User> user = userEdit(username, userChangesDto);
+            return new Response().build(user);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
         }
+    }
+
+    private ServiceResult<User> userEdit(String username, EditUserDto userChangesDto) {
+        EditUser userChanges = userChangesDto.toDomain(username);
+        return userServiceAPI.put(userChanges);
     }
 
     @DeleteMapping(value = "/{username}")
