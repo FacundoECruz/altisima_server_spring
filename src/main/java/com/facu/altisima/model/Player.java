@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Objects;
 
-@Document
+@Document(value = "players")
 public class Player {
     @Id
     private String _id;
