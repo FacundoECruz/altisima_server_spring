@@ -1,4 +1,4 @@
-package com.facu.altisima.dao.api;
+package com.facu.altisima.repository;
 
 import com.facu.altisima.model.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
