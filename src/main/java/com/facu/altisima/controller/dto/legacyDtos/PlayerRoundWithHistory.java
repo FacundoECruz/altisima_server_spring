@@ -1,5 +1,7 @@
 package com.facu.altisima.controller.dto.legacyDtos;
 
+import com.facu.altisima.controller.dto.PlayerRoundDto;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -18,6 +20,10 @@ public class PlayerRoundWithHistory {
         this.bidsLost = bidsLost;
         this.image = image;
         this.history = history;
+    }
+
+    public PlayerRoundDto toDto() {
+        return new PlayerRoundDto(username, bid, bidsLost);
     }
 
     public String getUsername() {
