@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/v1/games")
@@ -25,17 +26,19 @@ public class GameControllerLegacy {
 
     @PostMapping
     public ResponseEntity<?> saveGameV1(@RequestBody List<PlayerRoundAndScoreDto> players) {
-        //Translate for service
         Integer totalRounds = 9;
         List<String> playersNames = getPlayerNames(players);
 
         ServiceResult<Game> receivedGameFromService = gameServiceAPI.createGame(playersNames, totalRounds);
         Game game = receivedGameFromService.getData();
 
-        //Translate for frontend
         List<PlayerWithImageV1> playersWithImages = getPlayerWithImageV1s(players, game);
-        String serializedId = game.getId().toString();
-        GameCreatedV1Dto gameCreatedV1 = new GameCreatedV1Dto(serializedId, game.getCurrentRound(), game.getCardsPerRound(), "inProgress", playersWithImages);
+        GameCreatedV1Dto gameCreatedV1 = new GameCreatedV1Dto(
+                game.get_id(),
+                game.getCurrentRound(),
+                game.getCardsPerRound(),
+                "inProgress",
+                playersWithImages);
 
         return new ResponseEntity<>(gameCreatedV1, HttpStatus.OK);
     }
@@ -53,7 +56,12 @@ public class GameControllerLegacy {
     private static List<PlayerWithImageV1> getPlayerWithImageV1s(List<PlayerRoundAndScoreDto> players, Game game) {
         List<PlayerWithImageV1> playersWithImagesList = new ArrayList<>();
         for (int i = 0; i < players.size(); i++) {
-            PlayerWithImageV1 playerWithImageV1 = new PlayerWithImageV1(players.get(i).getUsername(), players.get(i).getScore(), players.get(i).getBid(), players.get(i).getBidsLost(), game.getPlayersImgs().get(i));
+            PlayerWithImageV1 playerWithImageV1 = new PlayerWithImageV1(
+                    players.get(i).getUsername(),
+                    players.get(i).getScore(),
+                    players.get(i).getBid(),
+                    players.get(i).getBidsLost(),
+                    game.getPlayersImgs().get(i));
             playersWithImagesList.add(playerWithImageV1);
         }
         return playersWithImagesList;
@@ -61,10 +69,11 @@ public class GameControllerLegacy {
 
     @PutMapping(value = "/next")
     public ResponseEntity<?> nextRound(@RequestBody NextRoundDto nextRoundDto) {
-        //Translate for service
         String id = nextRoundDto.getGameId();
-        List<PlayerRoundWithHistory> roundData = nextRoundDto.getPlayersRound();
-        List<PlayerRoundDto> playersRound = getPlayerRoundDtos(roundData);
+        List<PlayerRoundWithHistory> roundResults = nextRoundDto.getPlayersRound();
+        List<PlayerRoundDto> playersRound = roundResults.stream().map(playerRoundResult -> {
+            return playerRoundResult.toDto();
+        }).collect(Collectors.toList());
 
         ServiceResult<Game> gameService = gameServiceAPI.nextRound(id, playersRound);
         if (gameService.isError()) {
@@ -72,23 +81,11 @@ public class GameControllerLegacy {
         }
         Game game = gameService.getData();
 
-        //Translate for frontend
         List<PlayerRoundWithHistory> newRoundState = generateNextRoundResponse(game);
         RoundResponseDto nextRoundResponse = new RoundResponseDto(game.getCurrentRound(), newRoundState, "in progress");
 
         return new ResponseEntity<>(nextRoundResponse, HttpStatus.OK);
     }
-
-    @NotNull
-    private static List<PlayerRoundDto> getPlayerRoundDtos(List<PlayerRoundWithHistory> roundData) {
-        List<PlayerRoundDto> playersRound = new ArrayList<>();
-        for (int i = 0; i < roundData.size(); i++) {
-            PlayerRoundDto playerRoundDto = new PlayerRoundDto(roundData.get(i).getUsername(), roundData.get(i).getBid(), roundData.get(i).getBidsLost());
-            playersRound.add(playerRoundDto);
-        }
-        return playersRound;
-    }
-
     @NotNull
     private static List<PlayerRoundWithHistory> generateNextRoundResponse(Game game) {
         List<PlayerRoundWithHistory> newRoundState = new ArrayList<>();

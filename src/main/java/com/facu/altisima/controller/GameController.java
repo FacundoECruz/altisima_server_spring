@@ -24,6 +24,7 @@ public class GameController {
 
     @GetMapping
     public ResponseEntity<?> getAllGames() {
+        //Estamos devolviendo objeto de dominio. No DTO.
         ServiceResult<List<Game>> allGames = gameServiceAPI.getAllGames();
         if (allGames.getErrorMessage() == null) {
             return new ResponseEntity<>(allGames.getData(), HttpStatus.OK);

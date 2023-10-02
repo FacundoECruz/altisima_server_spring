@@ -17,7 +17,8 @@ public class GameCreatedDto {
     }
 
     public GameCreatedDto(Game game) {
-        this._id = game.getId();
+        //El id ahora lo maneja el dto, no el game
+        this._id = "dtoId";
         this.cardsPerRound = game.getCardsPerRound();
         this.players = game.getPlayers();
     }

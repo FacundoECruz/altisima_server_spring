@@ -8,9 +8,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.*;
-@Document(value = "games")
+
 public class Game {
-    @Id
     private String _id;
     private String date;
     public Integer currentRound;
@@ -43,14 +42,6 @@ public class Game {
 
     public void setPlayersImgs(List<String> playersImgs) {
         this.playersImgs = playersImgs;
-    }
-
-    public String getId() {
-        return _id;
-    }
-
-    public void setId(String id) {
-        this._id = _id;
     }
 
     public String getDate() {
@@ -118,16 +109,24 @@ public class Game {
         this.lastBidsRound = lastBidsRound;
     }
 
+    public String get_id() {
+        return _id;
+    }
+
+    public void set_id(String _id) {
+        this._id = _id;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Game game = (Game) o;
-        return Objects.equals(_id, game._id) && Objects.equals(date, game.date) && Objects.equals(currentRound, game.currentRound) && Objects.equals(cardsPerRound, game.cardsPerRound) && Objects.equals(players, game.players) && Objects.equals(currentResults, game.currentResults) && Objects.equals(lastBidsRound, game.lastBidsRound) && Objects.equals(totalRounds, game.totalRounds) && Objects.equals(playersImgs, game.playersImgs);
+        return Objects.equals(date, game.date) && Objects.equals(currentRound, game.currentRound) && Objects.equals(cardsPerRound, game.cardsPerRound) && Objects.equals(players, game.players) && Objects.equals(currentResults, game.currentResults) && Objects.equals(lastBidsRound, game.lastBidsRound) && Objects.equals(totalRounds, game.totalRounds) && Objects.equals(playersImgs, game.playersImgs);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(_id, date, currentRound, cardsPerRound, players, currentResults, lastBidsRound, totalRounds, playersImgs);
+        return Objects.hash(date, currentRound, cardsPerRound, players, currentResults, lastBidsRound, totalRounds, playersImgs);
     }
 }
