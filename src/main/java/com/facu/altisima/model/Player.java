@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Objects;
 
-@Document(value = "players")
+@Document("players")
 public class Player {
     @Id
     private String _id;
@@ -82,5 +82,11 @@ public class Player {
         this.totalScore = totalScore;
     }
 
+    public String get_id() {
+        return _id;
+    }
 
+    public void set_id(String _id) {
+        this._id = _id;
+    }
 }

@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Objects;
 
-@Document(value = "users")
+@Document("users")
 public class User {
     @Id
     private String _id;
