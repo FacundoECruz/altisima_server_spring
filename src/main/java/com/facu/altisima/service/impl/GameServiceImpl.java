@@ -3,11 +3,9 @@ package com.facu.altisima.service.impl;
 import com.facu.altisima.controller.dto.FinishedGameDto;
 import com.facu.altisima.controller.dto.PlayerResultDto;
 import com.facu.altisima.controller.dto.PlayerRoundDto;
-import com.facu.altisima.controller.dto.legacyDtos.GameIdDto;
-import com.facu.altisima.controller.dto.legacyDtos.PlayerRoundWithHistory;
-import com.facu.altisima.dao.api.GameRepository;
-import com.facu.altisima.dao.api.PlayerRepository;
-import com.facu.altisima.dao.api.UserRepository;
+import com.facu.altisima.repository.GameRepository;
+import com.facu.altisima.repository.PlayerRepository;
+import com.facu.altisima.repository.UserRepository;
 import com.facu.altisima.model.Game;
 import com.facu.altisima.model.Player;
 import com.facu.altisima.model.User;
@@ -16,11 +14,11 @@ import com.facu.altisima.service.utils.DateFormatter;
 import com.facu.altisima.service.utils.Generate;
 import com.facu.altisima.service.utils.IdGenerator;
 import com.facu.altisima.service.utils.ServiceResult;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class GameServiceImpl implements GameServiceAPI {
@@ -30,6 +28,7 @@ public class GameServiceImpl implements GameServiceAPI {
     private final IdGenerator idGenerator;
     Generate generate = new Generate();
     DateFormatter dateFormatter = new DateFormatter();
+
     @Autowired
     public GameServiceImpl(GameRepository gameRepository, PlayerRepository playerRepository, UserRepository userRepository, IdGenerator idGenerator) {
         this.gameRepository = gameRepository;
@@ -42,19 +41,34 @@ public class GameServiceImpl implements GameServiceAPI {
         if (players.size() > 8) {
             return ServiceResult.error("Demasiados jugadores");
         } else {
-            List<String> playersImgs = new ArrayList<>();
-            for(int i = 0; i < players.size(); i++){
-                Optional<Player> playerFromDb = playerRepository.findByUsername(players.get(i));
-                if(playerFromDb.isPresent()){
-                    playersImgs.add(playerFromDb.get().getImage());
-                }
-            }
-            Game game = new Game(idGenerator.generate(), dateFormatter.formatDate(new Date()), 1, generate.cardsPerRound(players.size(), totalRounds), players, generate.roundResults(players), generate.roundBids(players), totalRounds, playersImgs);
+            List<String> playersImgs = getPlayersImages(players);
+            List<String> playersIds = getPlayersIds(players);
+            Game game = new Game(idGenerator.generate(), dateFormatter.formatDate(new Date()), 1, generate.cardsPerRound(players.size(), totalRounds), playersIds, generate.roundResults(players), generate.roundBids(players), totalRounds, playersImgs);
 
             Game savedGame = gameRepository.save(game);
 
             return ServiceResult.success(savedGame);
         }
+    }
+
+    private List<String> getPlayersImages(List<String> players) {
+        return players.stream().map(player -> {
+            Optional<Player> playerFromDb = playerRepository.findByUsername(player);
+            if (playerFromDb.isPresent())
+                return playerFromDb.get().getImage();
+            else
+                return null;
+        }).collect(Collectors.toList());
+    }
+
+    private List<String> getPlayersIds(List<String> players) {
+        return players.stream().map(player -> {
+            Optional<Player> playerFromDb = playerRepository.findByUsername(player);
+            if (playerFromDb.isPresent()) {
+                return playerFromDb.get().get_id();
+            } else
+                return null;
+        }).collect(Collectors.toList());
     }
 
     public ServiceResult<List<Game>> getAllGames() {
@@ -145,11 +159,12 @@ public class GameServiceImpl implements GameServiceAPI {
     private static Game turnBackOneRound(Game game) {
         Integer prevRound = game.getCurrentRound() - 1;
         List<PlayerResultDto> prevRoundResults = new ArrayList<>();
-        for (int i = 0; i < game.getPlayers().size(); i++){
+        for (int i = 0; i < game.getPlayers().size(); i++) {
             PlayerResultDto prevPlayerScore = game.getCurrentResults().get(i).prevRoundState();
             prevRoundResults.add(prevPlayerScore);
         }
-        return new Game(game.getId(),
+        return new Game(
+                game.get_id(),
                 game.getDate(),
                 prevRound,
                 game.getCardsPerRound(),
@@ -159,6 +174,7 @@ public class GameServiceImpl implements GameServiceAPI {
                 game.getTotalRounds(),
                 game.getPlayersImgs());
     }
+
     public ServiceResult<Game> finishGame(FinishedGameDto finishedGameDto) {
         String id = finishedGameDto.getId();
         String host = finishedGameDto.getHost();
