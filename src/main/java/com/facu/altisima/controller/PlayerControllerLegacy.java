@@ -20,7 +20,6 @@ import java.util.List;
 public class PlayerControllerLegacy {
     @Autowired
     private PlayerServiceAPI playerService;
-
     IdGenerator idGenerator = new UUIDGenerator();
 
     @PostMapping

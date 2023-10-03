@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class PlayerResultDto {
+    public static final int BASE_WIN_SCORE = 5;
     private String username;
     private Integer score;
     private List<Integer> history;
@@ -27,8 +28,14 @@ public class PlayerResultDto {
         return prevRound;
     }
 
-    public void updateHistory(Integer roundScore) {
-        this.history.add(roundScore);
+    public void updateScore(Integer roundBid) {
+        if (roundBid < 0) {
+            score = score + roundBid;
+            history.add(roundBid);
+        } else {
+            score = score + BASE_WIN_SCORE + roundBid;
+            history.add(BASE_WIN_SCORE + roundBid);
+        }
     }
 
     public List<Integer> getHistory() {

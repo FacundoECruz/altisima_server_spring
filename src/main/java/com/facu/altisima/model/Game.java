@@ -8,8 +8,10 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Game {
+    public static final int BASE_WIN_SCORE = 5;
     private String _id;
     private String date;
     public Integer currentRound;
@@ -34,6 +36,18 @@ public class Game {
         this.lastBidsRound = lastBidsRound;
         this.totalRounds = totalRounds;
         this.playersImgs = playersImgs;
+    }
+
+    public Game nextRound(List<PlayerRoundDto> roundBids){
+        lastBidsRound = roundBids;
+        currentRound += 1;
+        for(int i = 0; i < roundBids.size(); i++){
+            if(roundBids.get(i).getBidsLost() == 0)
+                currentResults.get(i).updateScore(roundBids.get(i).getBid());
+            else
+                currentResults.get(i).updateScore(-roundBids.get(i).getBidsLost());
+        }
+        return this;
     }
 
     public List<String> getPlayersImgs() {

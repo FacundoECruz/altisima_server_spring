@@ -4,8 +4,6 @@ import com.facu.altisima.controller.dto.PasswordDto;
 import com.facu.altisima.model.User;
 import com.facu.altisima.service.utils.IdGenerator;
 import com.facu.altisima.service.utils.UUIDGenerator;
-import org.bson.types.ObjectId;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 

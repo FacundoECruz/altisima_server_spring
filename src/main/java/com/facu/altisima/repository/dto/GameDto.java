@@ -35,10 +35,7 @@ public class GameDto {
 
     // FROM
     public static GameDto from(Game game) {
-        List<List<PlayerRoundWithHistory>> results = generateResults(
-                game.getLastBidsRound(),
-                game.getCurrentResults(),
-                game.getPlayersImgs());
+        List<List<PlayerRoundWithHistory>> results = generateResults(game.getLastBidsRound(), game.getCurrentResults(), game.getPlayersImgs());
         return new GameDto(
                 game.get_id(),
                 game.getCardsPerRound(),
@@ -53,7 +50,7 @@ public class GameDto {
             List<PlayerResultDto> currentResults,
             List<String> playersImgs) {
         List<List<PlayerRoundWithHistory>> resultsContainer = new ArrayList<>();
-        List<PlayerRoundWithHistory> firstRoundResults = new ArrayList<>();
+        List<PlayerRoundWithHistory> roundResults = new ArrayList<>();
         for (int i = 0; i < roundBids.size(); i++) {
             PlayerRoundWithHistory playerRound = new PlayerRoundWithHistory(
                     currentResults.get(i).getUsername(),
@@ -61,19 +58,19 @@ public class GameDto {
                     roundBids.get(i).getBid(),
                     roundBids.get(i).getBidsLost(),
                     playersImgs.get(i),
-                    new ArrayList<>());
+                    currentResults.get(i).getHistory());
 
-            firstRoundResults.add(playerRound);
+            roundResults.add(playerRound);
         }
-        resultsContainer.add(firstRoundResults);
+        resultsContainer.add(roundResults);
         return resultsContainer;
     }
 
     // TO DOMAIN
     public Game toDomain() {
-        List <PlayerRoundDto> lastBidsRound = generateLastBidsRound(results.get(0));
-        List <PlayerResultDto> currentResults = generateCurrentResults(results.get(0));
-        List <String> playersImgs = extractImages(results.get(0));
+        List<PlayerRoundDto> lastBidsRound = generateLastBidsRound(results.get(0));
+        List<PlayerResultDto> currentResults = generateCurrentResults(results.get(0));
+        List<String> playersImgs = extractImages(results.get(0));
         return new Game(_id, date, round, cardsPerRound, players, currentResults, lastBidsRound, totalRounds, playersImgs);
     }
 
@@ -105,3 +102,5 @@ public class GameDto {
         }).collect(Collectors.toList());
     }
 }
+
+

@@ -44,9 +44,7 @@ public class GameServiceImpl implements GameServiceAPI {
             List<String> playersImgs = getPlayersImages(players);
             List<String> playersIds = getPlayersIds(players);
             Game game = new Game(idGenerator.generate(), dateFormatter.formatDate(new Date()), 1, generate.cardsPerRound(players.size(), totalRounds), playersIds, generate.roundResults(players), generate.roundBids(players), totalRounds, playersImgs);
-
             Game savedGame = gameRepository.save(game);
-
             return ServiceResult.success(savedGame);
         }
     }
@@ -108,37 +106,12 @@ public class GameServiceImpl implements GameServiceAPI {
         Integer baseScoreForWinning = 5;
         if (retrievedGameFromDb.isPresent()) {
             Game game = retrievedGameFromDb.get();
-
             if (game.getCurrentRound() > game.getTotalRounds()) {
                 return ServiceResult.error("La partida ya esta terminada");
             }
+            Game updatedGameState = game.nextRound(roundResults);
 
-            game.setLastBidsRound(roundResults);
-            game.setCurrentRound(game.getCurrentRound() + 1);
-
-            List<PlayerResultDto> resultsUntilThePrevRound = game.getCurrentResults();
-
-            List<PlayerResultDto> updatedResults = new ArrayList<>();
-            for (int i = 0; i < resultsUntilThePrevRound.size(); i++) {
-                PlayerRoundDto playerRoundDto = roundResults.get(i);
-                PlayerResultDto playerResultDto = resultsUntilThePrevRound.get(i);
-
-                if (playerRoundDto.getUsername().equals(playerResultDto.getUsername())) {
-                    if (playerRoundDto.getBidsLost() == 0) {
-                        playerResultDto.setScore(playerResultDto.getScore() + playerRoundDto.getBid() + baseScoreForWinning);
-                        playerResultDto.updateHistory(playerRoundDto.getBid() + baseScoreForWinning);
-                    } else {
-                        playerResultDto.setScore(playerResultDto.getScore() - playerRoundDto.getBidsLost());
-                        playerResultDto.updateHistory(-playerRoundDto.getBidsLost());
-                    }
-                } else {
-                    return ServiceResult.error("Los nombres de los players no coinciden");
-                }
-                updatedResults.add(playerResultDto);
-            }
-            game.setCurrentResults(updatedResults);
-
-            Game updatedGame = gameRepository.save(game);
+            Game updatedGame = gameRepository.save(updatedGameState);
             return ServiceResult.success(updatedGame);
         } else {
             return ServiceResult.error("No se encontro la partida");

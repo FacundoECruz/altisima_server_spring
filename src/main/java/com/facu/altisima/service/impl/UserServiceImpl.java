@@ -2,11 +2,8 @@ package com.facu.altisima.service.impl;
 
 import com.facu.altisima.controller.dto.EditUser;
 import com.facu.altisima.controller.dto.LoginRequest;
-import com.facu.altisima.controller.dto.LoginRequestDto;
-import com.facu.altisima.controller.dto.legacyDtos.CreateUserDto;
-import com.facu.altisima.controller.dto.legacyDtos.EditUserDto;
-import com.facu.altisima.dao.api.PlayerRepository;
-import com.facu.altisima.dao.api.UserRepository;
+import com.facu.altisima.repository.PlayerRepository;
+import com.facu.altisima.repository.UserRepository;
 import com.facu.altisima.model.Player;
 import com.facu.altisima.model.User;
 import com.facu.altisima.service.api.UserServiceAPI;
@@ -39,9 +36,8 @@ public class UserServiceImpl implements UserServiceAPI {
     @Override
     public ServiceResult<User> save(User user) {
         Optional<User> dbUser = userRepository.findByUsername(user.getUsername());
-        //ACA HAY QUE CREAR EL PLAYER TAMBIEN
-        //Lo estamos creando en el controller legacy.
-        if (dbUser.isPresent()) {
+        Optional<Player> dbPlayer = playerRepository.findByUsername(user.getUsername());
+        if (dbUser.isPresent() || dbPlayer.isPresent()) {
             return ServiceResult.error("El nombre de usuario ya existe");
         } else {
             User savedUser = userRepository.save(user);

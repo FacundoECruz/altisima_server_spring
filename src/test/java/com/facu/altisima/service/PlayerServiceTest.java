@@ -1,6 +1,6 @@
 package com.facu.altisima.service;
 
-import com.facu.altisima.dao.api.PlayerRepository;
+import com.facu.altisima.repository.PlayerRepository;
 import com.facu.altisima.model.Player;
 import com.facu.altisima.service.api.PlayerServiceAPI;
 import com.facu.altisima.service.utils.ServiceResult;
@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

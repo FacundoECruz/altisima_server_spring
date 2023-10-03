@@ -2,7 +2,7 @@ package com.facu.altisima.service;
 
 import com.facu.altisima.controller.dto.LoginRequestDto;
 import com.facu.altisima.controller.dto.legacyDtos.EditUserDto;
-import com.facu.altisima.dao.api.UserRepository;
+import com.facu.altisima.repository.UserRepository;
 import com.facu.altisima.model.User;
 import com.facu.altisima.service.api.UserServiceAPI;
 import com.facu.altisima.service.utils.ServiceResult;
