@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Objects;
 
-@Document("players")
+@Document(value = "players")
 public class Player {
     @Id
     private String _id;
@@ -18,6 +18,9 @@ public class Player {
 
     public Player() {
 
+    }
+    public void apply(String newImage){
+        image = newImage;
     }
 
     @Override

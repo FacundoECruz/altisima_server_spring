@@ -3,6 +3,10 @@ package com.facu.altisima.model;
 import com.facu.altisima.controller.dto.PlayerResultDto;
 import com.facu.altisima.controller.dto.PlayerRoundDto;
 
+import com.facu.altisima.controller.dto.legacyDtos.GameCreatedV1Dto;
+import com.facu.altisima.controller.dto.legacyDtos.PlayerRoundAndScoreDto;
+import com.facu.altisima.controller.dto.legacyDtos.PlayerRoundWithHistory;
+import com.facu.altisima.controller.dto.legacyDtos.PlayerWithImageV1;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -36,6 +40,61 @@ public class Game {
         this.lastBidsRound = lastBidsRound;
         this.totalRounds = totalRounds;
         this.playersImgs = playersImgs;
+    }
+
+    public List<PlayerRoundWithHistory> toNewRoundState() {
+        List<PlayerRoundWithHistory> newRoundState = new ArrayList<>();
+        List<PlayerResultDto> tableScore = currentResults;
+        for (int i = 0; i < players.size(); i++) {
+            String playerImage = playersImgs.get(i);
+            PlayerResultDto playerResult = tableScore.get(i);
+            PlayerRoundWithHistory playerRoundWithHistory = new PlayerRoundWithHistory(playerResult.getUsername(), playerResult.getScore(), 0, 0, playerImage, playerResult.getHistory());
+            newRoundState.add(playerRoundWithHistory);
+        }
+        return newRoundState;
+    }
+
+    public GameCreatedV1Dto toGameCreatedV1Dto(List<PlayerRoundAndScoreDto> players){
+        List<PlayerWithImageV1> playersWithImages = getPlayerWithImageV1s(players);
+        return new GameCreatedV1Dto(
+                _id,
+                currentRound,
+                cardsPerRound,
+                "inProgress",
+                playersWithImages);
+    }
+
+    private List<PlayerWithImageV1> getPlayerWithImageV1s(List<PlayerRoundAndScoreDto> players) {
+        List<PlayerWithImageV1> playersWithImagesList = new ArrayList<>();
+        for (int i = 0; i < players.size(); i++) {
+            PlayerWithImageV1 playerWithImageV1 = new PlayerWithImageV1(
+                    players.get(i).getUsername(),
+                    players.get(i).getScore(),
+                    players.get(i).getBid(),
+                    players.get(i).getBidsLost(),
+                    playersImgs.get(i));
+            playersWithImagesList.add(playerWithImageV1);
+        }
+        return playersWithImagesList;
+    }
+
+    public Game turnBackOneRound() {
+        Integer prevRound = currentRound - 1;
+        List<PlayerResultDto> prevRoundResults = new ArrayList<>();
+        for (int i = 0; i < players.size(); i++) {
+            PlayerResultDto prevPlayerScore = currentResults.get(i).prevRoundState();
+            prevRoundResults.add(prevPlayerScore);
+        }
+        return new Game(
+                _id,
+                date,
+                prevRound,
+                cardsPerRound,
+                players,
+                prevRoundResults,
+                lastBidsRound,
+                totalRounds,
+                playersImgs);
     }
 
     public Game nextRound(List<PlayerRoundDto> roundBids){
