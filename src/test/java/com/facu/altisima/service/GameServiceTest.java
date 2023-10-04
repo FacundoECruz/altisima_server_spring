@@ -17,6 +17,7 @@ import com.facu.altisima.utils.GameGenerator;
 import com.facu.altisima.service.utils.IdGenerator;
 import com.facu.altisima.service.utils.ServiceResult;
 import com.facu.altisima.utils.FixedIdGenerator;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -141,25 +142,32 @@ public class GameServiceTest {
 
     @Test
     public void successfulNextRound() {
-        Optional<Game> gameOptional = Optional.of(game);
         List<PlayerRoundDto> playersRound = gameGenerator.generateRoundBids(players);
+        List<PlayerResultDto> expectedResults = generatePlayersResultDtos();
+        Game expectedGame = setNextRoundGame(playersRound, expectedResults);
 
-        PlayerResultDto expectedPlayerResult = new PlayerResultDto(players.get(0), -1, new ArrayList<>());
-        List<PlayerResultDto> expectedResults = new ArrayList<>();
-        expectedResults.add(expectedPlayerResult);
-
-        Game expectedGame = gameGenerator.generate(players, totalRounds);
-        expectedGame.setLastBidsRound(playersRound);
-        expectedGame.setCurrentRound(expectedGame.getCurrentRound() + 1);
-        expectedGame.setCurrentResults(expectedResults);
-
-        when(gameRepository.findById(game.get_id())).thenReturn(gameOptional);
+        when(gameRepository.findById(game.get_id())).thenReturn(Optional.of(game));
         when(gameRepository.save(game)).thenReturn(expectedGame);
 
         ServiceResult<Game> returnedGameState = gameService.nextRound(game.get_id(), playersRound);
 
         verify(gameRepository, times(1)).save(game);
         assertEquals(expectedGame, returnedGameState.getData());
+    }
+    @NotNull
+    private List<PlayerResultDto> generatePlayersResultDtos() {
+        PlayerResultDto expectedPlayerResult = new PlayerResultDto(players.get(0), -1, new ArrayList<>());
+        List<PlayerResultDto> expectedResults = new ArrayList<>();
+        expectedResults.add(expectedPlayerResult);
+        return expectedResults;
+    }
+    @NotNull
+    private Game setNextRoundGame(List<PlayerRoundDto> playersRound, List<PlayerResultDto> expectedResults) {
+        Game expectedGame = gameGenerator.generate(players, totalRounds);
+        expectedGame.setLastBidsRound(playersRound);
+        expectedGame.setCurrentRound(expectedGame.getCurrentRound() + 1);
+        expectedGame.setCurrentResults(expectedResults);
+        return expectedGame;
     }
 
     @Test
@@ -215,10 +223,8 @@ public class GameServiceTest {
         when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
 
         FinishedGameDto finishedGameDto = new FinishedGameDto(game.get_id(), "Facu", "Migue");
-
         ServiceResult<Game> finishedGame = gameService.finishGame(finishedGameDto);
 
         assertEquals(game, finishedGame.getData());
     }
-
 }

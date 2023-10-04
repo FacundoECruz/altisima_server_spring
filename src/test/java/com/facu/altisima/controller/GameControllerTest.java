@@ -9,9 +9,7 @@ import com.facu.altisima.utils.GameGenerator;
 import com.facu.altisima.service.utils.ServiceResult;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -54,7 +52,6 @@ public class GameControllerTest {
         gameIdDtoJson = objectMapper.writeValueAsString(gameIdDto);
     }
 
-    // APUNTAR A LA V1
     @Test
     public void saveGame() throws Exception {
         when(gameService.createGame(players, totalRounds)).thenReturn(succeedGame);
@@ -191,9 +188,7 @@ public class GameControllerTest {
 
     @Test
     public void successfulPrevRound() throws Exception {
-
-        // Adaptar este test a la v1
-
+        // Test adapted to v1
         String urlTemplate = "/v1" + path + "/prev";
         ServiceResult<Game> gameResult = ServiceResult.success(game);
         RoundResponseDto roundResponseDto = new RoundResponseDto().generate(gameResult.getData());
