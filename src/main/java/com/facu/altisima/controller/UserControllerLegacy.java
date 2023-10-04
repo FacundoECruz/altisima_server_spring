@@ -33,15 +33,8 @@ public class UserControllerLegacy {
     @NotNull
     private ServiceResult<User> saveUser(CreateUserDto userData) {
         User user = userData.toDomain();
-        playerService.save(user.toPlayer());
         ServiceResult<User> saveUserResult = userService.save(user);
+        playerService.save(user.toPlayer());
         return saveUserResult;
-    }
-    @NotNull
-    private static <A> ResponseEntity<?> buildResponse(ServiceResult<A> result) {
-        if (result.isSuccess())
-            return new ResponseEntity<>(result.getData(), HttpStatus.OK);
-        else
-            return new ResponseEntity<>(result.getErrorMessage(), HttpStatus.CONFLICT);
     }
 }

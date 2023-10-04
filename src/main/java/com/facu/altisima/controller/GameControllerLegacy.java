@@ -32,14 +32,7 @@ public class GameControllerLegacy {
         ServiceResult<Game> receivedGameFromService = gameServiceAPI.createGame(playersNames, totalRounds);
         Game game = receivedGameFromService.getData();
 
-        List<PlayerWithImageV1> playersWithImages = getPlayerWithImageV1s(players, game);
-        GameCreatedV1Dto gameCreatedV1 = new GameCreatedV1Dto(
-                game.get_id(),
-                game.getCurrentRound(),
-                game.getCardsPerRound(),
-                "inProgress",
-                playersWithImages);
-
+        GameCreatedV1Dto gameCreatedV1 = game.toGameCreatedV1Dto(players);
         return new ResponseEntity<>(gameCreatedV1, HttpStatus.OK);
     }
 
@@ -52,54 +45,30 @@ public class GameControllerLegacy {
         return playersNames;
     }
 
-    @NotNull
-    private static List<PlayerWithImageV1> getPlayerWithImageV1s(List<PlayerRoundAndScoreDto> players, Game game) {
-        List<PlayerWithImageV1> playersWithImagesList = new ArrayList<>();
-        for (int i = 0; i < players.size(); i++) {
-            PlayerWithImageV1 playerWithImageV1 = new PlayerWithImageV1(
-                    players.get(i).getUsername(),
-                    players.get(i).getScore(),
-                    players.get(i).getBid(),
-                    players.get(i).getBidsLost(),
-                    game.getPlayersImgs().get(i));
-            playersWithImagesList.add(playerWithImageV1);
-        }
-        return playersWithImagesList;
-    }
-
     @PutMapping(value = "/next")
     public ResponseEntity<?> nextRound(@RequestBody NextRoundDto nextRoundDto) {
-        String id = nextRoundDto.getGameId();
-        List<PlayerRoundWithHistory> roundResults = nextRoundDto.getPlayersRound();
-        List<PlayerRoundDto> playersRound = roundResults.stream().map(playerRoundResult -> {
-            return playerRoundResult.toDto();
-        }).collect(Collectors.toList());
-
-        ServiceResult<Game> gameService = gameServiceAPI.nextRound(id, playersRound);
+        ServiceResult<Game> gameService = getGameServiceResult(nextRoundDto);
         if (gameService.isError()) {
             return new ResponseEntity<>(gameService.getErrorMessage(), HttpStatus.NOT_FOUND);
         }
-        Game game = gameService.getData();
-
-        List<PlayerRoundWithHistory> newRoundState = generateNextRoundResponse(game);
-        RoundResponseDto nextRoundResponse = new RoundResponseDto(game.getCurrentRound(), newRoundState, "in progress");
+        RoundResponseDto nextRoundResponse = new RoundResponseDto(
+                gameService.getData().getCurrentRound(),
+                gameService.getData().toNewRoundState(),
+                "in progress");
 
         return new ResponseEntity<>(nextRoundResponse, HttpStatus.OK);
     }
-    @NotNull
-    private static List<PlayerRoundWithHistory> generateNextRoundResponse(Game game) {
-        List<PlayerRoundWithHistory> newRoundState = new ArrayList<>();
-        List<PlayerResultDto> tableScore = game.getCurrentResults();
-        List<PlayerRoundDto> prevRoundBids = game.getLastBidsRound();
-        for (int i = 0; i < game.getPlayers().size(); i++) {
-            String playerImage = game.getPlayersImgs().get(i);
-            PlayerResultDto playerResult = tableScore.get(i);
-            Integer lastRoundBid = prevRoundBids.get(i).getBid();
-            Integer lastRoundLost = prevRoundBids.get(i).getBidsLost();
-            PlayerRoundWithHistory playerRoundWithHistory = new PlayerRoundWithHistory(playerResult.getUsername(), playerResult.getScore(), 0, 0, playerImage, playerResult.getHistory());
-            newRoundState.add(playerRoundWithHistory);
-        }
-        return newRoundState;
+
+    private ServiceResult<Game> getGameServiceResult(NextRoundDto nextRoundDto) {
+        List<PlayerRoundDto> playersRound = getPlayerRoundDtos(nextRoundDto);
+        ServiceResult<Game> gameService = gameServiceAPI
+                .nextRound(nextRoundDto.getGameId(), playersRound);
+        return gameService;
+    }
+
+    private static List<PlayerRoundDto> getPlayerRoundDtos(NextRoundDto nextRoundDto) {
+        List<PlayerRoundWithHistory> roundResults = nextRoundDto.getPlayersRound();
+        return roundResults.stream().map(PlayerRoundWithHistory::toDto).collect(Collectors.toList());
     }
 
     @PutMapping(value = "/prev")
@@ -113,27 +82,10 @@ public class GameControllerLegacy {
         return new ResponseEntity<>(prevRoundResponse.generate(game), HttpStatus.OK);
     }
 
-    private static List<PlayerRoundWithHistory> generatePrevRoundResponse(Game game) {
-        //CAMBIAR ESTO, VAMOS A RECIBIR UN GAME Y TENEMOS QUE
-        //ARMAR EL DTO
-        List<PlayerRoundWithHistory> newRoundState = new ArrayList<>();
-        List<PlayerResultDto> tableScore = game.getCurrentResults();
-        List<PlayerRoundDto> prevRoundBids = game.getLastBidsRound();
-        for (int i = 0; i < game.getPlayers().size(); i++) {
-            String playerImage = game.getPlayersImgs().get(i);
-            PlayerResultDto playerResult = tableScore.get(i).prevRoundState();
-            Integer lastRoundBid = prevRoundBids.get(i).getBid();
-            Integer lastRoundLost = prevRoundBids.get(i).getBidsLost();
-            PlayerRoundWithHistory playerRoundWithHistory = new PlayerRoundWithHistory(playerResult.getUsername(), playerResult.getScore(),lastRoundBid, lastRoundLost, playerImage, playerResult.getHistory());
-            newRoundState.add(playerRoundWithHistory);
-        }
-        return newRoundState;
-    }
-
     @PutMapping(value = "/finish")
     public ResponseEntity<?> finishGame(@RequestBody FinishGameRequestDto finishGameDto) {
         FinishedGameDto finishedGameDto = new FinishedGameDto(finishGameDto.getGameId(), finishGameDto.getHost(), finishGameDto.getWinner());
         ServiceResult<Game> finishedGame = gameServiceAPI.finishGame(finishedGameDto);
-        return new ResponseEntity<>(finishedGame, HttpStatus.OK);
+        return new ResponseEntity<>(finishedGame.getData(), HttpStatus.OK);
     }
 }
