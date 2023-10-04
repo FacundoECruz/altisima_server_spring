@@ -3,6 +3,7 @@ package com.facu.altisima.service;
 import com.facu.altisima.controller.dto.FinishedGameDto;
 import com.facu.altisima.controller.dto.PlayerResultDto;
 import com.facu.altisima.controller.dto.PlayerRoundDto;
+import com.facu.altisima.repository.LegacyGameRepository;
 import com.facu.altisima.repository.MongoGameRepository;
 import com.facu.altisima.repository.PlayerRepository;
 import com.facu.altisima.repository.UserRepository;
@@ -32,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class GameServiceTest {
     PlayerRepository playerRepository;
     UserRepository userRepository;
-    MongoGameRepository gameRepository;
+    LegacyGameRepository gameRepository;
     IdGenerator idGenerator = new FixedIdGenerator("TestId");
     private GameServiceAPI gameService;
     GameGenerator gameGenerator = new GameGenerator();
@@ -44,7 +45,7 @@ public class GameServiceTest {
         players = new ArrayList<>();
         players.add("Migue");
         game = gameGenerator.generate(players, totalRounds);
-        this.gameRepository = mock(MongoGameRepository.class);
+        this.gameRepository = mock(LegacyGameRepository.class);
         this.playerRepository = mock(PlayerRepository.class);
         this.userRepository = mock(UserRepository.class);
         this.gameService = new GameServiceImpl(gameRepository, playerRepository, userRepository, idGenerator);
@@ -97,9 +98,9 @@ public class GameServiceTest {
     @Test
     public void successfulGetGame() {
         Optional<Game> successfulOptionalGame = Optional.of(game);
-        when(gameRepository.findById(game.getId())).thenReturn(successfulOptionalGame);
+        when(gameRepository.findById(game.get_id())).thenReturn(successfulOptionalGame);
 
-        ServiceResult<Game> returnedGame = gameService.getGame(game.getId());
+        ServiceResult<Game> returnedGame = gameService.getGame(game.get_id());
 
         assertEquals(returnedGame.getData(), game);
     }
@@ -107,9 +108,9 @@ public class GameServiceTest {
     @Test
     public void idGameToGetNotFound() {
         String gameNotFoundMsg = "No se encontro partida con ese id";
-        when(gameRepository.findById(game.getId())).thenReturn(Optional.empty());
+        when(gameRepository.findById(game.get_id())).thenReturn(Optional.empty());
 
-        ServiceResult<Game> returnedGame = gameService.getGame(game.getId());
+        ServiceResult<Game> returnedGame = gameService.getGame(game.get_id());
 
         assertEquals(returnedGame.getErrorMessage(), gameNotFoundMsg);
     }
@@ -117,24 +118,24 @@ public class GameServiceTest {
     @Test
     public void successfulDeleteGame() {
         Optional<Game> gameOptional= Optional.of(game);
-        when(gameRepository.findById(game.getId())).thenReturn(gameOptional);
-        doNothing().when(gameRepository).deleteById(game.getId());
+        when(gameRepository.findById(game.get_id())).thenReturn(gameOptional);
+        doNothing().when(gameRepository).deleteById(game.get_id());
         String successfulDeleteMsg = "Exitosamente borrado";
 
-        ServiceResult<String> result = gameService.delete(game.getId());
+        ServiceResult<String> result = gameService.delete(game.get_id());
 
-        verify(gameRepository, times(1)).deleteById(game.getId());
+        verify(gameRepository, times(1)).deleteById(game.get_id());
         assertEquals(result.getData(), successfulDeleteMsg);
     }
 
     @Test
     public void gameToDeleteDoesNotExist() {
-        when(gameRepository.findById(game.getId())).thenReturn(Optional.empty());
+        when(gameRepository.findById(game.get_id())).thenReturn(Optional.empty());
 
         String gameToDeleteNotFoundMsg = "No se encontro la partida";
-        ServiceResult<String> result = gameService.delete(game.getId());
+        ServiceResult<String> result = gameService.delete(game.get_id());
 
-        verify(gameRepository, times(0)).deleteById(game.getId());
+        verify(gameRepository, times(0)).deleteById(game.get_id());
         assertEquals(result.getErrorMessage(), gameToDeleteNotFoundMsg);
     }
 
@@ -152,10 +153,10 @@ public class GameServiceTest {
         expectedGame.setCurrentRound(expectedGame.getCurrentRound() + 1);
         expectedGame.setCurrentResults(expectedResults);
 
-        when(gameRepository.findById(game.getId())).thenReturn(gameOptional);
+        when(gameRepository.findById(game.get_id())).thenReturn(gameOptional);
         when(gameRepository.save(game)).thenReturn(expectedGame);
 
-        ServiceResult<Game> returnedGameState = gameService.nextRound(game.getId(), playersRound);
+        ServiceResult<Game> returnedGameState = gameService.nextRound(game.get_id(), playersRound);
 
         verify(gameRepository, times(1)).save(game);
         assertEquals(expectedGame, returnedGameState.getData());
@@ -164,10 +165,10 @@ public class GameServiceTest {
     @Test
     public void idGameToNextRoundNotFound() {
         String expectedErrMsg = "No se encontro la partida";
-        when(gameRepository.findById(game.getId())).thenReturn(Optional.empty());
+        when(gameRepository.findById(game.get_id())).thenReturn(Optional.empty());
         List<PlayerRoundDto> playersRound = gameGenerator.generateRoundBids(players);
 
-        ServiceResult<Game> gameServiceResult = gameService.nextRound(game.getId(), playersRound);
+        ServiceResult<Game> gameServiceResult = gameService.nextRound(game.get_id(), playersRound);
 
         assertEquals(expectedErrMsg, gameServiceResult.getErrorMessage());
     }
@@ -177,16 +178,16 @@ public class GameServiceTest {
         String expectedErrMsg = "La partida ya esta terminada";
         game.setCurrentRound(10);
         List<PlayerRoundDto> playersRound = gameGenerator.generateRoundBids(players);
-        when(gameRepository.findById(game.getId())).thenReturn(Optional.of(game));
+        when(gameRepository.findById(game.get_id())).thenReturn(Optional.of(game));
 
-        ServiceResult<Game> gameServiceResult = gameService.nextRound(game.getId(), playersRound);
+        ServiceResult<Game> gameServiceResult = gameService.nextRound(game.get_id(), playersRound);
 
         assertEquals(expectedErrMsg, gameServiceResult.getErrorMessage());
     }
 
     @Test
     public void successfulPrevRound() {
-        when(gameRepository.findById(game.getId())).thenReturn(Optional.of(game));
+        when(gameRepository.findById(game.get_id())).thenReturn(Optional.of(game));
 
         ServiceResult<List<PlayerRoundDto>> expectedResult = ServiceResult.success(game.getLastBidsRound());
 
@@ -196,26 +197,24 @@ public class GameServiceTest {
     @Test
     public void idGameToPrevRoundNotFound() {
         String expectedErrMsg = "No se encontro la partida";
-        when(gameRepository.findById(game.getId())).thenReturn(Optional.empty());
+        when(gameRepository.findById(game.get_id())).thenReturn(Optional.empty());
 
         ServiceResult<List<PlayerRoundDto>> expectedResult = ServiceResult.error(expectedErrMsg);
 
-        assertEquals(expectedResult.getErrorMessage(), expectedErrMsg);
+        assertEquals(expectedErrMsg, expectedResult.getErrorMessage());
     }
 
     @Test
     public void successfulFinishedGame() {
-        when(gameRepository.findById(game.getId())).thenReturn(Optional.of(game));
+        when(gameRepository.findById(game.get_id())).thenReturn(Optional.of(game));
 
-        Player player = null;
-//                new Player("Batman","www.image.com/batman", 0, 0, 0);
+        Player player = new Player(idGenerator.generate(), "Facu", "www.image.com/image", 0, 0, 0);
         when(playerRepository.findByUsername(any(String.class))).thenReturn(Optional.of(player));
 
-        User user = null;
-//                new User("43", "Mister", "www.image.com/image", "asdf", 0);
+        User user = new User(idGenerator.generate(), "Facu", "facu@facu", "www.image.com/facu", "asdfg",0);
         when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
 
-        FinishedGameDto finishedGameDto = new FinishedGameDto(game.getId(), "Facu", "Migue");
+        FinishedGameDto finishedGameDto = new FinishedGameDto(game.get_id(), "Facu", "Migue");
 
         ServiceResult<Game> finishedGame = gameService.finishGame(finishedGameDto);
 

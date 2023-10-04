@@ -3,6 +3,7 @@ package com.facu.altisima.controller;
 import com.facu.altisima.model.Player;
 import com.facu.altisima.service.impl.PlayerServiceImpl;
 import com.facu.altisima.service.utils.ServiceResult;
+import com.facu.altisima.utils.FixedIdGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,8 +29,8 @@ public class PlayerControllerTest {
     @MockBean
     PlayerServiceImpl playerService;
     ObjectMapper objectMapper = new ObjectMapper();
-    Player player = null;
-//            new Player("Facu", "www.image.com/facu", 0, 0, 0);
+    FixedIdGenerator idGenerator = new FixedIdGenerator("someFakeId");
+    Player player = new Player(idGenerator.generate(), "Facu", "www.image.com/image", 0, 0, 0);
     String path = "/players";
     ServiceResult<Player> succeedPlayer = ServiceResult.success(player);
     @Test

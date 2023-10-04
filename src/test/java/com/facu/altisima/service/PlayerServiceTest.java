@@ -4,6 +4,7 @@ import com.facu.altisima.repository.PlayerRepository;
 import com.facu.altisima.model.Player;
 import com.facu.altisima.service.api.PlayerServiceAPI;
 import com.facu.altisima.service.utils.ServiceResult;
+import com.facu.altisima.utils.FixedIdGenerator;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,8 +26,8 @@ public class PlayerServiceTest {
     @MockBean
     PlayerRepository playerRepository;
 
-    Player player = null;
-//            new Player("batman", "www.image.com/batman", 0, 0, 0);
+    FixedIdGenerator idGenerator = new FixedIdGenerator("someFakeId");
+    Player player = new Player(idGenerator.generate(), "Facu", "www.image.com/image", 0, 0, 0);
 
     @Test
     public void getAllPlayers() {
@@ -52,17 +53,18 @@ public class PlayerServiceTest {
 
     @Test
     public void successfulSavePlayer() {
+        when(playerRepository.findByUsername(player.getUsername())).thenReturn(Optional.empty());
         when(playerRepository.save(player)).thenReturn(player);
 
         ServiceResult<Player> savedPlayer = playerService.save(player);
 
-        assertEquals(savedPlayer.getData(), player);
+        assertEquals(player, savedPlayer.getData());
     }
 
     @Test
     public void usernameAlreadyExists() {
-        Optional<Player> optionalPlayer = Optional.of(player);
-        when(playerRepository.findByUsername(player.getUsername())).thenReturn(optionalPlayer);
+        when(playerRepository.findByUsername(player.getUsername()))
+                .thenReturn(Optional.of(player));
         String expectedMsg = "El nombre de usuario ya existe";
 
         ServiceResult<Player> returnedPlayer = playerService.save(player);
@@ -72,12 +74,11 @@ public class PlayerServiceTest {
 
     @Test
     public void successfulGetPlayerById() {
-        Optional<Player> optionalPlayer = Optional.of(player);
-        when(playerRepository.findByUsername(player.getUsername())).thenReturn(optionalPlayer);
+        when(playerRepository.findByUsername(player.getUsername())).thenReturn(Optional.of(player));
 
         ServiceResult<Player> returnedPlayer = playerService.get(player.getUsername());
 
-        assertEquals(returnedPlayer.getData(), player);
+        assertEquals(player, returnedPlayer.getData());
     }
 
     @Test
@@ -87,8 +88,6 @@ public class PlayerServiceTest {
 
         ServiceResult<Player> returnedPlayer = playerService.get(player.getUsername());
 
-        assertEquals(returnedPlayer.getErrorMessage(), expectedMsg);
+        assertEquals(expectedMsg, returnedPlayer.getErrorMessage());
     }
-
-
 }
