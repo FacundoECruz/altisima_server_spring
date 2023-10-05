@@ -103,16 +103,13 @@ public class GameServiceImpl implements GameServiceAPI {
 
     public ServiceResult<Game> nextRound(String id, List<PlayerRoundDto> roundResults) {
         Optional<Game> retrievedGameFromDb = gameRepository.findById(id);
-        Integer baseScoreForWinning = 5;
         if (retrievedGameFromDb.isPresent()) {
             Game game = retrievedGameFromDb.get();
             if (game.getCurrentRound() > game.getTotalRounds()) {
                 return ServiceResult.error("La partida ya esta terminada");
             }
             Game updatedGameState = game.nextRound(roundResults);
-
-            Game updatedGame = gameRepository.save(updatedGameState);
-            return ServiceResult.success(updatedGame);
+            return ServiceResult.success(gameRepository.save(updatedGameState));
         } else {
             return ServiceResult.error("No se encontro la partida");
         }
@@ -121,33 +118,13 @@ public class GameServiceImpl implements GameServiceAPI {
     public ServiceResult<Game> prevRound(String id) {
         Optional<Game> retrievedGameFromDb = gameRepository.findById(id);
         if (retrievedGameFromDb.isPresent()) {
-            Game game = turnBackOneRound(retrievedGameFromDb.get());
-            gameRepository.save(game);
+            Game game = retrievedGameFromDb.get();
+            gameRepository.save(game.turnBackOneRound());
             return ServiceResult.success(game);
         } else {
             return ServiceResult.error("No se encontro la partida");
         }
     }
-
-    private static Game turnBackOneRound(Game game) {
-        Integer prevRound = game.getCurrentRound() - 1;
-        List<PlayerResultDto> prevRoundResults = new ArrayList<>();
-        for (int i = 0; i < game.getPlayers().size(); i++) {
-            PlayerResultDto prevPlayerScore = game.getCurrentResults().get(i).prevRoundState();
-            prevRoundResults.add(prevPlayerScore);
-        }
-        return new Game(
-                game.get_id(),
-                game.getDate(),
-                prevRound,
-                game.getCardsPerRound(),
-                game.getPlayers(),
-                prevRoundResults,
-                game.getLastBidsRound(),
-                game.getTotalRounds(),
-                game.getPlayersImgs());
-    }
-
     public ServiceResult<Game> finishGame(FinishedGameDto finishedGameDto) {
         String id = finishedGameDto.getId();
         String host = finishedGameDto.getHost();

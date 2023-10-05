@@ -25,27 +25,24 @@ public class UserController {
     public ResponseEntity<?> findUser(@PathVariable String username) {
         ServiceResult<User> user = userServiceAPI.get(username);
         if (user.isSuccess()) {
-            User retrievedUser = user.getData();
-            return new ResponseEntity<>(retrievedUser, HttpStatus.OK);
+            return new ResponseEntity<>(user.getData(), HttpStatus.OK);
         } else {
-            String errorMessage = user.getErrorMessage();
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(user.getErrorMessage());
         }
     }
 
     @GetMapping
     public ResponseEntity<?> getUsers() {
         ServiceResult<List<User>> result = userServiceAPI.getAll();
-
         if (result.isSuccess()) {
-            List<User> users = result.getData();
-            return ResponseEntity.ok(users);
+            return ResponseEntity.ok(result.getData());
         } else {
-            String errorMessage = result.getErrorMessage();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result.getErrorMessage());
         }
     }
 
+    //Este no se usa por el momento
     @PostMapping
     public ResponseEntity<?> saveUser(@RequestBody User user) {
         ServiceResult<User> result = userServiceAPI.save(user);
@@ -62,12 +59,15 @@ public class UserController {
     public ResponseEntity<?> loginUser(@RequestBody LoginRequestDto loginRequestDto) {
         try {
             ServiceResult<User> user = userLogin(loginRequestDto);
-            return new Response().build(user);
+            if(user.isSuccess()){
+                return new Response().build(user);
+            } else {
+                return new ResponseEntity<>(user.getErrorMessage(), HttpStatus.UNAUTHORIZED);
+            }
         } catch (RuntimeException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
     }
-
     private ServiceResult<User> userLogin(LoginRequestDto loginRequestDto) {
         LoginRequest loginRequest = loginRequestDto.toDomain();
         return userServiceAPI.login(loginRequest);
@@ -77,12 +77,14 @@ public class UserController {
     public ResponseEntity<?> putUser(@PathVariable String username, @RequestBody EditUserDto userChangesDto) {
         try {
             ServiceResult<User> user = userEdit(username, userChangesDto);
-            return new Response().build(user);
+            if(user.isSuccess())
+                return new Response().build(user);
+            else
+                return new ResponseEntity<>(user.getErrorMessage(), HttpStatus.NOT_FOUND);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
         }
     }
-
     private ServiceResult<User> userEdit(String username, EditUserDto userChangesDto) {
         EditUser userChanges = userChangesDto.toDomain(username);
         return userServiceAPI.put(userChanges);
@@ -91,9 +93,8 @@ public class UserController {
     @DeleteMapping(value = "/{username}")
     public ResponseEntity<String> deleteUser(@PathVariable String username) {
         ServiceResult<User> user = userServiceAPI.get(username);
-        if (user.getErrorMessage() == null) {
-            User userToDelete = user.getData();
-            userServiceAPI.delete(userToDelete.getUsername());
+        if (user.isSuccess()) {
+            userServiceAPI.delete(user.getData().getUsername());
             return new ResponseEntity<>("Exitosamente borrado", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("No se encontro el usuario", HttpStatus.NOT_FOUND);

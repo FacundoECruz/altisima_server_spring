@@ -1,5 +1,6 @@
 package com.facu.altisima.controller.dto.legacyDtos;
 
+import com.facu.altisima.model.Game;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 
@@ -12,7 +13,6 @@ public class GameCreatedV1Dto {
     private List<Integer> cardsPerRound;
     private String status;
     private List<PlayerWithImageV1> players;
-
     public GameCreatedV1Dto(String id, Integer round, List<Integer> cardsPerRound, String status, List<PlayerWithImageV1> players) {
         this.id = id;
         this.round = round;
