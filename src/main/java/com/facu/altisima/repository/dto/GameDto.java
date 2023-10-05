@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Document("games")
+@Document(value = "games")
 public class GameDto {
     String _id;
     List<Integer> cardsPerRound;
@@ -68,9 +68,9 @@ public class GameDto {
 
     // TO DOMAIN
     public Game toDomain() {
-        List<PlayerRoundDto> lastBidsRound = generateLastBidsRound(results.get(0));
-        List<PlayerResultDto> currentResults = generateCurrentResults(results.get(0));
-        List<String> playersImgs = extractImages(results.get(0));
+        List<PlayerRoundDto> lastBidsRound = generateLastBidsRound(results.get(results.size() - 1));
+        List<PlayerResultDto> currentResults = generateCurrentResults(results.get(results.size() - 1));
+        List<String> playersImgs = extractImages(results.get(results.size() - 1));
         return new Game(_id, date, round, cardsPerRound, players, currentResults, lastBidsRound, totalRounds, playersImgs);
     }
 
@@ -100,6 +100,10 @@ public class GameDto {
         return results.stream().map((playerResult) -> {
             return playerResult.getImage();
         }).collect(Collectors.toList());
+    }
+
+    public List<List<PlayerRoundWithHistory>> getResults() {
+        return results;
     }
 }
 
