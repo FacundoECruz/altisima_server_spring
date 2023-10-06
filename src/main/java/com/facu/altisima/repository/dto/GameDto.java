@@ -4,6 +4,7 @@ import com.facu.altisima.controller.dto.PlayerResultDto;
 import com.facu.altisima.controller.dto.PlayerRoundDto;
 import com.facu.altisima.controller.dto.legacyDtos.PlayerRoundWithHistory;
 import com.facu.altisima.model.Game;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
@@ -33,7 +34,6 @@ public class GameDto {
         this.players = players;
     }
 
-    // FROM
     public static GameDto from(Game game) {
         List<List<PlayerRoundWithHistory>> results = generateResults(game.getLastBidsRound(), game.getCurrentResults(), game.getPlayersImgs());
         return new GameDto(
@@ -49,7 +49,22 @@ public class GameDto {
             List<PlayerRoundDto> roundBids,
             List<PlayerResultDto> currentResults,
             List<String> playersImgs) {
+        return getResultsContainer(roundBids, currentResults, playersImgs);
+    }
+
+    @NotNull
+    private static List<List<PlayerRoundWithHistory>> getResultsContainer(
+            List<PlayerRoundDto> roundBids,
+            List<PlayerResultDto> currentResults,
+            List<String> playersImgs) {
         List<List<PlayerRoundWithHistory>> resultsContainer = new ArrayList<>();
+        List<PlayerRoundWithHistory> roundResults = getRoundResults(roundBids, currentResults, playersImgs);
+        resultsContainer.add(roundResults);
+        return resultsContainer;
+    }
+
+    @NotNull
+    private static List<PlayerRoundWithHistory> getRoundResults(List<PlayerRoundDto> roundBids, List<PlayerResultDto> currentResults, List<String> playersImgs) {
         List<PlayerRoundWithHistory> roundResults = new ArrayList<>();
         for (int i = 0; i < roundBids.size(); i++) {
             PlayerRoundWithHistory playerRound = new PlayerRoundWithHistory(
@@ -62,11 +77,9 @@ public class GameDto {
 
             roundResults.add(playerRound);
         }
-        resultsContainer.add(roundResults);
-        return resultsContainer;
+        return roundResults;
     }
 
-    // TO DOMAIN
     public Game toDomain() {
         List<PlayerRoundDto> lastBidsRound = generateLastBidsRound(results.get(results.size() - 1));
         List<PlayerResultDto> currentResults = generateCurrentResults(results.get(results.size() - 1));
@@ -97,9 +110,7 @@ public class GameDto {
     }
 
     private List<String> extractImages(List<PlayerRoundWithHistory> results) {
-        return results.stream().map((playerResult) -> {
-            return playerResult.getImage();
-        }).collect(Collectors.toList());
+        return results.stream().map(PlayerRoundWithHistory::getImage).collect(Collectors.toList());
     }
 
     public List<List<PlayerRoundWithHistory>> getResults() {
