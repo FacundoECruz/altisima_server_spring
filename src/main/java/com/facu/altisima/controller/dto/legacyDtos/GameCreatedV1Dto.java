@@ -70,11 +70,20 @@ public class GameCreatedV1Dto {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         GameCreatedV1Dto that = (GameCreatedV1Dto) o;
-        return Objects.equals(id, that.id) && Objects.equals(round, that.round) && Objects.equals(cardsPerRound, that.cardsPerRound) && Objects.equals(status, that.status) && Objects.equals(players, that.players);
+        return Objects.equals(id, that.id)
+                && Objects.equals(round, that.round)
+                && Objects.equals(cardsPerRound, that.cardsPerRound)
+                && Objects.equals(status, that.status)
+                && Objects.equals(players, that.players);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, round, cardsPerRound, status, players);
+        return Objects.hash(
+                id,
+                round,
+                cardsPerRound,
+                status,
+                players);
     }
 }

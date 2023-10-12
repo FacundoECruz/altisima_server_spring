@@ -17,7 +17,11 @@ public class CreateUserDto {
     private PasswordDto password;
     private String image;
 
-    public CreateUserDto(String username, String email, String password, String image) {
+    public CreateUserDto(
+            String username,
+            String email,
+            String password,
+            String image) {
         this.username = username;
         this.email = email;
         this.password = new PasswordDto(password);
@@ -39,7 +43,12 @@ public class CreateUserDto {
 
     public User toDomain() {
         validate();
-        return new User(idGenerator.generate(), username, email, getDefaultImage(), password.getValue(), 0);
+        return new User(idGenerator.generate(),
+                username,
+                email,
+                getDefaultImage(),
+                password.getValue(),
+                0);
     }
 
     private String getDefaultImage() {
@@ -84,11 +93,18 @@ public class CreateUserDto {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CreateUserDto that = (CreateUserDto) o;
-        return Objects.equals(username, that.username) && Objects.equals(email, that.email) && Objects.equals(password, that.password) && Objects.equals(image, that.image);
+        return Objects.equals(username, that.username)
+                && Objects.equals(email, that.email)
+                && Objects.equals(password, that.password)
+                && Objects.equals(image, that.image);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(username, email, password, image);
+        return Objects.hash(
+                username,
+                email,
+                password,
+                image);
     }
 }

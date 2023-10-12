@@ -11,7 +11,9 @@ public class NextRoundDto {
 
     }
 
-    public NextRoundDto(List<PlayerRoundWithHistory> playersRound, String gameId) {
+    public NextRoundDto(
+            List<PlayerRoundWithHistory> playersRound,
+            String gameId) {
         this.playersRound = playersRound;
         this.gameId = gameId;
     }
@@ -37,7 +39,8 @@ public class NextRoundDto {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         NextRoundDto that = (NextRoundDto) o;
-        return Objects.equals(playersRound, that.playersRound) && Objects.equals(gameId, that.gameId);
+        return Objects.equals(playersRound, that.playersRound)
+                && Objects.equals(gameId, that.gameId);
     }
 
     @Override

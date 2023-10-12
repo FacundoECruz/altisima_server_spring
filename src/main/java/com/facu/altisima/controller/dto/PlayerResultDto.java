@@ -20,12 +20,12 @@ public class PlayerResultDto {
     }
 
     public PlayerResultDto prevRoundState() {
-        Integer lastRoundScore = this.getHistory().get(getHistory().size() - 1);
-        this.getHistory().remove(this.getHistory().size() - 1);
-        PlayerResultDto prevRound = new PlayerResultDto(this.getUsername(),
-                this.getScore() - lastRoundScore,
-                this.getHistory());
-        return prevRound;
+        Integer lastRoundScore = history.get(history.size() - 1);
+        history.remove(history.size() - 1);
+        return new PlayerResultDto(
+                username,
+                score - lastRoundScore,
+                history);
     }
 
     public void updateScore(Integer roundBid) {

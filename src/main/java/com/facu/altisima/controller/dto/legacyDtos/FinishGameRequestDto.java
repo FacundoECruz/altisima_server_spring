@@ -11,7 +11,11 @@ public class FinishGameRequestDto {
     String host;
     String winner;
 
-    public FinishGameRequestDto(List<PlayerRoundWithHistory> finishPlayersResult, String gameId, String host, String winner) {
+    public FinishGameRequestDto(
+            List<PlayerRoundWithHistory> finishPlayersResult,
+            String gameId,
+            String host,
+            String winner) {
         this.finishPlayersResult = finishPlayersResult;
         this.gameId = gameId;
         this.host = host;
@@ -26,7 +30,8 @@ public class FinishGameRequestDto {
         return finishPlayersResult;
     }
 
-    public void setFinishPlayersResult(List<PlayerRoundWithHistory> finishPlayersResult) {
+    public void setFinishPlayersResult(
+            List<PlayerRoundWithHistory> finishPlayersResult) {
         this.finishPlayersResult = finishPlayersResult;
     }
 

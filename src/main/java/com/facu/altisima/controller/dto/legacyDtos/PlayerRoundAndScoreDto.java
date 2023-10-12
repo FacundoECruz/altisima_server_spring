@@ -55,7 +55,10 @@ public class PlayerRoundAndScoreDto {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PlayerRoundAndScoreDto that = (PlayerRoundAndScoreDto) o;
-        return Objects.equals(username, that.username) && Objects.equals(score, that.score) && Objects.equals(bid, that.bid) && Objects.equals(bidsLost, that.bidsLost);
+        return Objects.equals(username, that.username)
+                && Objects.equals(score, that.score)
+                && Objects.equals(bid, that.bid)
+                && Objects.equals(bidsLost, that.bidsLost);
     }
 
     @Override

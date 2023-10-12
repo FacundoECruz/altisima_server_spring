@@ -42,7 +42,8 @@ public class EditUserDto {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         EditUserDto that = (EditUserDto) o;
-        return Objects.equals(password, that.password) && Objects.equals(image, that.image);
+        return Objects.equals(password, that.password)
+                && Objects.equals(image, that.image);
     }
 
     @Override
