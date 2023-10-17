@@ -1,7 +1,9 @@
 package com.facu.altisima.service;
 
 import com.facu.altisima.controller.dto.LoginRequestDto;
+import com.facu.altisima.controller.dto.legacyDtos.CreateUserDto;
 import com.facu.altisima.controller.dto.legacyDtos.EditUserDto;
+import com.facu.altisima.model.Player;
 import com.facu.altisima.repository.PlayerRepository;
 import com.facu.altisima.repository.UserRepository;
 import com.facu.altisima.model.User;
@@ -32,7 +34,6 @@ public class UserServiceTest {
     PlayerRepository playerRepository;
     FixedIdGenerator idGenerator = new FixedIdGenerator("someFakeId");
     User user = new User(idGenerator.generate(), "Facu", "facu@facu", "www.image.com/facu", "asdfg",0);
-
     List<User> users = new ArrayList<>();
 
     @Test
@@ -168,5 +169,18 @@ public class UserServiceTest {
 
         assertEquals(retrievedUser.getErrorMessage(), expectedMsg);
 
+    }
+
+    @Test
+    public void successfulAssociateUser(){
+        CreateUserDto createUserDto = new CreateUserDto("newUser", "newUser@gmail.com", "password", "www.image.com/newUser");
+        Player preExistingPlayer = new Player(idGenerator.generate(), "newUser", "www.image.com/default", 2, 15, 435);
+        when(playerRepository.findByUsername(createUserDto.getUsername())).thenReturn(Optional.of(preExistingPlayer));
+        preExistingPlayer.setImage(createUserDto.getImage());
+
+        ServiceResult<User> userResult = userService.associate(createUserDto.toDomain());
+
+        verify(playerRepository, times(1)).save(preExistingPlayer);
+        assertEquals(userResult.getData().getImage(), preExistingPlayer.getImage());
     }
 }
