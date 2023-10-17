@@ -2,6 +2,7 @@ package com.facu.altisima.controller;
 
 import com.facu.altisima.controller.dto.LoginRequest;
 import com.facu.altisima.controller.dto.LoginRequestDto;
+import com.facu.altisima.controller.dto.legacyDtos.CreateUserDto;
 import com.facu.altisima.controller.dto.legacyDtos.EditUserDto;
 import com.facu.altisima.model.User;
 import com.facu.altisima.service.impl.UserServiceImpl;
@@ -41,6 +42,8 @@ public class UserControllerTest {
     String userChangesJson = objectMapper.writeValueAsString(userChanges);
     LoginRequestDto loginRequestDto = new LoginRequestDto("facu", "facundo");
     LoginRequest loginRequest = loginRequestDto.toDomain();
+    CreateUserDto createUserDto = new CreateUserDto("Facu", "facu@gmail", "facundo", "www.image.com/elFaku");
+    String createUserDtoJson = objectMapper.writeValueAsString(createUserDto);
     public UserControllerTest() throws JsonProcessingException {
     }
 
@@ -208,5 +211,16 @@ public class UserControllerTest {
         mockMvc.perform(delete(urlTemplate))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(expected));
+    }
+
+    @Test
+    public void successfulAssociateUserToPlayer() throws Exception {
+        when(userService.associate(createUserDto.toDomain())).thenReturn(succeedUser);
+
+        mockMvc.perform(post("/v1/users/associate")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(createUserDtoJson))
+                .andExpect(status().isOk())
+                .andExpect(content().string(userJson));
     }
 }
