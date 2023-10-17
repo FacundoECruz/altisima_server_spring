@@ -1,7 +1,6 @@
 package com.facu.altisima.controller;
 
 import com.facu.altisima.controller.dto.legacyDtos.CreateUserDto;
-import com.facu.altisima.model.Player;
 import com.facu.altisima.model.User;
 import com.facu.altisima.service.api.PlayerServiceAPI;
 import com.facu.altisima.service.api.UserServiceAPI;
@@ -36,5 +35,20 @@ public class UserControllerLegacy {
         ServiceResult<User> saveUserResult = userService.save(user);
         playerService.save(user.toPlayer());
         return saveUserResult;
+    }
+
+    @PostMapping(value = "/associate")
+    public ResponseEntity<?> associateUser(@RequestBody CreateUserDto createUserDto) {
+        try{
+            ServiceResult<User> associatedUser = associate(createUserDto);
+            return new Response().build(associatedUser);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    private ServiceResult<User> associate(CreateUserDto associateDto) {
+        User user = associateDto.toDomain();
+        return userService.associate(user);
     }
 }
