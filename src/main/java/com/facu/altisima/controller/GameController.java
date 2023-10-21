@@ -24,7 +24,6 @@ public class GameController {
 
     @GetMapping
     public ResponseEntity<?> getAllGames() {
-        //Estamos devolviendo objeto de dominio. No DTO.
         ServiceResult<List<Game>> allGames = gameServiceAPI.getAllGames();
         if (allGames.getErrorMessage() == null) {
             return new ResponseEntity<>(allGames.getData(), HttpStatus.OK);
@@ -32,7 +31,6 @@ public class GameController {
             return new ResponseEntity<>(allGames.getErrorMessage(), HttpStatus.NOT_FOUND);
         }
     }
-
 
 
     @PostMapping
@@ -69,6 +67,7 @@ public class GameController {
         }
     }
 
+    //De aca en adelante no se esta usando nada por ahora
     @PutMapping(value = "/{id}/next")
     public ResponseEntity<?> nextRound(@PathVariable String id, @RequestBody List<PlayerRoundDto> playersRound) {
         ServiceResult<Game> game = gameServiceAPI.nextRound(id, playersRound);

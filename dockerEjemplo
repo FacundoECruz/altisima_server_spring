@@ -1,0 +1,52 @@
+// Ademas de levantar la aplicacion hace otras cosas.
+// Una imagen de Docker es la plantilla que usamos para crear un contenedor de Docker.
+// Una dockerfile se escribe para crear una imagen.
+
+FROM maven:3.8.1-openjdk-8-slim AS builder      //FROM especifica la base para la imagen
+
+ARG version        //ARG: Permite definir una variable usable en el resto del Dockerfile. Se usa con ${}
+
+# Required Native libs
+RUN apt-get update      //RUN: Ejecuta el comando especificado. Se usa para instalar paquetes en el contenedor. //apt-get update: actualiza el sistema de gestión de paquetes.
+COPY pom.xml /usr/src/app/          //COPY: Copia archivos y directorios al contenedor //Mete en el contenedor el pom(que es como el packageJson).
+RUN mvn -B -f /usr/src/app/pom.xml verify clean --fail-never    //Parece ser que construye el proyecto, seria algo asi como un "npm run build".
+COPY src /usr/src/app/src/
+COPY .git/ ./.git/
+RUN mvn -f /usr/src/app/pom.xml test        //Maven buscará las configuraciones de pruebas en el archivo pom.xml y ejecutará las pruebas definidas en el proyecto, proporcionando resultados en la salida de la consola.
+RUN mvn -f /usr/src/app/pom.xml package -DskipTests -Drevision=${version}           //construir un proyecto Java, empaquetarlo y generar un archivo de distribución (generalmente un archivo JAR) sin ejecutar las pruebas unitarias.
+
+// Aca parece estar la division de la imagen entre la etapa de construccion
+// de la aplicacion y la etapa de ejecucion.
+
+FROM openjdk:8u292-jre-slim AS runner           //Esto es pa ejecutar la aplicación Java después de que se haya construido en la etapa anterior.
+LABEL NAME="xbid-console"
+
+RUN apt-get update && \
+    apt-get install -y jq curl vim procps awscli libzen-dev libmediainfo-dev wget git zsh cron && \
+    rm -rf /var/lib/apt/lists/*
+
+// Hay varios comandillos juntos: el primero es update como el de arriba,
+// el segundo parece que instala una banda de utilidades para que la app corra,
+// el tercero elimina "archivos de índice y metadatos relacionados con los paquetes de software disponibles en los repositorios configurados en el sistema."
+
+//ES OTRO SISTEMA OPERATIVO
+
+ARG version         //ARG desaparece una vez que termina de correr el dockerfile
+ENV APP_NAME=console           //ENV: establece una variable de entorno persistente
+ENV APP_DIR=/usr/app/${APP_NAME}-app    //esta carpeta app no esta en src. Debe de ser la root
+ENV APP_VERSION=${version}
+
+WORKDIR ${APP_DIR}          //WORKDIR: directorio sobre el que se van a aplicar las instrucciones siguientes.
+COPY --from=builder /usr/src/app/target/${APP_NAME}-${APP_VERSION}.jar ./   //Mete en el contenedor el .jar que toma del builder
+## Dropwizard version < 0.9.1 requires the file outside the jar.
+COPY *.yml ./           // mete todos los .yml que haya en la local
+
+WORKDIR /
+COPY scripts/slack-past-hour-profit.py slack-past-hour-profit.py
+COPY scripts/run.sh run.sh
+COPY scripts/${APP_NAME} ${APP_NAME}
+RUN chmod +x run.sh
+RUN chmod +x slack-past-hour-profit.py
+RUN chmod +x ${APP_NAME}
+RUN echo "1 * * * * /slack-past-hour-profit.py" | crontab -
+ENTRYPOINT ["./run.sh"]         //ENTRYPOINT: especificar el comando principal que se ejecutará cuando se inicie un contenedor.

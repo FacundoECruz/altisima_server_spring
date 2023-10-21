@@ -1,9 +1,13 @@
 package com.facu.altisima.model;
 
+import org.springframework.data.annotation.Id;
+
 import java.util.List;
 import java.util.Objects;
 
 public class AchievementReport {
+    @Id
+    private String _id;
     private List<PlayerInTop> top3;
     private List<Score> topScoreInAGame;
     private List<Score> wasTopScoreInAGame;

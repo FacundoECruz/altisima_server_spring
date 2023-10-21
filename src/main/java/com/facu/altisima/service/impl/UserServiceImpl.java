@@ -45,11 +45,30 @@ public class UserServiceImpl implements UserServiceAPI {
             return ServiceResult.success(savedUser);
         }
     }
+
     private <A> Boolean exists(Optional<A> opt) {
-        if(opt.isPresent())
+        if (opt.isPresent())
             return true;
         else
             return false;
+    }
+
+    @Override
+    public ServiceResult<User> associate(User user) {
+        Optional<Player> player = playerRepository.findByUsername(user.getUsername());
+        if (player.isEmpty()) {
+            return ServiceResult.error("No se encontro jugador con ese nombre");
+        } else {
+            Player updatedPlayer = update(player.get(), user.getImage());
+            playerRepository.save(updatedPlayer);
+            User savedUser = userRepository.save(user);
+            return ServiceResult.success(savedUser);
+        }
+    }
+
+    private Player update(Player player, String imageUrl) {
+        player.setImage(imageUrl);
+        return player;
     }
 
     @Override

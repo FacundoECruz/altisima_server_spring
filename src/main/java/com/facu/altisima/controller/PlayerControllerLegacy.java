@@ -22,9 +22,18 @@ public class PlayerControllerLegacy {
     private PlayerServiceAPI playerService;
     IdGenerator idGenerator = new UUIDGenerator();
 
+    @GetMapping
+    public ResponseEntity<?> getUnregisteredPlayers(){
+        ServiceResult<List<Player>> allPlayers = playerService.getUnregistered();
+        if (allPlayers.getErrorMessage() == null) {
+            return new ResponseEntity<>(allPlayers.getData(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(allPlayers.getErrorMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
     @PostMapping
     public ResponseEntity<?> savePlayerV1(@RequestBody CreatePlayerDto playerName) {
-        System.out.println(playerName);
         String defaultPlayerImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSwUmQOGfv3HMATaiRo8hDCdcu23Otwqg2pEg&usqp=CAU";
         Player player = new Player(idGenerator.generate(), playerName.getUsername(), defaultPlayerImageUrl, 0, 0, 0);
         ServiceResult<Player> servicePlayer = playerService.save(player);

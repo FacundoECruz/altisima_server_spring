@@ -6,13 +6,15 @@ import com.facu.altisima.repository.AchievementRepository;
 import com.facu.altisima.service.api.AchievementServiceAPI;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Optional;
+
 public class AchievementService implements AchievementServiceAPI {
 
     @Autowired
     private AchievementRepository achievementRepository;
     @Override
-    public AchievementReport getReport(){
-        AchievementReport report = AchievementRepository.findAll();
+    public AchievementReport getReport(String id){
+        Optional<AchievementReport> report = achievementRepository.findById(id);
     }
 
     @Override
