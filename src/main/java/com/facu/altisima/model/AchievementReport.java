@@ -22,6 +22,14 @@ public class AchievementReport {
         this.highestScoreInARound = highestScoreInARound;
     }
 
+    public List<Score> getTopScoreInAGame() {
+        return topScoreInAGame;
+    }
+
+    public void setTopScoreInAGame(List<Score> topScoreInAGame) {
+        this.topScoreInAGame = topScoreInAGame;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

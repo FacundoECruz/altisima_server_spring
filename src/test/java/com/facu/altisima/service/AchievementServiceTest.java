@@ -2,6 +2,8 @@ package com.facu.altisima.service;
 
 import com.facu.altisima.controller.dto.PlayerResultDto;
 import com.facu.altisima.model.*;
+import com.facu.altisima.repository.AchievementRepository;
+import com.facu.altisima.repository.UserRepository;
 import com.facu.altisima.service.impl.AchievementService;
 import com.facu.altisima.utils.GameGenerator;
 import org.jetbrains.annotations.NotNull;
@@ -12,17 +14,22 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 public class AchievementServiceTest {
     public static final int INSIGNIFICANT_NUMBER = 5;
-    AchievementService achievementService = new AchievementService();
 
+    public static final int TOTAL_ROUNDS = 8;
+    AchievementService achievementService = new AchievementService();
+    AchievementRepository achievementRepository;
     AchievementReport achievementReport;
-    Integer totalRounds = 9;
     Game game;
     @BeforeEach
     public void setup() {
         generateFinishedGame();
         generateAchievmentReport();
+        this.achievementRepository = mock(AchievementRepository.class);
     }
 
     private void generateFinishedGame() {
@@ -42,7 +49,7 @@ public class AchievementServiceTest {
 
     private void makeGame(List<String> players) {
         GameGenerator gameGenerator = new GameGenerator();
-        game = gameGenerator.generate(players, totalRounds);
+        game = gameGenerator.generate(players, TOTAL_ROUNDS);
         List<PlayerResultDto> finalResults = new ArrayList<>();
         generateFinalResults(players, finalResults);
         game.setCurrentResults(finalResults);
@@ -51,7 +58,7 @@ public class AchievementServiceTest {
     private void generateFinalResults(List<String> playersList, List<PlayerResultDto> finalResults) {
         for (int i = 0; i < playersList.size(); i++) {
             List<Integer> genericHistory = new ArrayList<>();
-            for (int j = 0; j < totalRounds; j++) {
+            for (int j = 0; j < TOTAL_ROUNDS; j++) {
                 genericHistory.add(INSIGNIFICANT_NUMBER);
             }
             PlayerResultDto playerResult = new PlayerResultDto(playersList.get(i), (i + 5) * 7, genericHistory);
@@ -60,31 +67,27 @@ public class AchievementServiceTest {
     }
 
     private void generateAchievmentReport() {
-        generateTop3();
-        makeHighestScoreInAGame();
-        makeWasHighestScoreInAGame();
-        makeScoredTenOrMoreInARound();
-        makeHighestScoreInARound();
+        List<PlayerInTop> top3 = generateTop3();
+        List<Score> highestScoreInAGame = makeHighestScoreInAGame();
+        List<Score> wasHighest = makeWasHighestScoreInAGame();
+        List<String> tenOrMore = makeScoredTenOrMoreInARound();
+        List<Score> highestInARound = makeHighestScoreInARound();
+        achievementReport = new AchievementReport(top3,
+                highestScoreInAGame,
+                wasHighest,
+                tenOrMore,
+                highestInARound);
     }
 
-    private static List<Score> makeHighestScoreInARound() {
-        List<Score> highestScoreInARound = new ArrayList<>();
-        Score highestInARound = new Score("Chaky", 11);
-        highestScoreInARound.add(highestInARound);
-        return highestScoreInARound;
-    }
-
-    private static List<String> makeScoredTenOrMoreInARound() {
-        List<String> scoredTenOrMoreInARound = new ArrayList<>();
-        scoredTenOrMoreInARound.add("Antone");
-        return scoredTenOrMoreInARound;
-    }
-
-    private static List<Score> makeWasHighestScoreInAGame() {
-        List<Score> wasTopScoreInAGame = new ArrayList<>();
-        Score wasTopScore = new Score("Cristiano", 49);
-        wasTopScoreInAGame.add(wasTopScore);
-        return wasTopScoreInAGame;
+    private static List<PlayerInTop> generateTop3() {
+        List<PlayerInTop> top3 = new ArrayList<>();
+        PlayerInTop player1 = new PlayerInTop("Messi", 8, 654);
+        PlayerInTop player2 = new PlayerInTop("Cristiano", 6, 492);
+        PlayerInTop player3 = new PlayerInTop("Mbappe", 3, 214);
+        top3.add(player1);
+        top3.add(player2);
+        top3.add(player3);
+        return top3;
     }
 
     private static List<Score> makeHighestScoreInAGame() {
@@ -94,36 +97,47 @@ public class AchievementServiceTest {
         return topScoreInAGame;
     }
 
-    private static void generateTop3() {
-        List<PlayerInTop> top3 = new ArrayList<>();
-        PlayerInTop player1 = new PlayerInTop("Messi", 8, 654);
-        PlayerInTop player2 = new PlayerInTop("Cristiano", 6, 492);
-        PlayerInTop player3 = new PlayerInTop("Mbappe", 3, 214);
-        top3.add(player1);
-        top3.add(player2);
-        top3.add(player3);
-    }
-    @Test
-    public void should_return_the_updated_achievements() {
-        AchievementReport expectedReport = new AchievementReport(top3, topScoreInAGame, wasTopScoreInAGame, scoredTenOrMoreInARound, highestScoreInARound);
-        achievementService.update(game);
-        AchievementReport report = achievementService.getReport();
-        Assertions.assertEquals(report, expectedReport);
+    private static List<Score> makeWasHighestScoreInAGame() {
+        List<Score> wasTopScoreInAGame = new ArrayList<>();
+        Score wasTopScore = new Score("Cristiano", 49);
+        wasTopScoreInAGame.add(wasTopScore);
+        return wasTopScoreInAGame;
     }
 
-    // Esto es una banda, se puede dividir en test mas pequeños, por ejemplo:
-    // - Un test para el top#1
-    // - Un test para el top#3
-    // - Un test para el topScore
+    private static List<String> makeScoredTenOrMoreInARound() {
+        List<String> scoredTenOrMoreInARound = new ArrayList<>();
+        scoredTenOrMoreInARound.add("Antone");
+        return scoredTenOrMoreInARound;
+    }
+    private static List<Score> makeHighestScoreInARound() {
+        List<Score> highestScoreInARound = new ArrayList<>();
+        Score highestInARound = new Score("Chaky", 11);
+        highestScoreInARound.add(highestInARound);
+        return highestScoreInARound;
+    }
+
+    @Test
+    public void should_return_the_updated_highest_score_in_a_game() {
+        List<AchievementReport> returnedReport = new ArrayList<>();
+        returnedReport.add(achievementReport);
+        when(achievementRepository.findAll()).thenReturn(returnedReport);
+        achievementService.update(game);
+        AchievementReport report = achievementService.getReport();
+        updateAchievementReport();
+        Assertions.assertEquals(report.getTopScoreInAGame(), achievementReport.getTopScoreInAGame());
+    }
+
+    private void updateAchievementReport() {
+        List<Score> newHighestContainer = new ArrayList<>();
+        Score newHighest = new Score("Pablin", 56);
+        newHighestContainer.add(newHighest);
+        achievementReport.setTopScoreInAGame(newHighestContainer);
+    }
 
     @Test
     private void should_update_the_top1(){
         achievementService.update(game);
         AchievementReport report = achievementService.getReport();
-        // en algun momento va a llamar al repository para pedir
-        // el reporte, vamos a tener que mockear esa llamada,
-        // asi por el momento no nos preocupamos de la coleccion en la
-        // base de datos.
     }
     @Test
     public void should_return_the_achievements_of_a_given_player() {
