@@ -5,6 +5,7 @@ import com.facu.altisima.model.*;
 import com.facu.altisima.repository.AchievementRepository;
 import com.facu.altisima.repository.UserRepository;
 import com.facu.altisima.service.impl.AchievementService;
+import com.facu.altisima.service.utils.FirstReport;
 import com.facu.altisima.utils.GameGenerator;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
@@ -14,8 +15,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class AchievementServiceTest {
     public static final int INSIGNIFICANT_NUMBER = 5;
@@ -135,7 +135,15 @@ public class AchievementServiceTest {
     }
 
     @Test
-    private void should_update_the_top1(){
+    public void should_return_the_first_report() {
+        AchievementReport currentReport = FirstReport.generate();
+        when(achievementRepository.save(any(AchievementReport.class))).thenReturn(currentReport);
+        achievementService.save();
+        verify(achievementRepository, times(1)).save(currentReport);
+    }
+
+    @Test
+    public void should_update_the_top1(){
         achievementService.update(game);
         AchievementReport report = achievementService.getReport();
     }

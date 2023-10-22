@@ -1,10 +1,14 @@
 package com.facu.altisima.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
 import java.util.Objects;
 
+@JsonInclude(JsonInclude.Include.ALWAYS)
+@Document("achievements")
 public class AchievementReport {
     @Id
     private String _id;
@@ -28,6 +32,46 @@ public class AchievementReport {
 
     public void setTopScoreInAGame(List<Score> topScoreInAGame) {
         this.topScoreInAGame = topScoreInAGame;
+    }
+
+    public String get_id() {
+        return _id;
+    }
+
+    public void set_id(String _id) {
+        this._id = _id;
+    }
+
+    public List<PlayerInTop> getTop3() {
+        return top3;
+    }
+
+    public void setTop3(List<PlayerInTop> top3) {
+        this.top3 = top3;
+    }
+
+    public List<Score> getWasTopScoreInAGame() {
+        return wasTopScoreInAGame;
+    }
+
+    public void setWasTopScoreInAGame(List<Score> wasTopScoreInAGame) {
+        this.wasTopScoreInAGame = wasTopScoreInAGame;
+    }
+
+    public List<String> getScoredTenOrMoreInARound() {
+        return scoredTenOrMoreInARound;
+    }
+
+    public void setScoredTenOrMoreInARound(List<String> scoredTenOrMoreInARound) {
+        this.scoredTenOrMoreInARound = scoredTenOrMoreInARound;
+    }
+
+    public List<Score> getHighestScoreInARound() {
+        return highestScoreInARound;
+    }
+
+    public void setHighestScoreInARound(List<Score> highestScoreInARound) {
+        this.highestScoreInARound = highestScoreInARound;
     }
 
     @Override
