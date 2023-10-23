@@ -31,6 +31,7 @@ public class AchievementReport {
         if(Objects.equals(newHighest.getScore(), topScoreInAGame.get(0).getScore())){
             topScoreInAGame.add(newHighest);
         } else {
+            wasTopScoreInAGame.addAll(topScoreInAGame);
             List<Score> newHighestContainer = new ArrayList<>();
             newHighestContainer.add(newHighest);
             topScoreInAGame = newHighestContainer;
