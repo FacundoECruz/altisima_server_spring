@@ -140,9 +140,8 @@ public class GameServiceImpl implements GameServiceAPI {
 
     private void assignResultsToPlayers(Game game, String host, String winner) {
         List<PlayerResultDto> finalResults = game.getCurrentResults();
-        for (int i = 0; i < finalResults.size(); i++) {
-            PlayerResultDto playerResults = finalResults.get(i);
-            Optional<Player> optionalPlayer = playerRepository.findByUsername(finalResults.get(i).getUsername());
+        for (PlayerResultDto playerResults : finalResults) {
+            Optional<Player> optionalPlayer = playerRepository.findByUsername(playerResults.getUsername());
             if (optionalPlayer.isPresent()) {
                 Player player = optionalPlayer.get();
                 player.setGamesPlayed(player.getGamesPlayed() + 1);

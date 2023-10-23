@@ -38,6 +38,10 @@ public class AchievementReport {
         }
     }
 
+    public void updateTop3(List<PlayerInTop> newTop3){
+        top3 = newTop3;
+    }
+
     public List<Score> getTopScoreInAGame() {
         return topScoreInAGame;
     }

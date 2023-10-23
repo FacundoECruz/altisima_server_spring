@@ -1,11 +1,10 @@
 package com.facu.altisima.service.impl;
 
 import com.facu.altisima.controller.dto.PlayerResultDto;
-import com.facu.altisima.model.AchievementReport;
-import com.facu.altisima.model.Game;
-import com.facu.altisima.model.Score;
+import com.facu.altisima.model.*;
 import com.facu.altisima.repository.AchievementRepository;
 import com.facu.altisima.repository.GameRepository;
+import com.facu.altisima.repository.PlayerRepository;
 import com.facu.altisima.service.api.AchievementServiceAPI;
 import com.facu.altisima.service.utils.FirstReport;
 import com.facu.altisima.service.utils.ServiceResult;
@@ -13,8 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 
 @Service
@@ -22,13 +20,16 @@ public class AchievementService implements AchievementServiceAPI {
 
     @Autowired
     private final AchievementRepository achievementRepository;
+    @Autowired
+    private final PlayerRepository playerRepository;
 
     private final GameRepository gameRepository;
 
     @Autowired
-    public AchievementService(AchievementRepository achievementRepository, GameRepository gameRepository) {
+    public AchievementService(AchievementRepository achievementRepository, GameRepository gameRepository, PlayerRepository playerRepository) {
         this.achievementRepository = achievementRepository;
         this.gameRepository = gameRepository;
+        this.playerRepository = playerRepository;
     }
 
     @Override
@@ -47,9 +48,38 @@ public class AchievementService implements AchievementServiceAPI {
         AchievementReport prevReport = allReports.get(allReports.size() - 1);
 
         ServiceResult<Score> highScore = checkNewHigherScore(game.getCurrentResults(), prevReport.getTopScoreInAGame());
-        if(highScore.isSuccess())
+        if (highScore.isSuccess())
             prevReport.updateHighestScoreInAGame(highScore.getData());
+
+        List<PlayerInTop> newTop3 = updateTop3();
+        prevReport.updateTop3(newTop3);
+
         return ServiceResult.success(prevReport);
+    }
+
+    private List<PlayerInTop> updateTop3() {
+        List<Player> allPlayers = playerRepository.findAll();
+        sort(allPlayers);
+        List<PlayerInTop> newTop3 = new ArrayList<>();
+        for(int i = 0; i < 3; i++){
+            PlayerInTop player = new PlayerInTop(
+                    allPlayers.get(i).getUsername(),
+                    allPlayers.get(i).getGamesWon(),
+                    allPlayers.get(i).getTotalScore());
+            newTop3.add(player);
+        }
+        return newTop3;
+    }
+
+    private static void sort(List<Player> allPlayers) {
+        Comparator<Player> playerComparator = (p1, p2) -> {
+            if (!Objects.equals(p1.getGamesWon(), p2.getGamesWon())) {
+                return p2.getGamesWon() - p1.getGamesWon();
+            } else {
+                return p2.getTotalScore() - p1.getTotalScore();
+            }
+        };
+        allPlayers.sort(playerComparator);
     }
 
     private ServiceResult<Score> checkNewHigherScore(List<PlayerResultDto> results, List<Score> currentHighest) {
