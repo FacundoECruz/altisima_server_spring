@@ -6,6 +6,6 @@ import com.facu.altisima.service.utils.ServiceResult;
 
 public interface AchievementServiceAPI {
     ServiceResult<AchievementReport> getReport();
-    void update(Game game);
+    ServiceResult<AchievementReport> update(Game game);
     ServiceResult<AchievementReport> save();
 }

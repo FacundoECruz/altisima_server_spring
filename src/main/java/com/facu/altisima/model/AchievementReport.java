@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -24,6 +25,16 @@ public class AchievementReport {
         this.wasTopScoreInAGame = wasTopScoreInAGame;
         this.scoredTenOrMoreInARound = scoredTenOrMoreInARound;
         this.highestScoreInARound = highestScoreInARound;
+    }
+
+    public void updateHighestScoreInAGame(Score newHighest){
+        if(Objects.equals(newHighest.getScore(), topScoreInAGame.get(0).getScore())){
+            topScoreInAGame.add(newHighest);
+        } else {
+            List<Score> newHighestContainer = new ArrayList<>();
+            newHighestContainer.add(newHighest);
+            topScoreInAGame = newHighestContainer;
+        }
     }
 
     public List<Score> getTopScoreInAGame() {

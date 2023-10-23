@@ -68,7 +68,10 @@ public class AchievementServiceTest {
             for (int j = 0; j < TOTAL_ROUNDS; j++) {
                 genericHistory.add(INSIGNIFICANT_NUMBER);
             }
-            PlayerResultDto playerResult = new PlayerResultDto(playersList.get(i), (i + 5) * 7, genericHistory);
+            PlayerResultDto playerResult = new PlayerResultDto(
+                    playersList.get(i),
+                    (i + 5) * 7,
+                    genericHistory);
             finalResults.add(playerResult);
         }
     }
@@ -133,11 +136,11 @@ public class AchievementServiceTest {
     }
     @Test
     public void should_update_highest_score_in_a_game() throws JsonProcessingException {
-        List<AchievementReport> mocked = new ArrayList<>();
-        mocked.add(achievementReport);
-        when(achievementRepository.findAll()).thenReturn(mocked);
-        achievementService.update(game);
-        ServiceResult<AchievementReport> result = achievementService.getReport();
+        List<AchievementReport> mockedReport = new ArrayList<>();
+        mockedReport.add(achievementReport);
+        when(achievementRepository.findAll()).thenReturn(mockedReport);
+        ServiceResult<AchievementReport> result = achievementService.update(game);
+        System.out.println(objectMapper.writeValueAsString(result.getData().getTopScoreInAGame()));
         List<Score> expected = generateExpected();
         Assertions.assertEquals(expected, result.getData().getTopScoreInAGame());
     }
