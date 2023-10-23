@@ -17,16 +17,22 @@ import java.util.List;
 public class AchievementService implements AchievementServiceAPI {
 
     @Autowired
-    private AchievementRepository achievementRepository;
+    private final AchievementRepository achievementRepository;
 
-    private GameRepository gameRepository;
+    private final GameRepository gameRepository;
+
+    @Autowired
+    public AchievementService(AchievementRepository achievementRepository, GameRepository gameRepository){
+        this.achievementRepository = achievementRepository;
+        this.gameRepository = gameRepository;
+    }
     @Override
     public ServiceResult<AchievementReport> getReport(){
         List<AchievementReport> report = achievementRepository.findAll();
         if(report.isEmpty()){
             return ServiceResult.error("No se encontro el reporte");
         } else {
-            return ServiceResult.success(report.get(0));
+            return ServiceResult.success(report.get(report.size() - 1));
         }
     }
 
@@ -37,7 +43,7 @@ public class AchievementService implements AchievementServiceAPI {
     public ServiceResult<AchievementReport> save(){
         AchievementReport report = FirstReport.generate();
         AchievementReport savedReport = achievementRepository.save(report);
-        return ServiceResult.success(report);
+        return ServiceResult.success(savedReport);
     }
 
 

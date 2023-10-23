@@ -3,10 +3,13 @@ package com.facu.altisima.service;
 import com.facu.altisima.controller.dto.PlayerResultDto;
 import com.facu.altisima.model.*;
 import com.facu.altisima.repository.AchievementRepository;
-import com.facu.altisima.repository.UserRepository;
+import com.facu.altisima.repository.GameRepository;
 import com.facu.altisima.service.impl.AchievementService;
 import com.facu.altisima.service.utils.FirstReport;
+import com.facu.altisima.service.utils.ServiceResult;
 import com.facu.altisima.utils.GameGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,17 +22,21 @@ import static org.mockito.Mockito.*;
 
 public class AchievementServiceTest {
     public static final int INSIGNIFICANT_NUMBER = 5;
-
     public static final int TOTAL_ROUNDS = 8;
-    AchievementService achievementService = new AchievementService();
+
+    ObjectMapper objectMapper = new ObjectMapper();
     AchievementRepository achievementRepository;
+    GameRepository gameRepository;
     AchievementReport achievementReport;
     Game game;
+    private AchievementService achievementService;
     @BeforeEach
     public void setup() {
         generateFinishedGame();
         generateAchievmentReport();
         this.achievementRepository = mock(AchievementRepository.class);
+        this.gameRepository = mock(GameRepository.class);
+        this.achievementService = new AchievementService(achievementRepository, gameRepository);
     }
 
     private void generateFinishedGame() {
@@ -116,36 +123,36 @@ public class AchievementServiceTest {
         return highestScoreInARound;
     }
 
-    @Test
-    public void should_return_the_updated_highest_score_in_a_game() {
-        List<AchievementReport> returnedReport = new ArrayList<>();
-        returnedReport.add(achievementReport);
-        when(achievementRepository.findAll()).thenReturn(returnedReport);
-        achievementService.update(game);
-        AchievementReport report = achievementService.getReport();
-        updateAchievementReport();
-        Assertions.assertEquals(report.getTopScoreInAGame(), achievementReport.getTopScoreInAGame());
-    }
-
-    private void updateAchievementReport() {
-        List<Score> newHighestContainer = new ArrayList<>();
-        Score newHighest = new Score("Pablin", 56);
-        newHighestContainer.add(newHighest);
-        achievementReport.setTopScoreInAGame(newHighestContainer);
-    }
 
     @Test
-    public void should_return_the_first_report() {
+    public void should_save_the_first_report() {
         AchievementReport currentReport = FirstReport.generate();
         when(achievementRepository.save(any(AchievementReport.class))).thenReturn(currentReport);
-        achievementService.save();
-        verify(achievementRepository, times(1)).save(currentReport);
+        ServiceResult<AchievementReport> returnedReport = achievementService.save();
+        verify(achievementRepository, times(1)).save(any(AchievementReport.class));
     }
+    @Test
+    public void should_update_highest_score_in_a_game() throws JsonProcessingException {
+        List<AchievementReport> mocked = new ArrayList<>();
+        mocked.add(achievementReport);
+        when(achievementRepository.findAll()).thenReturn(mocked);
+        achievementService.update(game);
+        ServiceResult<AchievementReport> result = achievementService.getReport();
+        List<Score> expected = generateExpected();
+        Assertions.assertEquals(expected, result.getData().getTopScoreInAGame());
+    }
+
+    private List<Score> generateExpected() {
+        List<Score> container = new ArrayList<>();
+        Score newHighestScore = new Score("Pablin", 56);
+        container.add(newHighestScore);
+        return container;
+    }
+
 
     @Test
     public void should_update_the_top1(){
-        achievementService.update(game);
-        AchievementReport report = achievementService.getReport();
+
     }
     @Test
     public void should_return_the_achievements_of_a_given_player() {
