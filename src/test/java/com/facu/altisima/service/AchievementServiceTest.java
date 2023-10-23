@@ -28,6 +28,10 @@ public class AchievementServiceTest {
     AchievementRepository achievementRepository;
     GameRepository gameRepository;
     AchievementReport achievementReport;
+
+    // Esto es porque todavia no resolvimos que onda la base de datos
+    // Entonces estamos usando el findAll() que nos devuelve una lista
+    List<AchievementReport> mockedReport = new ArrayList<>();
     Game game;
     private AchievementService achievementService;
     @BeforeEach
@@ -37,6 +41,7 @@ public class AchievementServiceTest {
         this.achievementRepository = mock(AchievementRepository.class);
         this.gameRepository = mock(GameRepository.class);
         this.achievementService = new AchievementService(achievementRepository, gameRepository);
+        mockedReport.add(achievementReport);
     }
 
     private void generateFinishedGame() {
@@ -92,7 +97,7 @@ public class AchievementServiceTest {
     private static List<PlayerInTop> generateTop3() {
         List<PlayerInTop> top3 = new ArrayList<>();
         PlayerInTop player1 = new PlayerInTop("Messi", 8, 654);
-        PlayerInTop player2 = new PlayerInTop("Cristiano", 6, 492);
+        PlayerInTop player2 = new PlayerInTop("Cristiano", 7, 620);
         PlayerInTop player3 = new PlayerInTop("Mbappe", 3, 214);
         top3.add(player1);
         top3.add(player2);
@@ -135,12 +140,9 @@ public class AchievementServiceTest {
         verify(achievementRepository, times(1)).save(any(AchievementReport.class));
     }
     @Test
-    public void should_update_highest_score_in_a_game() throws JsonProcessingException {
-        List<AchievementReport> mockedReport = new ArrayList<>();
-        mockedReport.add(achievementReport);
+    public void should_update_highest_score_in_a_game() {
         when(achievementRepository.findAll()).thenReturn(mockedReport);
         ServiceResult<AchievementReport> result = achievementService.update(game);
-        System.out.println(objectMapper.writeValueAsString(result.getData().getTopScoreInAGame()));
         List<Score> expected = generateExpectedHighestScore();
         Assertions.assertEquals(expected, result.getData().getTopScoreInAGame());
     }
@@ -152,10 +154,23 @@ public class AchievementServiceTest {
         return container;
     }
     @Test
+    public void should_add_to_highest_score_if_new_is_equal_to_prev_highest() throws JsonProcessingException {
+        when(achievementRepository.findAll()).thenReturn(mockedReport);
+        setHighestGameScoreEqualToCurrentHighest();
+        ServiceResult<AchievementReport> result = achievementService.update(game);
+        Score newHighestEqualToPrev = new Score("Pablin", 50);
+        Assertions.assertEquals(2, result.getData().getTopScoreInAGame().size());
+        Assertions.assertTrue(result.getData().getTopScoreInAGame().contains(newHighestEqualToPrev));
+    }
+
+    private void setHighestGameScoreEqualToCurrentHighest() {
+        List<PlayerResultDto> results = game.getCurrentResults();
+        results.get(3).setScore(50);
+    }
+
+    @Test
     public void should_update_was_highest_score_in_a_game() throws JsonProcessingException {
         Score wasHighest = achievementReport.getTopScoreInAGame().get(0);
-        List<AchievementReport> mockedReport = new ArrayList<>();
-        mockedReport.add(achievementReport);
         when(achievementRepository.findAll()).thenReturn(mockedReport);
         ServiceResult<AchievementReport> result = achievementService.update(game);
         Assertions.assertTrue(result.getData().getWasTopScoreInAGame().contains(wasHighest));
@@ -163,7 +178,13 @@ public class AchievementServiceTest {
 
     @Test
     public void should_update_the_top1(){
-
+        when(achievementRepository.findAll()).thenReturn(mockedReport);
+        List<PlayerResultDto> results = game.getCurrentResults();
+        results.get(2).setUsername("Cristiano");
+        results.get(2).setScore(60);
+        ServiceResult<AchievementReport> result = achievementService.update(game);
+        PlayerInTop newTop1 = new PlayerInTop("Cristiano", 8, 680);
+        Assertions.assertSame(result.getData().getTop3().get(0), newTop1);
     }
     @Test
     public void should_return_the_achievements_of_a_given_player() {
