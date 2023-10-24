@@ -179,6 +179,7 @@ public class AchievementServiceTest {
         Assertions.assertTrue(result.getData().getWasTopScoreInAGame().contains(wasHighest));
     }
 
+    // Vamos por aca
     @Test
     public void should_update_the_top1() throws JsonProcessingException {
         when(achievementRepository.findAll()).thenReturn(mockedReport);
@@ -187,8 +188,8 @@ public class AchievementServiceTest {
         results.get(2).setScore(60);
         ServiceResult<AchievementReport> result = achievementService.update(game);
         System.out.println(objectMapper.writeValueAsString(result.getData().getTop3()));
-//        PlayerInTop newTop1 = new PlayerInTop("Cristiano", 8, 680);
-//        Assertions.assertSame(result.getData().getTop3().get(0), newTop1);
+        PlayerInTop newTop1 = new PlayerInTop("Cristiano", 8, 680);
+        Assertions.assertSame(result.getData().getTop3().get(0), newTop1);
     }
     @Test
     public void should_return_the_achievements_of_a_given_player() {

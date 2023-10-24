@@ -58,17 +58,10 @@ public class AchievementService implements AchievementServiceAPI {
     }
 
     private List<PlayerInTop> updateTop3() {
-        List<Player> allPlayers = playerRepository.findAll();
-        sort(allPlayers);
-        List<PlayerInTop> newTop3 = new ArrayList<>();
-        for(int i = 0; i < 3; i++){
-            PlayerInTop player = new PlayerInTop(
-                    allPlayers.get(i).getUsername(),
-                    allPlayers.get(i).getGamesWon(),
-                    allPlayers.get(i).getTotalScore());
-            newTop3.add(player);
-        }
-        return newTop3;
+        // Refactorizar esto, checkear uno por uno los de la partida
+        // Pedir a la base de datos los players por username
+        // Checkear si alguno tiene que entrar o moverse en el top 3
+        // Actualizarlo en caso de ser necesario
     }
 
     private static void sort(List<Player> allPlayers) {
