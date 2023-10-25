@@ -36,7 +36,11 @@ public class AchievementService implements AchievementServiceAPI {
             return ServiceResult.success(report.get(report.size() - 1));
         }
     }
-
+    public ServiceResult<AchievementReport> save() {
+        AchievementReport report = FirstReport.generate();
+        AchievementReport savedReport = achievementRepository.save(report);
+        return ServiceResult.success(savedReport);
+    }
     @Override
     public ServiceResult<AchievementReport> update(Game game) {
         List<AchievementReport> allReports = achievementRepository.findAll();
@@ -44,27 +48,45 @@ public class AchievementService implements AchievementServiceAPI {
 
         updateHighestScore(game, prevReport);
         updateTop3(game, prevReport);
-
+        updateHighestRound(game, prevReport);
+        //aca deberiamos guardar en la base de datos el reporte actualizado
         return ServiceResult.success(prevReport);
     }
     private void updateHighestScore(Game game, AchievementReport prevReport) {
         HighestScore highestScore = new HighestScore(prevReport.getTopScoreInAGame());
-        ServiceResult<Score> highScore = highestScore.check(game.getCurrentResults());
+        checkHighestScoreUpdate(game, prevReport, highestScore);
+    }
+
+    private static void checkHighestScoreUpdate(Game game, AchievementReport prevReport, HighestScore highestScore) {
+        ServiceResult<List<Score>> highScore = highestScore.check(game.getCurrentResults());
         if (highScore.isSuccess())
             prevReport.updateHighestScoreInAGame(highScore.getData());
     }
+
     private void updateTop3(Game game, AchievementReport prevReport) {
         Top3 top3 = new Top3(prevReport.getTop3(), playerRepository);
+        checkTop3Update(game, prevReport, top3);
+    }
+    private static void checkTop3Update(Game game, AchievementReport prevReport, Top3 top3) {
         ServiceResult<List<PlayerInTop>> newTop3 = top3.check(game.getCurrentResults());
         if(newTop3.isSuccess())
             prevReport.updateTop3(newTop3.getData());
     }
 
-    public ServiceResult<AchievementReport> save() {
-        AchievementReport report = FirstReport.generate();
-        AchievementReport savedReport = achievementRepository.save(report);
-        return ServiceResult.success(savedReport);
+    private void updateHighestRound(Game game, AchievementReport prevReport){
+        HighestRound highestRound = new HighestRound(prevReport.getScoredTenOrMoreInARound(),
+                    prevReport.getHighestScoreInARound(), game.getCurrentResults());
+        checkTenOrMoreInARound(prevReport, highestRound);
+        checkHighestScoreInARound(prevReport, highestRound);
     }
-
-
+    private static void checkTenOrMoreInARound(AchievementReport prevReport, HighestRound highestRound) {
+        ServiceResult<List<String>> tenOrMore = highestRound.checkTenOrMoreInARound();
+        if(tenOrMore.isSuccess())
+            prevReport.updateTenOrMoreInARound(tenOrMore.getData());
+    }
+    private static void checkHighestScoreInARound(AchievementReport prevReport, HighestRound highestRound) {
+        ServiceResult<List<Score>> highestInARound = highestRound.checkHighestRound();
+        if(highestInARound.isSuccess())
+            prevReport.updateHighestScoreInARound(highestInARound.getData());
+    }
 }

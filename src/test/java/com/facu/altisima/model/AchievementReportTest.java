@@ -1,6 +1,5 @@
 package com.facu.altisima.model;
 
-import com.facu.altisima.service.AchievementServiceTest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
@@ -11,11 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AchievementReportTest {
-
     List<Score> topScoreInAGame = new ArrayList<>();
     List<Score> wasTopScoreInAGame = new ArrayList<>();
-    Score currentHighestScore = new Score("Messi", 55);
-    Score currentWasHighestScore = new Score("Modric", 50);
     AchievementReport achievementReport;
 
     ObjectMapper objectMapper = new ObjectMapper();
@@ -72,42 +68,7 @@ public class AchievementReportTest {
 
     @BeforeEach
     public void setup(){
-        topScoreInAGame.add(currentHighestScore);
-        wasTopScoreInAGame.add(currentWasHighestScore);
         achievementReport = generateAchievmentReport();
     }
 
-    @Test
-    public void should_update_highest_score_in_a_game() {
-        List<Score> updatedHighestScore = new ArrayList<>();
-        Score newHighest = new Score("Diego", 56);
-        updatedHighestScore.add(newHighest);
-        achievementReport.updateHighestScoreInAGame(newHighest);
-        Assertions.assertEquals(achievementReport.getTopScoreInAGame(), updatedHighestScore);
-    }
-
-    @Test
-    public void should_add_to_highest_score_if_new_is_equal_to_prev_highest() throws JsonProcessingException {
-        List<Score> updatedHighestScore = new ArrayList<>();
-        updatedHighestScore.add(achievementReport.getTopScoreInAGame().get(0));
-        Score newHighest = new Score("Diego", 50);
-        updatedHighestScore.add(newHighest);
-        achievementReport.updateHighestScoreInAGame(newHighest);
-        Assertions.assertEquals(achievementReport.getTopScoreInAGame(), updatedHighestScore);
-    }
-
-    @Test
-    public void should_update_was_highest_score_in_a_game() throws JsonProcessingException {
-        List<Score> updatedWasHighestScore = new ArrayList<>();
-        updatedWasHighestScore.add(achievementReport.getWasTopScoreInAGame().get(0));
-        updatedWasHighestScore.add(achievementReport.getTopScoreInAGame().get(0));
-        Score newHighest = new Score("Diego", 56);
-        achievementReport.updateHighestScoreInAGame(newHighest);
-        Assertions.assertEquals(achievementReport.getWasTopScoreInAGame(), updatedWasHighestScore);
-    }
-
-    @Test
-    public void should_not_update_anything() {
-
-    }
 }

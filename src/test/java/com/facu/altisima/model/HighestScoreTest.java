@@ -4,6 +4,7 @@ import com.facu.altisima.controller.dto.PlayerResultDto;
 import com.facu.altisima.service.utils.ServiceResult;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,20 +27,19 @@ public class HighestScoreTest {
     }
 
     @Test
-    public void should_return_highest_game_score_if_is_new_record() throws JsonProcessingException {
+    public void should_update_highest_game_score_if_is_new_record() throws JsonProcessingException {
         Integer newHighestScore = 57;
         List<PlayerResultDto> newHighest = generateResultDto(newHighestUsername, newHighestScore);
-        Score expectedResult = new Score(newHighestUsername, newHighestScore);
-        ServiceResult<Score> result = highestScore.check(newHighest);
-        Assertions.assertEquals(result.getData(), expectedResult);
+        List<Score> expectedResult = getNewRecord(newHighestScore);
+        ServiceResult<List<Score>> result = highestScore.check(newHighest);
+        Assertions.assertEquals(expectedResult, result.getData());
     }
-
-    @Test
-    public void should_return_no_new_record_msg() {
-        Integer newHighestScore = 50;
-        List<PlayerResultDto> newHighest = generateResultDto(newHighestUsername, newHighestScore);
-        ServiceResult<Score> result = highestScore.check(newHighest);
-        Assertions.assertEquals(result.getErrorMessage(), "No hay nuevo record");
+    @NotNull
+    private List<Score> getNewRecord(Integer newHighestScore) {
+        List<Score> expectedResult = new ArrayList<>();
+        Score player = new Score(newHighestUsername, newHighestScore);
+        expectedResult.add(player);
+        return expectedResult;
     }
 
     private List<PlayerResultDto> generateResultDto(String name, Integer score) {
@@ -48,5 +48,28 @@ public class HighestScoreTest {
         PlayerResultDto player = new PlayerResultDto(name, score, history);
         container.add(player);
         return container;
+    }
+    @Test
+    public void should_add_to_list_if_score_is_equal_to_record() throws JsonProcessingException {
+        Integer newHighestScore = 55;
+        List<PlayerResultDto> newHighest = generateResultDto(newHighestUsername, newHighestScore);
+        List<Score> expectedResult = getEqualRecord(newHighestScore);
+        ServiceResult<List<Score>> result = highestScore.check(newHighest);
+        Assertions.assertEquals(result.getData(), expectedResult);
+    }
+    @NotNull
+    private List<Score> getEqualRecord(Integer newHighestScore) {
+        Score player = new Score(newHighestUsername, newHighestScore);
+        List<Score> expectedResult = new ArrayList<>();
+        expectedResult.add(currentHigest.get(0));
+        expectedResult.add(player);
+        return expectedResult;
+    }
+    @Test
+    public void should_return_no_new_record_msg() {
+        Integer newHighestScore = 50;
+        List<PlayerResultDto> newHighest = generateResultDto(newHighestUsername, newHighestScore);
+        ServiceResult<List<Score>> result = highestScore.check(newHighest);
+        Assertions.assertEquals(result.getErrorMessage(), "No hubo cambios en el record actual");
     }
 }

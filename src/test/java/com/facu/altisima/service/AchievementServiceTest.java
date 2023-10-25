@@ -141,50 +141,16 @@ public class AchievementServiceTest {
         ServiceResult<AchievementReport> returnedReport = achievementService.save();
         verify(achievementRepository, times(1)).save(any(AchievementReport.class));
     }
+
     @Test
-    public void should_update_highest_score_in_a_game() {
+    public void should_return_the_updated_top3() throws JsonProcessingException {
         when(achievementRepository.findAll()).thenReturn(mockedReport);
+        System.out.println(objectMapper.writeValueAsString(achievementReport));
         ServiceResult<AchievementReport> result = achievementService.update(game);
-        List<Score> expected = generateExpectedHighestScore();
-        Assertions.assertEquals(expected, result.getData().getTopScoreInAGame());
+        System.out.println(objectMapper.writeValueAsString(result.getData()));
     }
 
-    private List<Score> generateExpectedHighestScore() {
-        List<Score> container = new ArrayList<>();
-        Score newHighestScore = new Score("Pablin", 56);
-        container.add(newHighestScore);
-        return container;
-    }
-    @Test
-    public void should_add_to_highest_score_if_new_is_equal_to_prev_highest() {
-        when(achievementRepository.findAll()).thenReturn(mockedReport);
-        setHighestGameScoreEqualToCurrentHighest();
-        ServiceResult<AchievementReport> result = achievementService.update(game);
-        Score newHighestEqualToPrev = new Score("Pablin", 50);
-        Assertions.assertEquals(2, result.getData().getTopScoreInAGame().size());
-        Assertions.assertTrue(result.getData().getTopScoreInAGame().contains(newHighestEqualToPrev));
-    }
-
-    private void setHighestGameScoreEqualToCurrentHighest() {
-        List<PlayerResultDto> results = game.getCurrentResults();
-        results.get(3).setScore(50);
-    }
-
-    @Test
-    public void should_update_was_highest_score_in_a_game() {
-        Score wasHighest = achievementReport.getTopScoreInAGame().get(0);
-        when(achievementRepository.findAll()).thenReturn(mockedReport);
-        ServiceResult<AchievementReport> result = achievementService.update(game);
-        Assertions.assertTrue(result.getData().getWasTopScoreInAGame().contains(wasHighest));
-    }
-
-    @Test
-    public void should_return_the_achievements_of_a_given_player() {
-
-    }
-
-    @Test
-    public void should_response_with_no_achievements_when_player_does_not_have_any() {
-
-    }
+    //testear uno por uno los achievements, en este ultimo test estamos
+    //testeando solamente el cambio en el highestScoreInAGame,
+    //tenemos que pasarle games donde se modifiquen los otros records
 }

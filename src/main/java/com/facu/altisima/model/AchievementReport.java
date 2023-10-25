@@ -31,19 +31,21 @@ public class AchievementReport {
 
     }
 
-    public void updateHighestScoreInAGame(Score newHighest){
-        if(Objects.equals(newHighest.getScore(), topScoreInAGame.get(0).getScore())){
-            topScoreInAGame.add(newHighest);
-        } else {
-            wasTopScoreInAGame.addAll(topScoreInAGame);
-            List<Score> newHighestContainer = new ArrayList<>();
-            newHighestContainer.add(newHighest);
-            topScoreInAGame = newHighestContainer;
-        }
+    public void updateHighestScoreInAGame(List<Score> newHighest){
+        wasTopScoreInAGame.addAll(topScoreInAGame);
+        topScoreInAGame = newHighest;
     }
 
     public void updateTop3(List<PlayerInTop> newTop3){
         top3 = newTop3;
+    }
+
+    public void updateTenOrMoreInARound(List<String> newListOfRecords){
+        scoredTenOrMoreInARound = newListOfRecords;
+    }
+
+    public void updateHighestScoreInARound(List<Score> newRecord){
+        highestScoreInARound = newRecord;
     }
 
     public List<Score> getTopScoreInAGame() {
