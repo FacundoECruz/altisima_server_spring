@@ -23,7 +23,7 @@ import static org.mockito.Mockito.*;
 
 public class AchievementServiceTest {
     public static final int INSIGNIFICANT_NUMBER = 5;
-    public static final int TOTAL_ROUNDS = 8;
+    public static final int TOTAL_ROUNDS = 9;
     ObjectMapper objectMapper = new ObjectMapper();
     AchievementRepository achievementRepository;
     GameRepository gameRepository;
@@ -100,7 +100,7 @@ public class AchievementServiceTest {
         List<PlayerInTop> top3 = new ArrayList<>();
         PlayerInTop player1 = new PlayerInTop("Messi", 8, 654);
         PlayerInTop player2 = new PlayerInTop("Cristiano", 7, 620);
-        PlayerInTop player3 = new PlayerInTop("Mbappe", 3, 214);
+        PlayerInTop player3 = new PlayerInTop("Mbappe", 6, 600);
         top3.add(player1);
         top3.add(player2);
         top3.add(player3);
@@ -143,14 +143,65 @@ public class AchievementServiceTest {
     }
 
     @Test
-    public void should_return_the_updated_top3() throws JsonProcessingException {
+    public void should_return_the_updated_highest_score_and_was_highest() throws JsonProcessingException {
         when(achievementRepository.findAll()).thenReturn(mockedReport);
-        System.out.println(objectMapper.writeValueAsString(achievementReport));
+        List<Score> expectedCurrentHighest = makeExpectedCurrentHighest();
+        List<Score> expectedWasHighest = makeExpectedWasHighest();
         ServiceResult<AchievementReport> result = achievementService.update(game);
-        System.out.println(objectMapper.writeValueAsString(result.getData()));
+        Assertions.assertEquals(expectedCurrentHighest, result.getData().getTopScoreInAGame());
+        Assertions.assertEquals(expectedWasHighest, result.getData().getWasTopScoreInAGame());
     }
 
-    //testear uno por uno los achievements, en este ultimo test estamos
-    //testeando solamente el cambio en el highestScoreInAGame,
-    //tenemos que pasarle games donde se modifiquen los otros records
+    private List<Score> makeExpectedWasHighest() {
+        List<Score> expected = new ArrayList<>();
+        expected.add(achievementReport.getWasTopScoreInAGame().get(0));
+        expected.add(achievementReport.getTopScoreInAGame().get(0));
+        return expected;
+    }
+
+    private List<Score> makeExpectedCurrentHighest() {
+        List<Score> expected = new ArrayList<>();
+        Score playerHighest = new Score("Pablin", 56);
+        expected.add(playerHighest);
+        return expected;
+    }
+    @Test
+    public void should_update_the_highest_score_in_round_and_more_than_ten() {
+        List<Integer> recordHistory = generateRecordHistory();
+        game.getCurrentResults().get(0).setHistory(recordHistory);
+        when(achievementRepository.findAll()).thenReturn(mockedReport);
+        List<String> expectedTenOrMore = makeExpectedTenOrMore();
+        List<Score> expectedHighestInRound = makeExpectedHighestInRound();
+        ServiceResult<AchievementReport> result = achievementService.update(game);
+        Assertions.assertEquals(expectedTenOrMore, result.getData().getScoredTenOrMoreInARound());
+        Assertions.assertEquals(expectedHighestInRound, result.getData().getHighestScoreInARound());
+    }
+    private List<String> makeExpectedTenOrMore() {
+        List<String> expected = new ArrayList<>();
+        expected.add(achievementReport.getScoredTenOrMoreInARound().get(0));
+        for(int i = 0; i < 3; i++){
+            expected.add(game.getCurrentResults().get(0).getUsername());
+        }
+        return expected;
+    }
+    private List<Score> makeExpectedHighestInRound() {
+        List<Score> expected = new ArrayList<>();
+        Score player = new Score(game.getCurrentResults().get(0).getUsername(), 12);
+        expected.add(player);
+        return expected;
+    }
+    private List<Integer> generateRecordHistory() {
+        List<Integer> history = new ArrayList<>();
+        for(int i = 0; i < TOTAL_ROUNDS; i++){
+            history.add(i + 4);
+        }
+        return history;
+    }
+
+    @Test
+    public void should_update_the_top3() {
+       //el top3 se actualiza de una forma distinta: pidiendo a la base
+       //de datos la data ya actualizada del player que acaba de jugar.
+        // Hay que pensar como lo vamos a testear aca.
+    }
 }
