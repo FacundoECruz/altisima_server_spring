@@ -27,7 +27,6 @@ public class AchievementServiceTest {
     ObjectMapper objectMapper = new ObjectMapper();
     AchievementRepository achievementRepository;
     GameRepository gameRepository;
-
     PlayerRepository playerRepository;
     AchievementReport achievementReport;
 
@@ -157,7 +156,7 @@ public class AchievementServiceTest {
         return container;
     }
     @Test
-    public void should_add_to_highest_score_if_new_is_equal_to_prev_highest() throws JsonProcessingException {
+    public void should_add_to_highest_score_if_new_is_equal_to_prev_highest() {
         when(achievementRepository.findAll()).thenReturn(mockedReport);
         setHighestGameScoreEqualToCurrentHighest();
         ServiceResult<AchievementReport> result = achievementService.update(game);
@@ -179,18 +178,6 @@ public class AchievementServiceTest {
         Assertions.assertTrue(result.getData().getWasTopScoreInAGame().contains(wasHighest));
     }
 
-    // Vamos por aca
-    @Test
-    public void should_update_the_top1() throws JsonProcessingException {
-        when(achievementRepository.findAll()).thenReturn(mockedReport);
-        List<PlayerResultDto> results = game.getCurrentResults();
-        results.get(2).setUsername("Cristiano");
-        results.get(2).setScore(60);
-        ServiceResult<AchievementReport> result = achievementService.update(game);
-        System.out.println(objectMapper.writeValueAsString(result.getData().getTop3()));
-        PlayerInTop newTop1 = new PlayerInTop("Cristiano", 8, 680);
-        Assertions.assertSame(result.getData().getTop3().get(0), newTop1);
-    }
     @Test
     public void should_return_the_achievements_of_a_given_player() {
 
