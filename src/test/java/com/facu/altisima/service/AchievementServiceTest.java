@@ -171,7 +171,7 @@ public class AchievementServiceTest {
     }
 
     @Test
-    public void should_update_was_highest_score_in_a_game() throws JsonProcessingException {
+    public void should_update_was_highest_score_in_a_game() {
         Score wasHighest = achievementReport.getTopScoreInAGame().get(0);
         when(achievementRepository.findAll()).thenReturn(mockedReport);
         ServiceResult<AchievementReport> result = achievementService.update(game);

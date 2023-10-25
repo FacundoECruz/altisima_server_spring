@@ -20,8 +20,6 @@ public class AchievementService implements AchievementServiceAPI {
     @Autowired
     private final PlayerRepository playerRepository;
     private final GameRepository gameRepository;
-
-    HighestScore highestScore = new HighestScore();
     @Autowired
     public AchievementService(AchievementRepository achievementRepository, GameRepository gameRepository, PlayerRepository playerRepository) {
         this.achievementRepository = achievementRepository;
@@ -50,8 +48,8 @@ public class AchievementService implements AchievementServiceAPI {
         return ServiceResult.success(prevReport);
     }
     private void updateHighestScore(Game game, AchievementReport prevReport) {
-        ServiceResult<Score> highScore = highestScore.check(game.getCurrentResults(),
-                prevReport.getTopScoreInAGame());
+        HighestScore highestScore = new HighestScore(prevReport.getTopScoreInAGame());
+        ServiceResult<Score> highScore = highestScore.check(game.getCurrentResults());
         if (highScore.isSuccess())
             prevReport.updateHighestScoreInAGame(highScore.getData());
     }

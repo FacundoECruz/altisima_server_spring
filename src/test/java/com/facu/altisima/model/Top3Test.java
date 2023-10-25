@@ -18,7 +18,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class Top3Test {
-
     List<PlayerInTop> prevTop3 = new ArrayList<>();
     PlayerInTop player1 = new PlayerInTop("Messi", 8, 666);
     PlayerInTop player2 = new PlayerInTop("Cristiano", 7, 620);
