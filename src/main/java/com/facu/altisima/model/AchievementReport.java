@@ -27,6 +27,10 @@ public class AchievementReport {
         this.highestScoreInARound = highestScoreInARound;
     }
 
+    public AchievementReport(){
+
+    }
+
     public void updateHighestScoreInAGame(Score newHighest){
         if(Objects.equals(newHighest.getScore(), topScoreInAGame.get(0).getScore())){
             topScoreInAGame.add(newHighest);
