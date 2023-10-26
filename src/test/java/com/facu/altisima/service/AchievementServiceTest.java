@@ -166,7 +166,7 @@ public class AchievementServiceTest {
         return expected;
     }
     @Test
-    public void should_update_the_highest_score_in_round_and_more_than_ten() {
+    public void should_update_the_highest_score_in_round_and_more_than_ten() throws JsonProcessingException {
         List<Integer> recordHistory = generateRecordHistory();
         game.getCurrentResults().get(0).setHistory(recordHistory);
         when(achievementRepository.findAll()).thenReturn(mockedReport);

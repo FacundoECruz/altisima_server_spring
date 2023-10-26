@@ -49,7 +49,7 @@ public class AchievementService implements AchievementServiceAPI {
         updateHighestScore(game, prevReport);
         updateTop3(game, prevReport);
         updateHighestRound(game, prevReport);
-        //aca deberiamos guardar en la base de datos el reporte actualizado
+        achievementRepository.save(prevReport);
         return ServiceResult.success(prevReport);
     }
     private void updateHighestScore(Game game, AchievementReport prevReport) {

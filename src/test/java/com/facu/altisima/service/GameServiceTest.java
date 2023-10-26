@@ -3,8 +3,8 @@ package com.facu.altisima.service;
 import com.facu.altisima.controller.dto.FinishedGameDto;
 import com.facu.altisima.controller.dto.PlayerResultDto;
 import com.facu.altisima.controller.dto.PlayerRoundDto;
+import com.facu.altisima.repository.AchievementRepository;
 import com.facu.altisima.repository.LegacyGameRepository;
-import com.facu.altisima.repository.MongoGameRepository;
 import com.facu.altisima.repository.PlayerRepository;
 import com.facu.altisima.repository.UserRepository;
 import com.facu.altisima.model.Game;
@@ -35,6 +35,8 @@ public class GameServiceTest {
     PlayerRepository playerRepository;
     UserRepository userRepository;
     LegacyGameRepository gameRepository;
+
+    AchievementRepository achievementRepository;
     IdGenerator idGenerator = new FixedIdGenerator("TestId");
     private GameServiceAPI gameService;
     GameGenerator gameGenerator = new GameGenerator();
@@ -49,7 +51,8 @@ public class GameServiceTest {
         this.gameRepository = mock(LegacyGameRepository.class);
         this.playerRepository = mock(PlayerRepository.class);
         this.userRepository = mock(UserRepository.class);
-        this.gameService = new GameServiceImpl(gameRepository, playerRepository, userRepository, idGenerator);
+        this.achievementRepository = mock(AchievementRepository.class);
+        this.gameService = new GameServiceImpl(gameRepository, playerRepository, userRepository, idGenerator, achievementRepository);
     }
 
     @Test

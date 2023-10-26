@@ -1,6 +1,7 @@
 package com.facu.altisima.controller;
 
 import com.facu.altisima.model.AchievementReport;
+import com.facu.altisima.model.Game;
 import com.facu.altisima.model.User;
 import com.facu.altisima.service.api.AchievementServiceAPI;
 import com.facu.altisima.service.impl.AchievementService;
@@ -35,6 +36,20 @@ public class AchievementController {
     public ResponseEntity<?> saveFirstReport(){
         try {
             ServiceResult<AchievementReport> report = achievementService.save();
+            if(report.isSuccess()){
+                return new Response().build(report);
+            } else {
+                return new ResponseEntity<>(report.getErrorMessage(), HttpStatus.CONFLICT);
+            }
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+        }
+    }
+
+    @PostMapping(value = "update")
+    public ResponseEntity<?> updateReport(@RequestBody Game game){
+        try {
+            ServiceResult<AchievementReport> report = achievementService.update(game);
             if(report.isSuccess()){
                 return new Response().build(report);
             } else {
