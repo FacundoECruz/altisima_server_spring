@@ -20,43 +20,31 @@ public class AchievementController {
 
     @GetMapping
     public ResponseEntity<?> getReport() {
-        try {
-            ServiceResult<AchievementReport> report = achievementService.getReport();
-            if(report.isSuccess()){
-                return new Response().build(report);
-            } else {
-                return new ResponseEntity<>(report.getErrorMessage(), HttpStatus.CONFLICT);
-            }
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+        ServiceResult<AchievementReport> report = achievementService.getReport();
+        if (report.isSuccess()) {
+            return new Response().build(report);
+        } else {
+            return new ResponseEntity<>(report.getErrorMessage(), HttpStatus.CONFLICT);
         }
     }
 
     @PostMapping
-    public ResponseEntity<?> saveFirstReport(){
-        try {
-            ServiceResult<AchievementReport> report = achievementService.save();
-            if(report.isSuccess()){
-                return new Response().build(report);
-            } else {
-                return new ResponseEntity<>(report.getErrorMessage(), HttpStatus.CONFLICT);
-            }
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+    public ResponseEntity<?> saveFirstReport() {
+        ServiceResult<AchievementReport> report = achievementService.save();
+        if (report.isSuccess()) {
+            return new Response().build(report);
+        } else {
+            return new ResponseEntity<>(report.getErrorMessage(), HttpStatus.CONFLICT);
         }
     }
 
     @PostMapping(value = "update")
-    public ResponseEntity<?> updateReport(@RequestBody Game game){
-        try {
-            ServiceResult<AchievementReport> report = achievementService.update(game);
-            if(report.isSuccess()){
-                return new Response().build(report);
-            } else {
-                return new ResponseEntity<>(report.getErrorMessage(), HttpStatus.CONFLICT);
-            }
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+    public ResponseEntity<?> updateReport(@RequestBody Game game) {
+        ServiceResult<AchievementReport> report = achievementService.update(game);
+        if (report.isSuccess()) {
+            return new Response().build(report);
+        } else {
+            return new ResponseEntity<>(report.getErrorMessage(), HttpStatus.CONFLICT);
         }
     }
 }
