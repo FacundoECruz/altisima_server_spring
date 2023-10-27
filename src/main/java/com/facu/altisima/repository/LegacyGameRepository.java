@@ -18,7 +18,8 @@ public class LegacyGameRepository implements GameRepository {
     @Override
     public List<Game> findAll() {
         List<GameDto> gamesDto = mongoLegacyGameRepository.findAll();
-        return gamesDto.stream().map((gameDto) ->
+        List<GameDto> filteredDtos = gamesDto.stream().filter(gameDto -> gameDto.getResults().size() > 0).collect(Collectors.toList());
+        return filteredDtos.stream().map((gameDto) ->
                 gameDto.toDomain()
         ).collect(Collectors.toList());
     }

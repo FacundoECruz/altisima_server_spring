@@ -3,6 +3,7 @@ package com.facu.altisima.service.impl;
 import com.facu.altisima.controller.dto.FinishedGameDto;
 import com.facu.altisima.controller.dto.PlayerResultDto;
 import com.facu.altisima.controller.dto.PlayerRoundDto;
+import com.facu.altisima.repository.AchievementRepository;
 import com.facu.altisima.repository.GameRepository;
 import com.facu.altisima.repository.PlayerRepository;
 import com.facu.altisima.repository.UserRepository;
@@ -26,15 +27,20 @@ public class GameServiceImpl implements GameServiceAPI {
     private final PlayerRepository playerRepository;
     private final UserRepository userRepository;
     private final IdGenerator idGenerator;
+
+    private final AchievementRepository achievementRepository;
+    private final AchievementService achievementService;
     Generate generate = new Generate();
     DateFormatter dateFormatter = new DateFormatter();
 
     @Autowired
-    public GameServiceImpl(GameRepository gameRepository, PlayerRepository playerRepository, UserRepository userRepository, IdGenerator idGenerator) {
+    public GameServiceImpl(GameRepository gameRepository, PlayerRepository playerRepository, UserRepository userRepository, IdGenerator idGenerator, AchievementRepository achievementRepository) {
         this.gameRepository = gameRepository;
         this.playerRepository = playerRepository;
         this.userRepository = userRepository;
         this.idGenerator = idGenerator;
+        this.achievementRepository = achievementRepository;
+        this.achievementService = new AchievementService(achievementRepository, gameRepository, playerRepository);
     }
 
     public ServiceResult<Game> createGame(List<String> players, Integer totalRounds) {
@@ -132,6 +138,7 @@ public class GameServiceImpl implements GameServiceAPI {
         Optional<Game> retrievedGameFromDb = gameRepository.findById(id);
         if (retrievedGameFromDb.isPresent()) {
             assignResultsToPlayers(retrievedGameFromDb.get(), host, winner);
+            achievementService.update(retrievedGameFromDb.get());
             return ServiceResult.success(retrievedGameFromDb.get());
         } else {
             return ServiceResult.error("No se encontro la partida");
@@ -140,9 +147,8 @@ public class GameServiceImpl implements GameServiceAPI {
 
     private void assignResultsToPlayers(Game game, String host, String winner) {
         List<PlayerResultDto> finalResults = game.getCurrentResults();
-        for (int i = 0; i < finalResults.size(); i++) {
-            PlayerResultDto playerResults = finalResults.get(i);
-            Optional<Player> optionalPlayer = playerRepository.findByUsername(finalResults.get(i).getUsername());
+        for (PlayerResultDto playerResults : finalResults) {
+            Optional<Player> optionalPlayer = playerRepository.findByUsername(playerResults.getUsername());
             if (optionalPlayer.isPresent()) {
                 Player player = optionalPlayer.get();
                 player.setGamesPlayed(player.getGamesPlayed() + 1);

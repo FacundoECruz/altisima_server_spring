@@ -9,9 +9,7 @@ import java.util.Objects;
 
 public class CreateUserDto {
     public static final String EMPTY_FIELD_MSG = "Completar todos los campos";
-    public static final String DEFAULT_IMAGE_URL = "https://play-lh.googleusercontent.com/rX_nOuUDijsV_NnWZP9JgYTsFpxn5y7qCqDxFIpZ-BqiJu8un7UbdSgVTZSrJuzAlQ";
-
-    IdGenerator idGenerator = new UUIDGenerator();
+    public static final String DEFAULT_IMAGE_URL = "https://play-lh.googleusercontent.com/rX_nOuUDijsV_NnWZP9JgYTsFpxn5y7qCqDxFIpZ-BqiJu8un7UbdSgVTZSrJuzAlQ";    IdGenerator idGenerator = new UUIDGenerator();
     private String username;
     private String email;
     private PasswordDto password;

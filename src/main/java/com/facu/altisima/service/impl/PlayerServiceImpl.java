@@ -1,20 +1,25 @@
 package com.facu.altisima.service.impl;
 
+import com.facu.altisima.model.User;
 import com.facu.altisima.repository.PlayerRepository;
 import com.facu.altisima.model.Player;
+import com.facu.altisima.repository.UserRepository;
 import com.facu.altisima.service.api.PlayerServiceAPI;
 import com.facu.altisima.service.utils.ServiceResult;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class PlayerServiceImpl implements PlayerServiceAPI {
 
     @Autowired
     private PlayerRepository playerRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
     public ServiceResult<List<Player>> getAll() {
@@ -25,6 +30,30 @@ public class PlayerServiceImpl implements PlayerServiceAPI {
         } else {
             return ServiceResult.error("No se pudieron recuperar los jugadores");
         }
+    }
+
+    @Override
+    public ServiceResult<List<Player>> getUnregistered(){
+        List<Player> allPlayers = playerRepository.findAll();
+        List<User> allUsers = userRepository.findAll();
+
+        List<Player> filteredPlayers = getFilteredPlayers(allPlayers, allUsers);
+        return ServiceResult.success(filteredPlayers);
+    }
+
+    @NotNull
+    private static List<Player> getFilteredPlayers(List<Player> allPlayers, List<User> allUsers) {
+        Set<String> userUsernames = new HashSet<>();
+        for (User user : allUsers) {
+            userUsernames.add(user.getUsername());
+        }
+        List<Player> filteredPlayers = new ArrayList<>();
+        for (Player player : allPlayers) {
+            if (!userUsernames.contains(player.getUsername())) {
+                filteredPlayers.add(player);
+            }
+        }
+        return filteredPlayers;
     }
 
     @Override

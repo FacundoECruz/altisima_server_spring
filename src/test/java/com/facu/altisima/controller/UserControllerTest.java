@@ -223,4 +223,17 @@ public class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string(userJson));
     }
+
+    @Test
+    public void username_to_associate_does_not_exist() throws Exception {
+        String errorMsg = "No se encontro jugador con ese nombre";
+        ServiceResult<User> unsucceedUser = ServiceResult.error(errorMsg);
+        when(userService.associate(createUserDto.toDomain())).thenReturn(unsucceedUser);
+
+        mockMvc.perform(post("/v1/users/associate")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(createUserDtoJson))
+                .andExpect(status().isConflict())
+                .andExpect(content().string(errorMsg));
+    }
 }

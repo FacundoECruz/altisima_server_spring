@@ -13,4 +13,6 @@ public interface PlayerServiceAPI {
         ServiceResult<Player> get(String username);
 
         ServiceResult<List<Player>> getAll();
+
+        ServiceResult<List<Player>> getUnregistered();
 }

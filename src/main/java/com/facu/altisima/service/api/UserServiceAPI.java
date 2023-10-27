@@ -11,7 +11,7 @@ import java.util.List;
 public interface UserServiceAPI {
 
     ServiceResult<User> save(User user);
-
+    ServiceResult<User> associate(User user);
     void delete(String id);
 
     ServiceResult<User> get(String username);

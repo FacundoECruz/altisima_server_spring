@@ -1,5 +1,6 @@
 package com.facu.altisima.model;
 
+import com.facu.altisima.controller.dto.EditUser;
 import com.facu.altisima.controller.dto.legacyDtos.EditUserDto;
 import com.facu.altisima.service.utils.IdGenerator;
 import com.facu.altisima.service.utils.UUIDGenerator;
@@ -9,7 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Objects;
 
-@Document("users")
+@Document(value = "users")
 public class User {
     @Id
     private String _id;
@@ -26,6 +27,11 @@ public class User {
     public Player toPlayer() {
         IdGenerator idGenerator = new UUIDGenerator();
         return new Player(idGenerator.generate(),this.getUsername(), this.getImage(), 0, 0, 0);
+    }
+
+    public void apply(EditUser userChanges){
+        image = userChanges.getImage();
+        password = userChanges.getPassword();
     }
 
     @Override
