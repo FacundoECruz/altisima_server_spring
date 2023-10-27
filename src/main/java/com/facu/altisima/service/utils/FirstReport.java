@@ -49,7 +49,7 @@ public class FirstReport {
     private static List<Score> makeWasTopScoreInAGame() {
         List<Score> wasTopScore = new ArrayList<>();
         Score wasHigh1 = new Score("Antone", 51);
-        Score wasHigh2 = new Score("Newi", 51);
+        Score wasHigh2 = new Score("Nehui", 51);
         Score wasHigh3 = new Score("Bren", 52);
         wasTopScore.add(wasHigh1);
         wasTopScore.add(wasHigh2);
