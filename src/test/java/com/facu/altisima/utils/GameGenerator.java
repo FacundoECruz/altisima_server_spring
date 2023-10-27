@@ -12,6 +12,8 @@ public class GameGenerator {
 
     }
 
+    public static final int INSIGNIFICANT_NUMBER = 5;
+    public static final int TOTAL_ROUNDS = 9;
     FixedIdGenerator idGenerator = new FixedIdGenerator("TestId");
 
     public List<Integer> generateCardsPerRound(Integer playersQty, Integer totalRounds) {
@@ -71,5 +73,27 @@ public class GameGenerator {
             playersImgs.add(fakeImageUrl);
         }
         return playersImgs;
+    }
+    public Game generateFinished(List<String> players){
+        GameGenerator gameGenerator = new GameGenerator();
+        Game game = gameGenerator.generate(players, TOTAL_ROUNDS);
+        List<PlayerResultDto> finalResults = new ArrayList<>();
+        generateFinalResults(players, finalResults);
+        game.setCurrentResults(finalResults);
+        return game;
+    }
+
+    private void generateFinalResults(List<String> playersList, List<PlayerResultDto> finalResults) {
+        for (int i = 0; i < playersList.size(); i++) {
+            List<Integer> genericHistory = new ArrayList<>();
+            for (int j = 0; j < TOTAL_ROUNDS; j++) {
+                genericHistory.add(INSIGNIFICANT_NUMBER);
+            }
+            PlayerResultDto playerResult = new PlayerResultDto(
+                    playersList.get(i),
+                    (i + 5) * 7,
+                    genericHistory);
+            finalResults.add(playerResult);
+        }
     }
 }
