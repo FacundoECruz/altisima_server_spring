@@ -9,6 +9,7 @@ import com.facu.altisima.service.impl.AchievementService;
 import com.facu.altisima.service.utils.FirstReport;
 import com.facu.altisima.service.utils.ServiceResult;
 import com.facu.altisima.utils.GameGenerator;
+import com.facu.altisima.utils.ReportGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
@@ -17,7 +18,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.Mockito.*;
 
@@ -29,16 +32,16 @@ public class AchievementServiceTest {
     GameRepository gameRepository;
     PlayerRepository playerRepository;
     AchievementReport achievementReport;
-
-    // Esto es porque todavia no resolvimos que onda la base de datos
-    // Entonces estamos usando el findAll() que nos devuelve una lista
-    List<AchievementReport> mockedReport = new ArrayList<>();
     Game game;
+    GameGenerator gameGenerator = new GameGenerator();
+
+    ReportGenerator reportGenerator = new ReportGenerator();
+    List<AchievementReport> mockedReport = new ArrayList<>();
     private AchievementService achievementService;
     @BeforeEach
     public void setup() {
-        generateFinishedGame();
-        generateAchievmentReport();
+        game = generateFinishedGame();
+        achievementReport = reportGenerator.generate();
         this.achievementRepository = mock(AchievementRepository.class);
         this.gameRepository = mock(GameRepository.class);
         this.playerRepository = mock(PlayerRepository.class);
@@ -46,9 +49,9 @@ public class AchievementServiceTest {
         mockedReport.add(achievementReport);
     }
 
-    private void generateFinishedGame() {
+    private Game generateFinishedGame() {
         List<String> players = makePlayersList();
-        makeGame(players);
+        return gameGenerator.generateFinished(players);
     }
 
     @NotNull
@@ -61,85 +64,21 @@ public class AchievementServiceTest {
         return players;
     }
 
-    private void makeGame(List<String> players) {
-        GameGenerator gameGenerator = new GameGenerator();
-        game = gameGenerator.generate(players, TOTAL_ROUNDS);
-        List<PlayerResultDto> finalResults = new ArrayList<>();
-        generateFinalResults(players, finalResults);
-        game.setCurrentResults(finalResults);
-    }
-
-    private void generateFinalResults(List<String> playersList, List<PlayerResultDto> finalResults) {
-        for (int i = 0; i < playersList.size(); i++) {
-            List<Integer> genericHistory = new ArrayList<>();
-            for (int j = 0; j < TOTAL_ROUNDS; j++) {
-                genericHistory.add(INSIGNIFICANT_NUMBER);
-            }
-            PlayerResultDto playerResult = new PlayerResultDto(
-                    playersList.get(i),
-                    (i + 5) * 7,
-                    genericHistory);
-            finalResults.add(playerResult);
-        }
-    }
-
-    private void generateAchievmentReport() {
-        List<PlayerInTop> top3 = generateTop3();
-        List<Score> highestScoreInAGame = makeHighestScoreInAGame();
-        List<Score> wasHighest = makeWasHighestScoreInAGame();
-        List<String> tenOrMore = makeScoredTenOrMoreInARound();
-        List<Score> highestInARound = makeHighestScoreInARound();
-        achievementReport = new AchievementReport(top3,
-                highestScoreInAGame,
-                wasHighest,
-                tenOrMore,
-                highestInARound);
-    }
-
-    private static List<PlayerInTop> generateTop3() {
-        List<PlayerInTop> top3 = new ArrayList<>();
-        PlayerInTop player1 = new PlayerInTop("Messi", 8, 654);
-        PlayerInTop player2 = new PlayerInTop("Cristiano", 7, 620);
-        PlayerInTop player3 = new PlayerInTop("Mbappe", 6, 600);
-        top3.add(player1);
-        top3.add(player2);
-        top3.add(player3);
-        return top3;
-    }
-
-    private static List<Score> makeHighestScoreInAGame() {
-        List<Score> topScoreInAGame = new ArrayList<>();
-        Score topInAGame = new Score("Messi", 50);
-        topScoreInAGame.add(topInAGame);
-        return topScoreInAGame;
-    }
-
-    private static List<Score> makeWasHighestScoreInAGame() {
-        List<Score> wasTopScoreInAGame = new ArrayList<>();
-        Score wasTopScore = new Score("Cristiano", 49);
-        wasTopScoreInAGame.add(wasTopScore);
-        return wasTopScoreInAGame;
-    }
-
-    private static List<String> makeScoredTenOrMoreInARound() {
-        List<String> scoredTenOrMoreInARound = new ArrayList<>();
-        scoredTenOrMoreInARound.add("Antone");
-        return scoredTenOrMoreInARound;
-    }
-    private static List<Score> makeHighestScoreInARound() {
-        List<Score> highestScoreInARound = new ArrayList<>();
-        Score highestInARound = new Score("Chaky", 11);
-        highestScoreInARound.add(highestInARound);
-        return highestScoreInARound;
-    }
-
-
     @Test
     public void should_save_the_first_report() {
         AchievementReport currentReport = FirstReport.generate();
         when(achievementRepository.save(any(AchievementReport.class))).thenReturn(currentReport);
         ServiceResult<AchievementReport> returnedReport = achievementService.save();
         verify(achievementRepository, times(1)).save(any(AchievementReport.class));
+    }
+
+    @Test
+    public void return_error_message_when_report_not_found() {
+        String message = "No se encontro el reporte";
+        ServiceResult<AchievementReport> expected = ServiceResult.error(message);
+        when(achievementRepository.findAll()).thenReturn(Collections.emptyList());
+        ServiceResult<AchievementReport> result = achievementService.getReport();
+        Assertions.assertEquals(expected.getErrorMessage(), result.getErrorMessage());
     }
 
     @Test
@@ -199,9 +138,11 @@ public class AchievementServiceTest {
     }
 
     @Test
-    public void should_update_the_top3() {
-       //el top3 se actualiza de una forma distinta: pidiendo a la base
-       //de datos la data ya actualizada del player que acaba de jugar.
-        // Hay que pensar como lo vamos a testear aca.
+    public void return_error_message_when_repo_return_empty() {
+        String message = "Hubo un error en el repositorio";
+        ServiceResult<AchievementReport> expected = ServiceResult.error(message);
+        when(achievementRepository.findAll()).thenReturn(Collections.emptyList());
+        ServiceResult<AchievementReport> result = achievementService.update(game);
+        Assertions.assertEquals(expected.getErrorMessage(), result.getErrorMessage());
     }
 }

@@ -44,8 +44,9 @@ public class AchievementService implements AchievementServiceAPI {
     @Override
     public ServiceResult<AchievementReport> update(Game game) {
         List<AchievementReport> allReports = achievementRepository.findAll();
+        if(allReports.isEmpty())
+            return ServiceResult.error("Hubo un error en el repositorio");
         AchievementReport prevReport = allReports.get(allReports.size() - 1);
-
         updateHighestScore(game, prevReport);
         updateTop3(game, prevReport);
         updateHighestRound(game, prevReport);
