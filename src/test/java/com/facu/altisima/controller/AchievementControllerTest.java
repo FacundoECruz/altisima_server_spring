@@ -1,8 +1,4 @@
 package com.facu.altisima.controller;
-
-<<<<<<<<< Temporary merge branch 1
-public class AchievementControllerTest{
-=========
 import com.facu.altisima.model.AchievementReport;
 import com.facu.altisima.model.Game;
 import com.facu.altisima.service.impl.AchievementService;
@@ -120,5 +116,4 @@ public class AchievementControllerTest {
                 .andExpect(status().isConflict())
                 .andExpect(content().string(message));
     }
->>>>>>>>> Temporary merge branch 2
 }
