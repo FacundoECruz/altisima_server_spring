@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -26,35 +27,28 @@ public class AchievementReport {
         this.highestScoreInARound = highestScoreInARound;
     }
 
-    public AchievementReport(){
+    public AchievementReport() {
 
     }
 
-    public void updateHighestScoreInAGame(List<Score> newHighest){
-        boolean isOvercomeRecord = false;
-        for(int i = 0; i < newHighest.size(); i++){
-            for(int j = 0; j < topScoreInAGame.size(); j++) {
-                if (Objects.equals(topScoreInAGame.get(j).getUsername(), newHighest.get(i).getUsername())) {
-                    isOvercomeRecord = true;
-                    break;
-                }
-            }
+    public void updateHighestScoreInAGame(List<Score> newHighest) {
+        List<Score> previousTopScores = new ArrayList<>(topScoreInAGame);
+        topScoreInAGame = new ArrayList<>(newHighest);
+        if (newHighest.get(0).getScore() > previousTopScores.get(0).getScore()) {
+            wasTopScoreInAGame.addAll(previousTopScores);
         }
-        if(isOvercomeRecord) {
-            wasTopScoreInAGame.addAll(topScoreInAGame);
-        }
-        topScoreInAGame = newHighest;
     }
 
-    public void updateTop3(List<PlayerInTop> newTop3){
+
+    public void updateTop3(List<PlayerInTop> newTop3) {
         top3 = newTop3;
     }
 
-    public void updateTenOrMoreInARound(List<String> newListOfRecords){
+    public void updateTenOrMoreInARound(List<String> newListOfRecords) {
         scoredTenOrMoreInARound = newListOfRecords;
     }
 
-    public void updateHighestScoreInARound(List<Score> newRecord){
+    public void updateHighestScoreInARound(List<Score> newRecord) {
         highestScoreInARound = newRecord;
     }
 
