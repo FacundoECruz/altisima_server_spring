@@ -10,22 +10,20 @@ import java.util.Objects;
 public class CreateUserDto {
     public static final String EMPTY_FIELD_MSG = "Completar todos los campos";
     public static final String DEFAULT_IMAGE_URL = "https://play-lh.googleusercontent.com/rX_nOuUDijsV_NnWZP9JgYTsFpxn5y7qCqDxFIpZ-BqiJu8un7UbdSgVTZSrJuzAlQ";
-
-    IdGenerator idGenerator = new UUIDGenerator();
+    IdGenerator idGenerator;
     private String username;
     private String email;
     private PasswordDto password;
     private String image;
+    private Long createdDate;
 
-    public CreateUserDto(
-            String username,
-            String email,
-            String password,
-            String image) {
+    public CreateUserDto(IdGenerator idGenerator, String username, String email, PasswordDto password, String image, Long createdDate) {
+        this.idGenerator = new UUIDGenerator();
         this.username = username;
         this.email = email;
-        this.password = new PasswordDto(password);
+        this.password = password;
         this.image = image;
+        this.createdDate = createdDate;
     }
 
     public void validate() {
@@ -48,7 +46,7 @@ public class CreateUserDto {
                 email,
                 getDefaultImage(),
                 password.getValue(),
-                0);
+                0, createdDate);
     }
 
     private String getDefaultImage() {
@@ -88,23 +86,24 @@ public class CreateUserDto {
         this.image = image;
     }
 
+    public Long getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Long createdDate) {
+        this.createdDate = createdDate;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CreateUserDto that = (CreateUserDto) o;
-        return Objects.equals(username, that.username)
-                && Objects.equals(email, that.email)
-                && Objects.equals(password, that.password)
-                && Objects.equals(image, that.image);
+        return Objects.equals(idGenerator, that.idGenerator) && Objects.equals(username, that.username) && Objects.equals(email, that.email) && Objects.equals(password, that.password) && Objects.equals(image, that.image) && Objects.equals(createdDate, that.createdDate);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(
-                username,
-                email,
-                password,
-                image);
+        return Objects.hash(idGenerator, username, email, password, image, createdDate);
     }
 }

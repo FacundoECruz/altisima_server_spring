@@ -5,6 +5,7 @@ import com.facu.altisima.model.User;
 import com.facu.altisima.service.api.PlayerServiceAPI;
 import com.facu.altisima.service.api.UserServiceAPI;
 import com.facu.altisima.service.utils.ServiceResult;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,10 +28,12 @@ public class UserControllerLegacy {
             return new Response().build(savedUser);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
     }
     @NotNull
-    private ServiceResult<User> saveUser(CreateUserDto userData) {
+    private ServiceResult<User> saveUser(CreateUserDto userData) throws JsonProcessingException {
         User user = userData.toDomain();
         ServiceResult<User> saveUserResult = userService.save(user);
         playerService.save(user.toPlayer());
