@@ -1,6 +1,5 @@
 package com.facu.altisima;
 
-import com.facu.altisima.model.User;
 import com.facu.altisima.repository.*;
 import com.facu.altisima.service.api.GameServiceAPI;
 import com.facu.altisima.service.impl.GameServiceImpl;
@@ -40,7 +39,8 @@ public class AltisimaApplication {
             @Autowired GameRepository gameRepository,
             @Autowired PlayerRepository playerRepository,
             @Autowired UserRepository userRepository,
-            @Autowired IdGenerator idGenerator){
-        return new GameServiceImpl(gameRepository, playerRepository, userRepository, idGenerator);
+            @Autowired IdGenerator idGenerator,
+            @Autowired AchievementRepository achievementRepository){
+        return new GameServiceImpl(gameRepository, playerRepository, userRepository, idGenerator, achievementRepository);
     }
 }

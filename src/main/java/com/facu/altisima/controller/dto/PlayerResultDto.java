@@ -1,5 +1,7 @@
 package com.facu.altisima.controller.dto;
 
+import com.facu.altisima.model.Score;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -36,6 +38,10 @@ public class PlayerResultDto {
             score = score + BASE_WIN_SCORE + roundBid;
             history.add(BASE_WIN_SCORE + roundBid);
         }
+    }
+
+    public Score toScore(){
+        return new Score(username, score);
     }
 
     public List<Integer> getHistory() {
