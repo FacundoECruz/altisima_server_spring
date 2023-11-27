@@ -12,11 +12,14 @@ public class Generate {
 
         Integer cardsInDeck = 40;
         Integer maxCardsPerRound = cardsInDeck / players;
+        Integer minCardsPerRound = 3;
 
-        for(int i = 0; i < totalRounds; i++){
-            Integer num = (int) (Math.random() * maxCardsPerRound) + 1;
+        for(int i = 0; i < totalRounds - 2; i++){
+            Integer num = (int) (Math.random() * (maxCardsPerRound - minCardsPerRound + 1)) + minCardsPerRound;
             cardsPerRound.add(num);
         }
+        cardsPerRound.add(maxCardsPerRound - 1);
+        cardsPerRound.add(maxCardsPerRound);
         return cardsPerRound;
     }
 
