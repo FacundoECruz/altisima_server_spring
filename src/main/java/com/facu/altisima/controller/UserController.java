@@ -1,5 +1,6 @@
 package com.facu.altisima.controller;
 
+import com.facu.altisima.controller.dto.jwtTest.AuthResponse;
 import com.facu.altisima.controller.dto.EditUser;
 import com.facu.altisima.controller.dto.LoginRequest;
 import com.facu.altisima.controller.dto.LoginRequestDto;
@@ -7,6 +8,7 @@ import com.facu.altisima.controller.dto.legacyDtos.EditUserDto;
 import com.facu.altisima.model.User;
 import com.facu.altisima.service.api.UserServiceAPI;
 import com.facu.altisima.service.utils.ServiceResult;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,33 +44,16 @@ public class UserController {
         }
     }
 
-    //Este no se usa por el momento
-    @PostMapping
-    public ResponseEntity<?> saveUser(@RequestBody User user) {
-        ServiceResult<User> result = userServiceAPI.save(user);
-        if (result.isSuccess()) {
-            User retrievedUser = result.getData();
-            return ResponseEntity.ok(retrievedUser);
-        } else {
-            String errorMessage = result.getErrorMessage();
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(errorMessage);
-        }
-    }
-
     @PostMapping(value = "/login")
     public ResponseEntity<?> loginUser(@RequestBody LoginRequestDto loginRequestDto) {
         try {
-            ServiceResult<User> user = userLogin(loginRequestDto);
-            if(user.isSuccess()){
-                return new Response().build(user);
-            } else {
-                return new ResponseEntity<>(user.getErrorMessage(), HttpStatus.UNAUTHORIZED);
-            }
-        } catch (RuntimeException e) {
+            AuthResponse token = userLogin(loginRequestDto);
+            return ResponseEntity.ok(token);
+        } catch (RuntimeException | JsonProcessingException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
     }
-    private ServiceResult<User> userLogin(LoginRequestDto loginRequestDto) {
+    private AuthResponse userLogin(LoginRequestDto loginRequestDto) throws JsonProcessingException {
         LoginRequest loginRequest = loginRequestDto.toDomain();
         return userServiceAPI.login(loginRequest);
     }

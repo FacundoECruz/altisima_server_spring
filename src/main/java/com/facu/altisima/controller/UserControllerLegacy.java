@@ -1,5 +1,6 @@
 package com.facu.altisima.controller;
 
+import com.facu.altisima.controller.dto.jwtTest.AuthResponse;
 import com.facu.altisima.controller.dto.legacyDtos.CreateUserDto;
 import com.facu.altisima.model.User;
 import com.facu.altisima.service.api.PlayerServiceAPI;
@@ -21,11 +22,12 @@ public class UserControllerLegacy {
     @Autowired
     private PlayerServiceAPI playerService;
 
+    //Register
     @PostMapping
     public ResponseEntity<?> saveUserV1(@RequestBody CreateUserDto userData) {
         try {
-            ServiceResult<User> savedUser = saveUser(userData);
-            return new Response().build(savedUser);
+            AuthResponse token = saveUser(userData);
+            return ResponseEntity.ok(token);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (JsonProcessingException e) {
@@ -33,11 +35,11 @@ public class UserControllerLegacy {
         }
     }
     @NotNull
-    private ServiceResult<User> saveUser(CreateUserDto userData) throws JsonProcessingException {
+    private AuthResponse saveUser(CreateUserDto userData) throws JsonProcessingException {
         User user = userData.toDomain();
-        ServiceResult<User> saveUserResult = userService.save(user);
+        AuthResponse token = userService.save(userData);
         playerService.save(user.toPlayer());
-        return saveUserResult;
+        return token;
     }
 
     @PostMapping(value = "/associate")
