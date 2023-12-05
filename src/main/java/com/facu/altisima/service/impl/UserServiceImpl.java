@@ -33,10 +33,11 @@ public class UserServiceImpl implements UserServiceAPI {
     private UserRepository userRepository;
     @Autowired
     private PlayerRepository playerRepository;
-
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    VerifyAssociateUser verifyAssociateUser = new VerifyAssociateUser();
+
     @Override
     public ServiceResult<List<User>> getAll() {
         List<User> users = userRepository.findAll();
@@ -50,7 +51,7 @@ public class UserServiceImpl implements UserServiceAPI {
     @Override
     public AuthResponse save(CreateUserDto request) {
         Optional<User> userFromDb = userRepository.findByUsername(request.getUsername());
-        if(userFromDb.isPresent()){
+        if (userFromDb.isPresent()) {
             throw new RuntimeException("El nombre de usuario ya existe");
         }
 
@@ -77,21 +78,37 @@ public class UserServiceImpl implements UserServiceAPI {
     }
 
     @Override
-    public ServiceResult<User> associate(User user) {
-        Optional<Player> player = playerRepository.findByUsername(user.getUsername());
+    public ServiceResult<User> associate(User userToAssociate) {
+        Optional<Player> player = playerRepository.findByUsername(userToAssociate.getUsername());
         if (player.isEmpty()) {
             return ServiceResult.error("No se encontro jugador con ese nombre");
         } else {
-            Player updatedPlayer = update(player.get(), user.getImage());
+            Player updatedPlayer = update(player.get(), userToAssociate.getImage());
             playerRepository.save(updatedPlayer);
-            User savedUser = userRepository.save(user);
-            return ServiceResult.success(savedUser);
+            User user = buildNotVerifiedUser(player.get());
+            userRepository.save(user);
+            return ServiceResult.success(user);
         }
     }
 
     private Player update(Player player, String imageUrl) {
         player.setImage(imageUrl);
         return player;
+    }
+
+    @NotNull
+    private User buildNotVerifiedUser(Player player) {
+        long currentTimeMillis = System.currentTimeMillis();
+        User user = User.builder()
+                .username(player.getUsername())
+                .password(passwordEncoder.encode(player.getUsername()))
+                .email(player.getUsername() + "@altisima.com")
+                .role(Role.USER)
+                .image(player.getImage())
+                .createdDate(currentTimeMillis)
+                .build();
+        user.setVerified(false);
+        return user;
     }
 
     @Override
@@ -138,11 +155,30 @@ public class UserServiceImpl implements UserServiceAPI {
         }
     }
 
-
     public AuthResponse login(LoginRequest request) throws JsonProcessingException {
+        Optional<User> userFromDb = userRepository.findByUsername(request.getUsername());
+        if(userFromDb.isPresent()){
+            User user = userFromDb.get();
+            if(user.isVerified()){
+                return getAuthResponse(request);
+            } else{
+                if(verifyAssociateUser.isValidLogin(user.getCreatedDate())){
+                    user.setVerified(true);
+                    userRepository.save(user);
+                    return getAuthResponse(request);
+                } else{
+                    throw new RuntimeException("Tiempo de gracia excedido");
+                }
+            }
+        } else {
+            throw new RuntimeException("Username not found");
+        }
+    }
+
+    private AuthResponse getAuthResponse(LoginRequest request) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
-        UserDetails user = userRepository.findByUsername(request.getUsername()).orElseThrow();
-        String token = jwtService.getToken(user);
+        UserDetails userDetails = userRepository.findByUsername(request.getUsername()).orElseThrow();
+        String token = jwtService.getToken(userDetails);
         return AuthResponse.builder()
                 .token(token)
                 .build();
@@ -157,4 +193,5 @@ public class UserServiceImpl implements UserServiceAPI {
             return ServiceResult.error(e.getMessage());
         }
     }
+
 }
