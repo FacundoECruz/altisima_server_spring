@@ -3,6 +3,7 @@ package com.facu.altisima.service.impl;
 import com.facu.altisima.controller.dto.FinishedGameDto;
 import com.facu.altisima.controller.dto.PlayerResultDto;
 import com.facu.altisima.controller.dto.PlayerRoundDto;
+import com.facu.altisima.repository.AchievementRepository;
 import com.facu.altisima.repository.GameRepository;
 import com.facu.altisima.repository.PlayerRepository;
 import com.facu.altisima.repository.UserRepository;
@@ -26,15 +27,22 @@ public class GameServiceImpl implements GameServiceAPI {
     private final PlayerRepository playerRepository;
     private final UserRepository userRepository;
     private final IdGenerator idGenerator;
+    private final AchievementRepository achievementRepository;
+    private final AchievementService achievementService;
+    private final FinishGameService finishGameService;
     Generate generate = new Generate();
     DateFormatter dateFormatter = new DateFormatter();
 
     @Autowired
-    public GameServiceImpl(GameRepository gameRepository, PlayerRepository playerRepository, UserRepository userRepository, IdGenerator idGenerator) {
+    public GameServiceImpl(GameRepository gameRepository, PlayerRepository playerRepository, UserRepository userRepository, IdGenerator idGenerator, AchievementRepository achievementRepository, FinishGameService finishGameService) {
         this.gameRepository = gameRepository;
         this.playerRepository = playerRepository;
         this.userRepository = userRepository;
         this.idGenerator = idGenerator;
+        this.achievementRepository = achievementRepository;
+        this.achievementService = new AchievementService(achievementRepository, gameRepository, playerRepository);
+        this.finishGameService = finishGameService;
+
     }
 
     public ServiceResult<Game> createGame(List<String> players, Integer totalRounds) {
@@ -105,8 +113,9 @@ public class GameServiceImpl implements GameServiceAPI {
         Optional<Game> retrievedGameFromDb = gameRepository.findById(id);
         if (retrievedGameFromDb.isPresent()) {
             Game game = retrievedGameFromDb.get();
-            if (game.getCurrentRound() > game.getTotalRounds()) {
-                return ServiceResult.error("La partida ya esta terminada");
+            if (game.isLastRound()) {
+                Game finished = finishGameService.finish(game, roundResults);
+                return ServiceResult.success(gameRepository.save(finished));
             }
             Game updatedGameState = game.nextRound(roundResults);
             return ServiceResult.success(gameRepository.save(updatedGameState));
@@ -123,45 +132,6 @@ public class GameServiceImpl implements GameServiceAPI {
             return ServiceResult.success(game);
         } else {
             return ServiceResult.error("No se encontro la partida");
-        }
-    }
-    public ServiceResult<Game> finishGame(FinishedGameDto finishedGameDto) {
-        String id = finishedGameDto.getId();
-        String host = finishedGameDto.getHost();
-        String winner = finishedGameDto.getWinner();
-        Optional<Game> retrievedGameFromDb = gameRepository.findById(id);
-        if (retrievedGameFromDb.isPresent()) {
-            assignResultsToPlayers(retrievedGameFromDb.get(), host, winner);
-            return ServiceResult.success(retrievedGameFromDb.get());
-        } else {
-            return ServiceResult.error("No se encontro la partida");
-        }
-    }
-
-    private void assignResultsToPlayers(Game game, String host, String winner) {
-        List<PlayerResultDto> finalResults = game.getCurrentResults();
-        for (int i = 0; i < finalResults.size(); i++) {
-            PlayerResultDto playerResults = finalResults.get(i);
-            Optional<Player> optionalPlayer = playerRepository.findByUsername(finalResults.get(i).getUsername());
-            if (optionalPlayer.isPresent()) {
-                Player player = optionalPlayer.get();
-                player.setGamesPlayed(player.getGamesPlayed() + 1);
-                player.setTotalScore(player.getTotalScore() + playerResults.getScore());
-                playerRepository.save(player);
-            }
-        }
-        Optional<User> retrievedUserHost = userRepository.findByUsername(host);
-        if (retrievedUserHost.isPresent()) {
-            User user = retrievedUserHost.get();
-            user.setCreatedGames(user.getCreatedGames() + 1);
-            userRepository.save(user);
-        }
-
-        Optional<Player> retrievedPlayer = playerRepository.findByUsername(winner);
-        if (retrievedPlayer.isPresent()) {
-            Player player = retrievedPlayer.get();
-            player.setGamesWon(player.getGamesWon() + 1);
-            playerRepository.save(player);
         }
     }
 }
