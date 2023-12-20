@@ -1,6 +1,7 @@
 package com.facu.altisima.controller;
 
 import com.facu.altisima.model.PlayerData;
+import com.facu.altisima.service.api.DataServiceAPI;
 import com.facu.altisima.service.impl.DataService;
 import com.facu.altisima.service.utils.ServiceResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,10 +15,8 @@ import java.util.List;
 @RequestMapping("/data")
 @CrossOrigin(origins = "*")
 public class DataController {
-
     @Autowired
-    DataService dataService;
-
+    private DataServiceAPI dataService;
     @GetMapping
     public ResponseEntity<?> getPlayersData() {
         ServiceResult<List<PlayerData>> data = dataService.getAll();

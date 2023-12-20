@@ -29,7 +29,7 @@ public class DataControllerTest {
     DataService dataService;
     ObjectMapper objectMapper = new ObjectMapper();
     String path = "/data";
-    PlayerData playerData = new PlayerData("fakeId","Messi", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+    PlayerData playerData = new PlayerData("fakeId","Messi", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
     @Test
     public void should_return_all_players_data() throws Exception {

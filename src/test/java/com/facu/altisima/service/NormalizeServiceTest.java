@@ -16,7 +16,7 @@ public class NormalizeServiceTest {
     GameGenerator generator = new GameGenerator();
     NormalizeDataService dataService;
     List<String> players = new ArrayList<>();
-    PlayerData playerData = new PlayerData("fakeId", "Messi", 234, 10, 1, 0, 90, 82, 8, 70, 70, 96, 36, 11, 2);
+    PlayerData playerData = new PlayerData("Messi", "Messi", 234, 10,0, 90, 82, 8, 70, 70, 96, 36, 11, 2);
     List<PlayerData> playersData = new ArrayList<>();
     List<Game> allGames = new ArrayList<>();
 
@@ -29,7 +29,7 @@ public class NormalizeServiceTest {
 
         Game game1 = generator.generateFinished(players);
         Game game2 = generator.generateFinished(players);
-        game2.setCurrentRound(5);
+//        game2.setCurrentRound(5);
         allGames.add(game1);
         allGames.add(game2);
         playersData.add(playerData);
