@@ -49,14 +49,15 @@ public class NormalizeDataService implements NormalizeDataServiceAPI {
 
     private List<PlayerData> groupByPlayer(List<PlayerPerformance> performances) {
         List<PlayerData> data = new ArrayList<>();
-
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy HH:mm");
         Map<String, List<PlayerPerformance>> groupedByPlayer = performances.stream()
                 .collect(Collectors.groupingBy(PlayerPerformance::getUsername));
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy HH:mm");
         groupedByPlayer.forEach((username, dataList) -> {
             List<PlayerPerformance> sortedList = dataList.stream()
-                    .sorted(Comparator.comparing(scoreData -> LocalDateTime.parse(scoreData.getDate(), formatter))).toList();
+                    .sorted(Comparator.comparing(scoreData -> LocalDateTime.parse(scoreData.getDate(), formatter)))
+                    .collect(Collectors.toList());
+            groupedByPlayer.put(username, sortedList);
         });
 
         groupedByPlayer.forEach((username, dataList) -> {

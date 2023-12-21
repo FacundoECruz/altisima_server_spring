@@ -53,10 +53,7 @@ public class DataService implements DataServiceAPI {
             return ServiceResult.error("Cannot find games");
         }
         List<PlayerData> updatedData = normalizeService.normalizeAndUpdatePlayersData(allGames);
-        for(int i = 0; i < updatedData.size(); i++){
-            System.out.println(updatedData.get(i).getUsername());
-            System.out.println(updatedData.get(i).getWinnedRounds());
-            System.out.println("*******************************");
+        for (int i = 0; i < updatedData.size(); i++) {
             dataRepository.save(updatedData.get(i));
         }
         return ServiceResult.success("Updated players data");
