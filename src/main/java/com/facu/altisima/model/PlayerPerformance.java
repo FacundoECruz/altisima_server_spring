@@ -12,5 +12,5 @@ public class PlayerPerformance {
     private String username;
     private Integer score;
     private List<Integer> history;
-    private Date date;
+    private String date;
 }
